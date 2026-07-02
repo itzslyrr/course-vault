@@ -13,7 +13,8 @@ When the owner gives you info to add ("feed the vault with ..."):
    - `references/` — external links, sources, dashboards, repos
 3. **Connect** — add `[[wikilinks]]` in `related:` frontmatter and in the body between the new note and existing ones. A note with no links is a dead end.
 4. **Index** — add new notes to `INDEX.md` under the right section, newest first in "Recently added."
-5. **The doorway** — summarize what was captured, filed, and linked so the owner can review.
+5. **Dashboard** — run `python3 .dashboard/generate.py` to refresh `dashboard.html` (a PostToolUse hook in the parent project's `.claude/settings.json` also does this automatically on every file write).
+6. **The doorway** — summarize what was captured, filed, and linked so the owner can review.
 
 ## Conventions
 
