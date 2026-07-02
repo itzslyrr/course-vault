@@ -4,6 +4,7 @@ Personal knowledge base. Fed daily. Rules in [CLAUDE.md](CLAUDE.md).
 
 ## 🕐 Recently added
 
+- 2026-07-02 · [Warhouse Vault project](projects/warhouse-vault.md) — warehouse parts inventory, 4 verification flags open
 - 2026-07-02 · [Next-Gen Warfare project](projects/next-gen-warfare.md) — missile knowledge base, first vault entry
 - 2026-07-02 · [The eight knowledge-base moves](knowledge/the-eight-kb-moves.md) — the method behind this vault
 - 2026-07-02 · [Hypersonic weapons](knowledge/hypersonic-weapons.md) — what "hypersonic" actually means
@@ -15,14 +16,15 @@ Personal knowledge base. Fed daily. Rules in [CLAUDE.md](CLAUDE.md).
 | Section | What lives there | Count |
 |---|---|---|
 | [daily/](daily/) | Daily capture log | 1 |
-| [projects/](projects/) | Ongoing work | 1 |
+| [projects/](projects/) | Ongoing work | 2 |
 | [knowledge/](knowledge/) | Atomic evergreen notes | 3 |
 | [references/](references/) | External sources | 1 |
 
 ## 🚀 Projects
 
 - [Next-Gen Warfare](projects/next-gen-warfare.md) — **active** · missile KB on GitHub, presentation upcoming
+- [Warhouse Vault](projects/warhouse-vault.md) — **active** · parts inventory on GitHub, 4 parts need supplier/assembly verification
 
 ## 🏷️ Tag cloud (grows over time)
 
-`missiles` · `knowledge-management` · `ai-workflow` · `github`
+`missiles` · `warehouse` · `inventory` · `knowledge-management` · `ai-workflow` · `github`
