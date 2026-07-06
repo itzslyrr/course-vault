@@ -16,11 +16,11 @@ from datetime import datetime
 
 VAULT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(VAULT, "dashboard.html")
-SECTIONS = ["daily", "knowledge", "projects", "references"]
+SECTIONS = ["course", "daily", "knowledge", "projects", "references"]
 
 TYPE_COLORS = {
     "daily": "#e9c46a", "note": "#2a9d8f", "project": "#e63946",
-    "reference": "#457b9d", "index": "#8d99ae",
+    "reference": "#457b9d", "index": "#8d99ae", "course": "#9d4edd", "week": "#9d4edd",
 }
 
 
@@ -121,7 +121,7 @@ def render(notes):
 
     section_html = ""
     section_meta = [
-        ("projects", "🚀 Projects"), ("knowledge", "🧠 Knowledge"),
+        ("course", "🎓 Course"), ("projects", "🚀 Projects"), ("knowledge", "🧠 Knowledge"),
         ("references", "🔗 References"), ("daily", "📅 Daily notes"),
     ]
     for key, label in section_meta:

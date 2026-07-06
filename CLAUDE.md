@@ -41,12 +41,21 @@ When the owner gives you info to add ("feed the vault with ..."):
 Vault/
 ├── CLAUDE.md      ← you are here (standing rules)
 ├── INDEX.md       ← front door: sections + recently added
+├── course/        ← 4-week course tracking: overview.md + week-N.md analyses
 ├── daily/         ← daily capture log, YYYY-MM-DD.md
 ├── knowledge/     ← atomic evergreen notes
 ├── projects/      ← ongoing work, one file per project
 ├── references/    ← external sources & links
-├── templates/     ← skeletons: daily, note, project, reference
+├── templates/     ← skeletons: daily, note, project, reference, week
 └── .claude/skills/feed-vault/  ← the feeding pipeline as a skill
 ```
+
+## Course tracking (until 2026-07-23)
+
+This vault tracks the owner's 4-week course (Mon 2026-06-29 → Thu 2026-07-23, see `course/overview.md`):
+
+- **Every Monday** (Jul 13, Jul 20): compile the previous week's analysis into `course/week-N.md` from `templates/week.md`, using that week's daily notes, project Logs, and git history. Update the timeline table in `course/overview.md`.
+- **Thursday 2026-07-23 (final day):** produce the full course summary in two versions — personal (everything done/worked on/learned) and team-facing (shareable) — from the four week analyses.
+- Week boundaries: W1 Jun 29–Jul 5 · W2 Jul 6–12 · W3 Jul 13–19 · W4 Jul 20–23.
 
 Everything is plain markdown under git. Commit after each feeding session with a message describing what was added.

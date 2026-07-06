@@ -1,9 +1,12 @@
 # 🗄️ Vault — Front Door
 
 Personal knowledge base. Fed daily. Rules in [CLAUDE.md](CLAUDE.md).
+**Now tracking:** the [4-week course](course/overview.md) → final summary due **Thu Jul 23**.
 
 ## 🕐 Recently added
 
+- 2026-07-06 · [Course overview](course/overview.md) — 4-week timeline, deliverables, weekly analysis plan
+- 2026-07-06 · [Week 1 analysis](course/week-1.md) — Jun 29–Jul 5: three KBs built, GitHub mastered
 - 2026-07-02 · [Warhouse Vault project](projects/warhouse-vault.md) — warehouse parts inventory, 4 verification flags open
 - 2026-07-02 · [Next-Gen Warfare project](projects/next-gen-warfare.md) — missile knowledge base, first vault entry
 - 2026-07-02 · [The eight knowledge-base moves](knowledge/the-eight-kb-moves.md) — the method behind this vault
@@ -15,7 +18,8 @@ Personal knowledge base. Fed daily. Rules in [CLAUDE.md](CLAUDE.md).
 
 | Section | What lives there | Count |
 |---|---|---|
-| [daily/](daily/) | Daily capture log | 1 |
+| [course/](course/) | 4-week course: overview + weekly analyses | 2 |
+| [daily/](daily/) | Daily capture log | 2 |
 | [projects/](projects/) | Ongoing work | 2 |
 | [knowledge/](knowledge/) | Atomic evergreen notes | 3 |
 | [references/](references/) | External sources | 1 |
