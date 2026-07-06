@@ -18,5 +18,5 @@ Run the capture → file → connect → index → review pipeline defined in th
 4. **Connect:** add `[[wikilinks]]` both ways — new note ↔ existing notes it touches, and list it under "🗂 Filed into" in the daily note.
 5. **Index:** add to `INDEX.md` "Recently added" (newest first), bump section counts, extend the tag cloud if a new tag appeared.
 6. **Dashboard:** run `python3 .dashboard/generate.py` from the vault root to refresh `dashboard.html`.
-7. **Commit:** `git add -A && git commit` with a message like `feed: <topics>`.
+7. **Commit & push:** `git add -A && git commit` with a message like `feed: <topics>`, then `git push` (remote: github.com/itzslyrr/course-vault).
 8. **The doorway:** report to the user exactly what was captured, which notes were created/updated, and what got linked.

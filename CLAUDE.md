@@ -58,4 +58,4 @@ This vault tracks the owner's 4-week course (Mon 2026-06-29 → Thu 2026-07-23, 
 - **Thursday 2026-07-23 (final day):** produce the full course summary in two versions — personal (everything done/worked on/learned) and team-facing (shareable) — from the four week analyses.
 - Week boundaries: W1 Jun 29–Jul 5 · W2 Jul 6–12 · W3 Jul 13–19 · W4 Jul 20–23.
 
-Everything is plain markdown under git. Commit after each feeding session with a message describing what was added.
+Everything is plain markdown under git. Commit after each feeding session with a message describing what was added, then push — the vault has a public remote at **github.com/itzslyrr/course-vault**.
