@@ -105,6 +105,21 @@ def render(notes):
     counts = {s: sum(1 for n in notes if n["section"] == s) for s in SECTIONS}
     commits = git_log()
 
+    # discover standalone HTML pages (explainers, decks) to link from the header
+    pages = []
+    for root, _dirs, files in os.walk(VAULT):
+        if "/.git" in root:
+            continue
+        for fn in sorted(files):
+            if fn.endswith(".html") and fn != "dashboard.html":
+                rel = os.path.relpath(os.path.join(root, fn), VAULT)
+                label = fn[:-5].replace("-", " ").replace("_", " ").title()
+                pages.append((rel, label))
+    pages_html = ""
+    if pages:
+        links = "".join(f'<a class="page-link" href="{html.escape(p)}">📄 {html.escape(l)}</a>' for p, l in pages)
+        pages_html = f'<div class="pages">{links}</div>'
+
     def card(n):
         color = TYPE_COLORS.get(n["type"], "#2a9d8f")
         tag_html = "".join(f'<span class="tag" data-tag="{html.escape(t)}">#{html.escape(t)}</span>' for t in n["tags"])
@@ -155,6 +170,9 @@ header h1 {{ font-size:clamp(28px,4vw,44px); letter-spacing:-1px; }}
 header h1 span {{ background:linear-gradient(135deg,var(--red),var(--accent)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }}
 .updated {{ color:var(--muted); font-size:14px; margin-top:6px; }}
 .updated b {{ color:var(--accent); font-weight:600; }}
+.pages {{ margin-top:14px; display:flex; flex-wrap:wrap; gap:10px; }}
+.page-link {{ display:inline-flex; align-items:center; gap:6px; background:rgba(157,78,221,.15); border:1px solid rgba(157,78,221,.5); color:#f1faee; text-decoration:none; border-radius:20px; padding:7px 15px; font-size:13.5px; transition:background .15s; }}
+.page-link:hover {{ background:rgba(157,78,221,.35); }}
 .stats {{ display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:12px; margin:26px 0; }}
 .stat {{ background:var(--surface); border:1px solid rgba(255,255,255,.07); border-radius:12px; padding:16px; text-align:center; }}
 .stat, .card, .commits {{ background:rgba(27,36,54,.88); backdrop-filter:blur(2px); }}
@@ -196,6 +214,7 @@ footer {{ margin-top:44px; color:var(--muted); font-size:12.5px; }}
 <header>
 <h1>🗄️ <span>Vault Dashboard</span></h1>
 <div class="updated">Last updated: <b>{now}</b> · regenerates automatically when the vault changes</div>
+{pages_html}
 </header>
 
 <div class="stats">
