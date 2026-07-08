@@ -16,11 +16,12 @@ from datetime import datetime
 
 VAULT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(VAULT, "dashboard.html")
-SECTIONS = ["course", "daily", "knowledge", "projects", "references"]
+SECTIONS = ["course", "daily", "knowledge", "projects", "decisions", "references"]
 
 TYPE_COLORS = {
     "daily": "#e9c46a", "note": "#2a9d8f", "project": "#e63946",
     "reference": "#457b9d", "index": "#8d99ae", "course": "#9d4edd", "week": "#9d4edd",
+    "adr": "#f4a261",
 }
 
 
@@ -96,7 +97,36 @@ def git_log():
         return []
 
 
-def render(notes):
+PENDING_SKIP = {"dashboard.html", "review.html", ".DS_Store"}
+
+
+def git_pending():
+    """Uncommitted writes: [(state, path)] where state is 'modified' or 'new'."""
+    try:
+        out = subprocess.run(["git", "status", "--porcelain"],
+                             cwd=VAULT, capture_output=True, text=True, timeout=10).stdout
+    except Exception:
+        return []
+    pending = []
+    for line in out.splitlines():
+        code, path = line[:2], line[3:].strip().strip('"')
+        if os.path.basename(path) in PENDING_SKIP:
+            continue
+        if code.strip() == "??":
+            full = os.path.join(VAULT, path)
+            if os.path.isdir(full):
+                for root, _, files in os.walk(full):
+                    for f in sorted(files):
+                        if f not in PENDING_SKIP:
+                            pending.append(("new", os.path.relpath(os.path.join(root, f), VAULT)))
+            else:
+                pending.append(("new", path))
+        else:
+            pending.append(("modified", path))
+    return pending
+
+
+def render(notes, pending):
     now = datetime.now().strftime("%A, %B %-d %Y · %H:%M:%S")
     tags = {}
     for n in notes:
@@ -104,6 +134,38 @@ def render(notes):
             tags[t] = tags.get(t, 0) + 1
     counts = {s: sum(1 for n in notes if n["section"] == s) for s in SECTIONS}
     commits = git_log()
+
+    # discover standalone HTML pages (explainers, review, decks) to link from the header
+    pages = []
+    for root, _dirs, files in os.walk(VAULT):
+        if "/.git" in root:
+            continue
+        for fn in sorted(files):
+            if fn.endswith(".html") and fn != "dashboard.html":
+                rel = os.path.relpath(os.path.join(root, fn), VAULT)
+                label = fn[:-5].replace("-", " ").replace("_", " ").title()
+                pages.append((rel, label))
+    pages_html = ""
+    if pages:
+        links = "".join(f'<a class="page-link" href="{html.escape(p)}">📄 {html.escape(l)}</a>' for p, l in pages)
+        pages_html = f'<div class="pages">{links}</div>'
+
+    if pending:
+        rows = "".join(
+            f'<div class="pending-row"><span class="pstate {st}">{"✏️ modified" if st == "modified" else "🆕 new"}</span>'
+            f'<code>{html.escape(p)}</code></div>'
+            for st, p in pending)
+        pending_html = f'''<section id="pending"><h2>⚖️ Pending review <span class="count">{len(pending)}</span></h2>
+<div class="pending-box">
+{rows}
+<div class="pending-actions">
+<a class="btn" href="review.html">Read the full diffs → review.html</a>
+<span class="hint">approve in terminal: <code>git add -A && git commit</code> · reject: <code>git checkout -- &lt;file&gt;</code></span>
+</div>
+</div></section>'''
+    else:
+        pending_html = ('<section id="pending"><h2>⚖️ Pending review <span class="count">0</span></h2>'
+                        '<div class="pending-box clean">Nothing awaiting approval — the vault is clean ✅</div></section>')
 
     def card(n):
         color = TYPE_COLORS.get(n["type"], "#2a9d8f")
@@ -122,7 +184,7 @@ def render(notes):
     section_html = ""
     section_meta = [
         ("course", "🎓 Course"), ("projects", "🚀 Projects"), ("knowledge", "🧠 Knowledge"),
-        ("references", "🔗 References"), ("daily", "📅 Daily notes"),
+        ("decisions", "⚖️ Decisions"), ("references", "🔗 References"), ("daily", "📅 Daily notes"),
     ]
     for key, label in section_meta:
         items = [n for n in notes if n["section"] == key]
@@ -155,6 +217,9 @@ header h1 {{ font-size:clamp(28px,4vw,44px); letter-spacing:-1px; }}
 header h1 span {{ background:linear-gradient(135deg,var(--red),var(--accent)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }}
 .updated {{ color:var(--muted); font-size:14px; margin-top:6px; }}
 .updated b {{ color:var(--accent); font-weight:600; }}
+.pages {{ margin-top:14px; display:flex; flex-wrap:wrap; gap:10px; }}
+.page-link {{ display:inline-flex; align-items:center; gap:6px; background:rgba(157,78,221,.15); border:1px solid rgba(157,78,221,.5); color:#f1faee; text-decoration:none; border-radius:20px; padding:7px 15px; font-size:13.5px; transition:background .15s; }}
+.page-link:hover {{ background:rgba(157,78,221,.35); }}
 .stats {{ display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:12px; margin:26px 0; }}
 .stat {{ background:var(--surface); border:1px solid rgba(255,255,255,.07); border-radius:12px; padding:16px; text-align:center; }}
 .stat, .card, .commits {{ background:rgba(27,36,54,.88); backdrop-filter:blur(2px); }}
@@ -189,6 +254,21 @@ section h2 {{ font-size:21px; margin-bottom:14px; }}
 .commit .date {{ margin-left:0; white-space:nowrap; }}
 .hidden {{ display:none; }}
 footer {{ margin-top:44px; color:var(--muted); font-size:12.5px; }}
+.pending-stat {{ text-decoration:none; border-color:rgba(233,196,106,.45) !important; }}
+.pending-stat .n {{ background:none; -webkit-text-fill-color:var(--accent); color:var(--accent); }}
+.pending-box {{ background:rgba(27,36,54,.88); border:1px solid rgba(233,196,106,.35); border-left:4px solid var(--accent); border-radius:12px; padding:12px 18px; max-width:760px; }}
+.pending-box.clean {{ border-color:rgba(42,157,143,.4); border-left-color:#2a9d8f; color:var(--muted); }}
+.pending-row {{ display:flex; gap:12px; align-items:baseline; padding:7px 0; border-bottom:1px solid rgba(255,255,255,.05); font-size:13.5px; }}
+.pending-row:last-of-type {{ border-bottom:none; }}
+.pending-row code {{ color:var(--text); }}
+.pstate {{ font-size:11.5px; white-space:nowrap; width:96px; }}
+.pstate.modified {{ color:var(--accent); }}
+.pstate.new {{ color:#7ddba3; }}
+.pending-actions {{ display:flex; flex-wrap:wrap; gap:14px; align-items:center; padding-top:12px; margin-top:4px; border-top:1px solid rgba(255,255,255,.08); }}
+.btn {{ background:var(--accent); color:#0d1321; font-weight:700; font-size:13px; text-decoration:none; border-radius:8px; padding:8px 14px; }}
+.btn:hover {{ filter:brightness(1.1); }}
+.hint {{ color:var(--muted); font-size:12.5px; }}
+.hint code {{ color:var(--accent); }}
 </style>
 </head>
 <body>
@@ -196,6 +276,7 @@ footer {{ margin-top:44px; color:var(--muted); font-size:12.5px; }}
 <header>
 <h1>🗄️ <span>Vault Dashboard</span></h1>
 <div class="updated">Last updated: <b>{now}</b> · regenerates automatically when the vault changes</div>
+{pages_html}
 </header>
 
 <div class="stats">
@@ -205,7 +286,10 @@ footer {{ margin-top:44px; color:var(--muted); font-size:12.5px; }}
 <div class="stat"><div class="n">{counts.get("references", 0)}</div><div class="l">references</div></div>
 <div class="stat"><div class="n">{counts.get("daily", 0)}</div><div class="l">daily notes</div></div>
 <div class="stat"><div class="n">{len(commits)}</div><div class="l">recent commits</div></div>
+<a class="stat pending-stat" href="#pending"><div class="n">{len(pending)}</div><div class="l">pending writes</div></a>
 </div>
+
+{pending_html}
 
 <input id="search" type="search" placeholder="Search notes, tags, text…">
 <div class="tagbar">{tag_html}</div>
@@ -286,10 +370,15 @@ document.querySelectorAll('.tag').forEach(t => t.addEventListener('click', e => 
 
 def main():
     notes = collect_notes()
-    html_out = render(notes)
+    pending = git_pending()
+    html_out = render(notes, pending)
     with open(OUT, "w", encoding="utf-8") as f:
         f.write(html_out)
-    print(f"dashboard.html regenerated: {len(notes)} notes")
+    # keep the full-diff review page in sync so the dashboard's link is never stale
+    review = os.path.join(os.path.dirname(os.path.abspath(__file__)), "review.py")
+    if os.path.exists(review):
+        subprocess.run([sys.executable, review], cwd=VAULT, capture_output=True, timeout=15)
+    print(f"dashboard.html regenerated: {len(notes)} notes, {len(pending)} pending write(s)")
 
 
 if __name__ == "__main__":

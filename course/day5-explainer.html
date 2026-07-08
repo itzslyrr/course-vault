@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 5 — Skills, ADRs & Hooks Explained</title>
+<style>
+:root{--bg:#0d1321;--surface:#1b2436;--text:#f1faee;--muted:#8d99ae;--accent:#e9c46a;--red:#e63946;--teal:#2a9d8f;--purple:#9d4edd;--blue:#457b9d;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:radial-gradient(ellipse at 30% -20%,#101a33 0%,#060a14 55%,#03060d 100%);background-attachment:fixed;color:var(--text);font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;line-height:1.6;padding:44px clamp(16px,5vw,80px) 100px;}
+#stars{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none;}
+.wrap{max-width:1000px;margin:0 auto;}
+header h1{font-size:clamp(28px,5vw,48px);font-weight:800;letter-spacing:-1px;background:linear-gradient(135deg,var(--red),var(--accent));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+header p{color:var(--muted);margin-top:8px;font-size:clamp(14px,2vw,18px);}
+.kicker{text-transform:uppercase;letter-spacing:4px;font-size:12px;color:var(--purple);font-weight:700;margin-bottom:6px;}
+section{margin-top:38px;}
+h2{font-size:clamp(20px,3vw,30px);margin-bottom:6px;display:flex;align-items:center;gap:12px;}
+h2 .n{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50%;font-size:18px;flex:none;}
+.tagline{color:var(--muted);margin-bottom:16px;font-size:15px;}
+.card{background:rgba(27,36,54,.85);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:22px 24px;margin-top:14px;}
+.card.skill{border-left:4px solid var(--teal);}
+.card.adr{border-left:4px solid var(--red);}
+.card.hook{border-left:4px solid var(--purple);}
+.s-skill{background:var(--teal);color:#04231f;}
+.s-adr{background:var(--red);color:#2a0608;}
+.s-hook{background:var(--purple);color:#1a0733;}
+p{margin:8px 0;}
+b{color:var(--accent);}
+pre{background:#0a0f1c;border:1px solid rgba(255,255,255,.09);border-radius:10px;padding:16px 18px;overflow-x:auto;font-family:"SF Mono",Menlo,monospace;font-size:13px;line-height:1.55;color:#cdd7e5;margin:12px 0;}
+pre .c{color:var(--muted);}
+pre .k{color:var(--accent);}
+pre .t{color:var(--teal);}
+.tip{background:rgba(233,196,106,.1);border-radius:0 10px 10px 0;border-left:3px solid var(--accent);padding:12px 18px;margin:14px 0;font-size:15px;}
+.tip b{color:var(--accent);}
+table{border-collapse:collapse;width:100%;margin:14px 0;font-size:14.5px;}
+th,td{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.1);text-align:left;vertical-align:top;}
+th{color:var(--accent);text-transform:uppercase;font-size:11.5px;letter-spacing:1.5px;}
+td .yes{color:var(--red);font-weight:700;}
+td .no{color:var(--teal);font-weight:700;}
+.flow{background:rgba(10,15,28,.7);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:24px;margin-top:16px;}
+.flow-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap;justify-content:center;}
+.node{border-radius:12px;padding:14px 18px;font-size:14px;flex:1;min-width:200px;text-align:center;border:1px solid rgba(255,255,255,.12);}
+.node small{display:block;color:var(--muted);font-size:12px;margin-top:4px;}
+.node.you{background:rgba(69,123,157,.18);border-color:var(--blue);}
+.node.sk{background:rgba(42,157,143,.15);border-color:var(--teal);}
+.node.hk{background:rgba(157,78,221,.15);border-color:var(--purple);}
+.node.commit{background:rgba(233,196,106,.13);border-color:var(--accent);}
+.arrow{color:var(--muted);font-size:24px;flex:none;}
+.legend{display:flex;gap:20px;flex-wrap:wrap;margin-top:16px;font-size:13.5px;color:var(--muted);}
+.legend span{display:flex;align-items:center;gap:7px;}
+.dot{width:12px;height:12px;border-radius:3px;}
+footer{margin-top:48px;color:var(--muted);font-size:13px;text-align:center;}
+@media(max-width:640px){.arrow{transform:rotate(90deg);}}
+</style>
+</head>
+<body>
+<canvas id="stars"></canvas>
+<div class="wrap">
+<header>
+  <div class="kicker">UAEN · Week 2 · Day 5</div>
+  <h1>Skills, ADRs &amp; Hooks</h1>
+  <p>The three ideas behind today's lab — explained with the actual files in your <code>~/vault</code>.</p>
+</header>
+
+<!-- SKILL -->
+<section>
+  <h2><span class="n s-skill">1</span> Skill <span style="font-size:15px;color:var(--muted);font-weight:400">— a tool you teach the AI once</span></h2>
+  <div class="tagline">A saved recipe with a trigger phrase. You write it once; it fires on its own when your sentence matches.</div>
+  <div class="card skill">
+    <p>A skill is just a <b>SKILL.md</b> file. The <b>description</b> at the top is the trigger — the AI watches your words, and when they match, it runs the steps. No command to type.</p>
+    <pre><span class="c">--- your capture-note skill ---</span>
+<span class="k">name:</span> capture-note
+<span class="k">description:</span> Use when the user says <span class="t">"save this"</span>, <span class="t">"capture this"</span>,
+  <span class="t">"note this down"</span>, or <span class="t">"add this to my vault"</span>. ...
+<span class="c">---</span>
+1. Decide the type   2. Create knowledge/&lt;title&gt;.md + frontmatter
+3. Write body + [[link]]   4. Add to index   5. Show it and <b>STOP</b></pre>
+    <p>Today you build <b>my-vault</b> — one skill holding <b>three recipes</b> (called <b>verbs</b>): <b>capture</b>, <b>record-a-decision</b>, and <b>recall</b>. It picks which verb by matching your sentence.</p>
+  </div>
+  <div class="tip"><b>Verb</b> = one recipe inside a skill. <code>my-vault</code> has 3 verbs = 3 jobs it can do.</div>
+</section>
+
+<!-- ADR -->
+<section>
+  <h2><span class="n s-adr">2</span> ADR <span style="font-size:15px;color:var(--muted);font-weight:400">— a record of a decision &amp; why</span></h2>
+  <div class="tagline">Architecture Decision Record. One decision per file: what you chose, what you rejected, and why.</div>
+  <div class="card adr">
+    <p>Six months later nobody asks <i>"why did we build it this way?"</i> — the answer is written down. You already have two, numbered so they form a timeline:</p>
+    <pre>projects/task-tracker/<span class="k">adr-001</span>-stack-choice.md   <span class="c">← "we chose this stack"</span>
+projects/task-tracker/<span class="k">adr-002</span>-newest-first.md   <span class="c">← "show newest tasks first"</span></pre>
+    <p>In <b>step 5</b> you say <i>"we decided to soft-delete tasks"</i> → the skill writes the <b>next</b> one, <span style="color:var(--accent)">adr-003-soft-delete-tasks.md</span>, with <code>status: proposed</code>, and links it into the project.</p>
+  </div>
+  <div class="tip">A knowledge note says <i>"here's how CORS works."</i> An ADR says <i>"here's a choice we made, and why."</i> Different <b>type</b> — that's the only difference.</div>
+</section>
+
+<!-- HOOK -->
+<section>
+  <h2><span class="n s-hook">3</span> Hook <span style="font-size:15px;color:var(--muted);font-weight:400">— an automatic gate around the AI</span></h2>
+  <div class="tagline">A script the system runs by itself at a set moment — it can allow or block what the AI is about to do.</div>
+  <div class="card hook">
+    <p>You don't call a hook; the system does. Day 5's hook is a <b>guard that fires before a write</b> (it sleeps until Day 6). Read it in English:</p>
+    <pre><span class="c"># vault-write-guard.sh</span>
+<span class="k">Read | Grep | Glob</span>            <span class="c">→ allowed, no questions   (reads run free)</span>
+<span class="k">Write | Edit</span> into ~/vault    <span class="c">→ flag it for review      (writes wait)</span></pre>
+    <p>That is <b>the house rule turned into code</b>: reads run free, writes wait for your review.</p>
+  </div>
+</section>
+
+<!-- PROMISE VS WALL -->
+<section>
+  <h2 style="font-size:22px">🔑 The key idea: promise vs. wall</h2>
+  <table>
+    <tr><th>&nbsp;</th><th>How the stop happens</th><th>Can the AI skip it?</th></tr>
+    <tr>
+      <td><b>Today</b><br><small style="color:var(--muted)">the skill</small></td>
+      <td>Each write-verb politely ends with the word <b>STOP</b></td>
+      <td><span class="yes">Yes</span> — it's just an instruction. Delete that line and nothing stops it.</td>
+    </tr>
+    <tr>
+      <td><b>Day 6</b><br><small style="color:var(--muted)">the hook</small></td>
+      <td>The guard script <b>forces</b> the stop from outside the AI</td>
+      <td><span class="no">No</span> — the system enforces it. The AI can't talk its way past.</td>
+    </tr>
+  </table>
+  <div class="tip">A skill is a <b>promise the AI makes</b>. A hook is a <b>wall the system builds</b>. Today you rely on the promise; Day 6 you build the wall. <br><i>That's your homework question: "what stops it if the STOP line is missing?" → the hook.</i></div>
+</section>
+
+<!-- FLOW -->
+<section>
+  <h2 style="font-size:22px">🔗 How the three fit together</h2>
+  <div class="flow">
+    <div class="flow-row">
+      <div class="node you">You type<small>"save this: back up the DB…"</small></div>
+      <div class="arrow">→</div>
+      <div class="node sk">SKILL · my-vault<small>matches the sentence, drafts the note, says STOP</small></div>
+    </div>
+    <div class="flow-row" style="margin-top:14px">
+      <div class="node hk">HOOK · write-guard<small>(Day 6) sees a ~/vault write, forces the pause</small></div>
+      <div class="arrow">→</div>
+      <div class="node commit">You review &amp; commit<small>git diff → git commit · you sign it</small></div>
+    </div>
+    <div class="legend">
+      <span><span class="dot" style="background:var(--teal)"></span>Skill = the recipe that does the work</span>
+      <span><span class="dot" style="background:var(--red)"></span>ADR = one <i>type</i> of note it can produce</span>
+      <span><span class="dot" style="background:var(--purple)"></span>Hook = the gate that enforces review</span>
+    </div>
+  </div>
+</section>
+
+<footer>Keep me open while you work · Day 5 lab · UAEN Week 2</footer>
+</div>
+
+<script>
+const canvas=document.getElementById('stars'),ctx=canvas.getContext('2d');let stars=[];
+function seed(){canvas.width=innerWidth;canvas.height=innerHeight;const n=Math.floor(canvas.width*canvas.height/4200);stars=Array.from({length:n},()=>({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*1.3+.3,base:Math.random()*.5+.25,amp:Math.random()*.45+.15,sp:Math.random()*1.5+.3,ph:Math.random()*6.28,h:Math.random()<.12?'233,196,106':(Math.random()<.08?'160,200,255':'241,250,238')}));}
+function draw(t){ctx.clearRect(0,0,canvas.width,canvas.height);for(const s of stars){const a=Math.max(0,Math.min(1,s.base+Math.sin(t/1000*s.sp+s.ph)*s.amp));ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,6.28);ctx.fillStyle=`rgba(${s.h},${a.toFixed(3)})`;ctx.fill();}requestAnimationFrame(draw);}
+seed();addEventListener('resize',seed);
+if(!matchMedia('(prefers-reduced-motion: reduce)').matches)requestAnimationFrame(draw);else draw(0);
+</script>
+</body>
+</html>

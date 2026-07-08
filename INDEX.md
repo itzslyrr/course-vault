@@ -5,6 +5,10 @@ Personal knowledge base. Fed daily. Rules in [CLAUDE.md](CLAUDE.md).
 
 ## 🕐 Recently added
 
+- 2026-07-08 · [The guard hook](knowledge/the-guard-hook.md) — turning the promise into a law (Day 6)
+- 2026-07-07 · [Day 6 log](daily/2026-07-07.md) — built & proved the vault-write-guard hook
+- 2026-07-06 · [ADR-001 — decisions folder](decisions/adr-001-decisions-folder.md) — keep decisions as numbered ADRs
+- 2026-07-06 · [The house rule](knowledge/the-house-rule.md) — reads run free, writes wait for review
 - 2026-07-06 · [Course overview](course/overview.md) — 4-week timeline, deliverables, weekly analysis plan
 - 2026-07-06 · [Week 1 analysis](course/week-1.md) — Jun 29–Jul 5: three KBs built, GitHub mastered
 - 2026-07-02 · [Warhouse Vault project](projects/warhouse-vault.md) — warehouse parts inventory, 4 verification flags open
@@ -19,9 +23,10 @@ Personal knowledge base. Fed daily. Rules in [CLAUDE.md](CLAUDE.md).
 | Section | What lives there | Count |
 |---|---|---|
 | [course/](course/) | 4-week course: overview + weekly analyses | 2 |
-| [daily/](daily/) | Daily capture log | 2 |
+| [daily/](daily/) | Daily capture log | 4 |
 | [projects/](projects/) | Ongoing work | 2 |
-| [knowledge/](knowledge/) | Atomic evergreen notes | 3 |
+| [knowledge/](knowledge/) | Atomic evergreen notes | 5 |
+| [decisions/](decisions/) | Architecture decision records (ADRs) | 1 |
 | [references/](references/) | External sources | 1 |
 
 ## 🚀 Projects
@@ -31,4 +36,4 @@ Personal knowledge base. Fed daily. Rules in [CLAUDE.md](CLAUDE.md).
 
 ## 🏷️ Tag cloud (grows over time)
 
-`missiles` · `warehouse` · `inventory` · `knowledge-management` · `ai-workflow` · `github`
+`missiles` · `warehouse` · `inventory` · `knowledge-management` · `ai-workflow` · `hooks` · `course` · `github`

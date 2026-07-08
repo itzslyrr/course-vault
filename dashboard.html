@@ -13,6 +13,9 @@ header h1 { font-size:clamp(28px,4vw,44px); letter-spacing:-1px; }
 header h1 span { background:linear-gradient(135deg,var(--red),var(--accent)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
 .updated { color:var(--muted); font-size:14px; margin-top:6px; }
 .updated b { color:var(--accent); font-weight:600; }
+.pages { margin-top:14px; display:flex; flex-wrap:wrap; gap:10px; }
+.page-link { display:inline-flex; align-items:center; gap:6px; background:rgba(157,78,221,.15); border:1px solid rgba(157,78,221,.5); color:#f1faee; text-decoration:none; border-radius:20px; padding:7px 15px; font-size:13.5px; transition:background .15s; }
+.page-link:hover { background:rgba(157,78,221,.35); }
 .stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:12px; margin:26px 0; }
 .stat { background:var(--surface); border:1px solid rgba(255,255,255,.07); border-radius:12px; padding:16px; text-align:center; }
 .stat, .card, .commits { background:rgba(27,36,54,.88); backdrop-filter:blur(2px); }
@@ -47,42 +50,68 @@ section h2 { font-size:21px; margin-bottom:14px; }
 .commit .date { margin-left:0; white-space:nowrap; }
 .hidden { display:none; }
 footer { margin-top:44px; color:var(--muted); font-size:12.5px; }
+.pending-stat { text-decoration:none; border-color:rgba(233,196,106,.45) !important; }
+.pending-stat .n { background:none; -webkit-text-fill-color:var(--accent); color:var(--accent); }
+.pending-box { background:rgba(27,36,54,.88); border:1px solid rgba(233,196,106,.35); border-left:4px solid var(--accent); border-radius:12px; padding:12px 18px; max-width:760px; }
+.pending-box.clean { border-color:rgba(42,157,143,.4); border-left-color:#2a9d8f; color:var(--muted); }
+.pending-row { display:flex; gap:12px; align-items:baseline; padding:7px 0; border-bottom:1px solid rgba(255,255,255,.05); font-size:13.5px; }
+.pending-row:last-of-type { border-bottom:none; }
+.pending-row code { color:var(--text); }
+.pstate { font-size:11.5px; white-space:nowrap; width:96px; }
+.pstate.modified { color:var(--accent); }
+.pstate.new { color:#7ddba3; }
+.pending-actions { display:flex; flex-wrap:wrap; gap:14px; align-items:center; padding-top:12px; margin-top:4px; border-top:1px solid rgba(255,255,255,.08); }
+.btn { background:var(--accent); color:#0d1321; font-weight:700; font-size:13px; text-decoration:none; border-radius:8px; padding:8px 14px; }
+.btn:hover { filter:brightness(1.1); }
+.hint { color:var(--muted); font-size:12.5px; }
+.hint code { color:var(--accent); }
 </style>
 </head>
 <body>
 <canvas id="stars"></canvas>
 <header>
 <h1>🗄️ <span>Vault Dashboard</span></h1>
-<div class="updated">Last updated: <b>Monday, July 6 2026 · 10:03:40</b> · regenerates automatically when the vault changes</div>
+<div class="updated">Last updated: <b>Wednesday, July 8 2026 · 10:06:08</b> · regenerates automatically when the vault changes</div>
+<div class="pages"><a class="page-link" href="review.html">📄 Review</a><a class="page-link" href="course/day5-explainer.html">📄 Day5 Explainer</a></div>
 </header>
 
 <div class="stats">
-<div class="stat"><div class="n">10</div><div class="l">total notes</div></div>
+<div class="stat"><div class="n">15</div><div class="l">total notes</div></div>
 <div class="stat"><div class="n">2</div><div class="l">projects</div></div>
-<div class="stat"><div class="n">3</div><div class="l">knowledge notes</div></div>
+<div class="stat"><div class="n">5</div><div class="l">knowledge notes</div></div>
 <div class="stat"><div class="n">1</div><div class="l">references</div></div>
-<div class="stat"><div class="n">2</div><div class="l">daily notes</div></div>
-<div class="stat"><div class="n">6</div><div class="l">recent commits</div></div>
+<div class="stat"><div class="n">4</div><div class="l">daily notes</div></div>
+<div class="stat"><div class="n">7</div><div class="l">recent commits</div></div>
+<a class="stat pending-stat" href="#pending"><div class="n">13</div><div class="l">pending writes</div></a>
 </div>
 
-<input id="search" type="search" placeholder="Search notes, tags, text…">
-<div class="tagbar"><button class="tag big" data-tag="knowledge-management">#knowledge-management <b>6</b></button><button class="tag big" data-tag="missiles">#missiles <b>5</b></button><button class="tag big" data-tag="ai-workflow">#ai-workflow <b>4</b></button><button class="tag big" data-tag="github">#github <b>4</b></button><button class="tag big" data-tag="course">#course <b>3</b></button><button class="tag big" data-tag="week-1">#week-1 <b>1</b></button><button class="tag big" data-tag="week-2">#week-2 <b>1</b></button><button class="tag big" data-tag="warehouse">#warehouse <b>1</b></button><button class="tag big" data-tag="inventory">#inventory <b>1</b></button><button class="tag big" data-tag="sources">#sources <b>1</b></button></div>
+<section id="pending"><h2>⚖️ Pending review <span class="count">13</span></h2>
+<div class="pending-box">
+<div class="pending-row"><span class="pstate modified">✏️ modified</span><code>.dashboard/generate.py</code></div><div class="pending-row"><span class="pstate modified">✏️ modified</span><code>.gitignore</code></div><div class="pending-row"><span class="pstate modified">✏️ modified</span><code>INDEX.md</code></div><div class="pending-row"><span class="pstate modified">✏️ modified</span><code>course/overview.md</code></div><div class="pending-row"><span class="pstate modified">✏️ modified</span><code>daily/2026-07-06.md</code></div><div class="pending-row"><span class="pstate new">🆕 new</span><code>.claude/skills/my-vault/SKILL.md</code></div><div class="pending-row"><span class="pstate new">🆕 new</span><code>.dashboard/review.py</code></div><div class="pending-row"><span class="pstate new">🆕 new</span><code>course/day5-explainer.html</code></div><div class="pending-row"><span class="pstate new">🆕 new</span><code>daily/2026-07-07.md</code></div><div class="pending-row"><span class="pstate new">🆕 new</span><code>daily/2026-07-08.md</code></div><div class="pending-row"><span class="pstate new">🆕 new</span><code>decisions/adr-001-decisions-folder.md</code></div><div class="pending-row"><span class="pstate new">🆕 new</span><code>knowledge/the-guard-hook.md</code></div><div class="pending-row"><span class="pstate new">🆕 new</span><code>knowledge/the-house-rule.md</code></div>
+<div class="pending-actions">
+<a class="btn" href="review.html">Read the full diffs → review.html</a>
+<span class="hint">approve in terminal: <code>git add -A && git commit</code> · reject: <code>git checkout -- &lt;file&gt;</code></span>
+</div>
+</div></section>
 
-<section><h2>🎓 Course <span class="count">2</span></h2><div class="grid"><a class="card" href="course/week-1.md" data-search="week 1 analysis (jun 29 – jul 5) course week-1 github knowledge-management ai-workflow 1. warhouse vault (~jul 1, &quot;day 2&quot;) — first knowledge-base build: a warehouse parts inventory (warhouse-vault) with 12 parts across 2 warehouses, strict frontmatter (partno, natoclass, warehouse), a never-guess rule with…" data-tags="course,week-1,github,knowledge-management,ai-workflow">
-<div class="card-top" style="background:#9d4edd"></div>
-<div class="card-body">
-<div class="card-head"><span class="type" style="color:#9d4edd">week</span><span class="date">2026-07-06</span></div>
-<h3>Week 1 Analysis (Jun 29 – Jul 5)</h3>
-<p>1. Warhouse Vault (~Jul 1, &quot;Day 2&quot;) — first knowledge-base build: a warehouse parts inventory (warhouse-vault) with 12 parts across 2 warehouses, strict frontmatter (partno, natoclass, warehouse), a never-guess rule with…</p>
-<div class="meta"><span class="tag" data-tag="course">#course</span><span class="tag" data-tag="week-1">#week-1</span><span class="tag" data-tag="github">#github</span><span class="tag" data-tag="knowledge-management">#knowledge-management</span><span class="tag" data-tag="ai-workflow">#ai-workflow</span><span class="rel">↔ overview</span><span class="rel">↔ warhouse-vault</span><span class="rel">↔ next-gen-warfare</span><span class="rel">↔ the-eight-kb-moves</span></div>
-</div></a>
-<a class="card" href="course/overview.md" data-search="4-week course — overview course ai-workflow knowledge-management what: a 4-week hands-on course; the work products live in the bash 1 workspace (terminal, git/github, and ai-assisted knowledge building)." data-tags="course,ai-workflow,knowledge-management">
+<input id="search" type="search" placeholder="Search notes, tags, text…">
+<div class="tagbar"><button class="tag big" data-tag="knowledge-management">#knowledge-management <b>9</b></button><button class="tag big" data-tag="ai-workflow">#ai-workflow <b>7</b></button><button class="tag big" data-tag="course">#course <b>5</b></button><button class="tag big" data-tag="missiles">#missiles <b>5</b></button><button class="tag big" data-tag="github">#github <b>4</b></button><button class="tag big" data-tag="week-2">#week-2 <b>3</b></button><button class="tag big" data-tag="hooks">#hooks <b>2</b></button><button class="tag big" data-tag="week-1">#week-1 <b>1</b></button><button class="tag big" data-tag="housekeeping">#housekeeping <b>1</b></button><button class="tag big" data-tag="warehouse">#warehouse <b>1</b></button><button class="tag big" data-tag="inventory">#inventory <b>1</b></button><button class="tag big" data-tag="sources">#sources <b>1</b></button></div>
+
+<section><h2>🎓 Course <span class="count">2</span></h2><div class="grid"><a class="card" href="course/overview.md" data-search="4-week course — overview course ai-workflow knowledge-management what: a 4-week hands-on course; the work products live in the bash 1 workspace (terminal, git/github, and ai-assisted knowledge building)." data-tags="course,ai-workflow,knowledge-management">
 <div class="card-top" style="background:#9d4edd"></div>
 <div class="card-body">
 <div class="card-head"><span class="type" style="color:#9d4edd">course</span><span class="status">active</span><span class="date">2026-07-06</span></div>
 <h3>4-Week Course — Overview</h3>
 <p>What: a 4-week hands-on course; the work products live in the BASH 1 workspace (terminal, git/GitHub, and AI-assisted knowledge building).</p>
 <div class="meta"><span class="tag" data-tag="course">#course</span><span class="tag" data-tag="ai-workflow">#ai-workflow</span><span class="tag" data-tag="knowledge-management">#knowledge-management</span><span class="rel">↔ week-1</span><span class="rel">↔ next-gen-warfare</span><span class="rel">↔ warhouse-vault</span></div>
+</div></a>
+<a class="card" href="course/week-1.md" data-search="week 1 analysis (jun 29 – jul 5) course week-1 github knowledge-management ai-workflow 1. warhouse vault (~jul 1, &quot;day 2&quot;) — first knowledge-base build: a warehouse parts inventory (warhouse-vault) with 12 parts across 2 warehouses, strict frontmatter (partno, natoclass, warehouse), a never-guess rule with…" data-tags="course,week-1,github,knowledge-management,ai-workflow">
+<div class="card-top" style="background:#9d4edd"></div>
+<div class="card-body">
+<div class="card-head"><span class="type" style="color:#9d4edd">week</span><span class="date">2026-07-06</span></div>
+<h3>Week 1 Analysis (Jun 29 – Jul 5)</h3>
+<p>1. Warhouse Vault (~Jul 1, &quot;Day 2&quot;) — first knowledge-base build: a warehouse parts inventory (warhouse-vault) with 12 parts across 2 warehouses, strict frontmatter (partno, natoclass, warehouse), a never-guess rule with…</p>
+<div class="meta"><span class="tag" data-tag="course">#course</span><span class="tag" data-tag="week-1">#week-1</span><span class="tag" data-tag="github">#github</span><span class="tag" data-tag="knowledge-management">#knowledge-management</span><span class="tag" data-tag="ai-workflow">#ai-workflow</span><span class="rel">↔ overview</span><span class="rel">↔ warhouse-vault</span><span class="rel">↔ next-gen-warfare</span><span class="rel">↔ the-eight-kb-moves</span></div>
 </div></a></div></section>
 <section><h2>🚀 Projects <span class="count">2</span></h2><div class="grid"><a class="card" href="projects/next-gen-warfare.md" data-search="next-gen warfare missiles knowledge-management ai-workflow github one-liner: a non-sensitive, public-data missile knowledge base — 11 systems profiled across inventory/classes/armory, with photos, custom svg infographics, and an 11-slide presentation — built in one day by instructing a…" data-tags="missiles,knowledge-management,ai-workflow,github">
 <div class="card-top" style="background:#e63946"></div>
@@ -100,7 +129,23 @@ footer { margin-top:44px; color:var(--muted); font-size:12.5px; }
 <p>One-liner: a warehouse parts-inventory knowledge base — markdown notes tracking industrial parts (part number, NATO supply class, warehouse location, supplier, assembly) across two warehouses, with strict never-guess rul…</p>
 <div class="meta"><span class="tag" data-tag="warehouse">#warehouse</span><span class="tag" data-tag="inventory">#inventory</span><span class="tag" data-tag="knowledge-management">#knowledge-management</span><span class="tag" data-tag="github">#github</span><span class="rel">↔ next-gen-warfare</span><span class="rel">↔ the-eight-kb-moves</span></div>
 </div></a></div></section>
-<section><h2>🧠 Knowledge <span class="count">3</span></h2><div class="grid"><a class="card" href="knowledge/mirv.md" data-search="mirv missiles one missile carries several warheads, each steered to a different target. introduced by the us minuteman iii (1970); now standard on heavy icbms (sarmat: 10+, df-41: up to 10) and demonstrated by india in 2024 (agni-v, &quot;…" data-tags="missiles">
+<section><h2>🧠 Knowledge <span class="count">5</span></h2><div class="grid"><a class="card" href="knowledge/the-guard-hook.md" data-search="the guard hook (promise → law) ai-workflow knowledge-management hooks day 5&#x27;s the-house-rule made the ai promise to stop before a write. a hook makes that stop a law — enforced from outside the ai, every time, whether or not the ai remembers." data-tags="ai-workflow,knowledge-management,hooks">
+<div class="card-top" style="background:#2a9d8f"></div>
+<div class="card-body">
+<div class="card-head"><span class="type" style="color:#2a9d8f">note</span><span class="date">2026-07-08</span></div>
+<h3>The Guard Hook (promise → law)</h3>
+<p>Day 5&#x27;s the-house-rule made the AI promise to stop before a write. A hook makes that stop a law — enforced from outside the AI, every time, whether or not the AI remembers.</p>
+<div class="meta"><span class="tag" data-tag="ai-workflow">#ai-workflow</span><span class="tag" data-tag="knowledge-management">#knowledge-management</span><span class="tag" data-tag="hooks">#hooks</span><span class="rel">↔ the-house-rule</span><span class="rel">↔ the-eight-kb-moves</span></div>
+</div></a>
+<a class="card" href="knowledge/the-house-rule.md" data-search="the house rule ai-workflow knowledge-management reads run free, writes wait for your review. when an ai tool acts on your vault, any verb that reads (a lookup, a recall) can run on its own — nothing changes, so there is nothing to check. any verb that writes (a new no…" data-tags="ai-workflow,knowledge-management">
+<div class="card-top" style="background:#2a9d8f"></div>
+<div class="card-body">
+<div class="card-head"><span class="type" style="color:#2a9d8f">note</span><span class="date">2026-07-06</span></div>
+<h3>The House Rule</h3>
+<p>Reads run free, writes wait for your review. When an AI tool acts on your vault, any verb that reads (a lookup, a recall) can run on its own — nothing changes, so there is nothing to check. Any verb that writes (a new no…</p>
+<div class="meta"><span class="tag" data-tag="ai-workflow">#ai-workflow</span><span class="tag" data-tag="knowledge-management">#knowledge-management</span><span class="rel">↔ the-eight-kb-moves</span></div>
+</div></a>
+<a class="card" href="knowledge/mirv.md" data-search="mirv missiles one missile carries several warheads, each steered to a different target. introduced by the us minuteman iii (1970); now standard on heavy icbms (sarmat: 10+, df-41: up to 10) and demonstrated by india in 2024 (agni-v, &quot;…" data-tags="missiles">
 <div class="card-top" style="background:#2a9d8f"></div>
 <div class="card-body">
 <div class="card-head"><span class="type" style="color:#2a9d8f">note</span><span class="date">2026-07-02</span></div>
@@ -124,6 +169,14 @@ footer { margin-top:44px; color:var(--muted); font-size:12.5px; }
 <p>A method for building knowledge bases that are readable by humans and consumable by AI:</p>
 <div class="meta"><span class="tag" data-tag="knowledge-management">#knowledge-management</span><span class="tag" data-tag="ai-workflow">#ai-workflow</span><span class="rel">↔ next-gen-warfare</span></div>
 </div></a></div></section>
+<section><h2>⚖️ Decisions <span class="count">1</span></h2><div class="grid"><a class="card" href="decisions/adr-001-decisions-folder.md" data-search="adr-001 — keep decisions as numbered adrs in a decisions/ folder knowledge-management ai-workflow " data-tags="knowledge-management,ai-workflow">
+<div class="card-top" style="background:#f4a261"></div>
+<div class="card-body">
+<div class="card-head"><span class="type" style="color:#f4a261">adr</span><span class="status">proposed</span><span class="date">2026-07-06</span></div>
+<h3>ADR-001 — Keep decisions as numbered ADRs in a decisions/ folder</h3>
+<p></p>
+<div class="meta"><span class="tag" data-tag="knowledge-management">#knowledge-management</span><span class="tag" data-tag="ai-workflow">#ai-workflow</span><span class="rel">↔ the-house-rule</span><span class="rel">↔ the-eight-kb-moves</span></div>
+</div></a></div></section>
 <section><h2>🔗 References <span class="count">1</span></h2><div class="grid"><a class="card" href="references/missile-sources.md" data-search="missile info sources missiles sources " data-tags="missiles,sources">
 <div class="card-top" style="background:#457b9d"></div>
 <div class="card-body">
@@ -132,7 +185,23 @@ footer { margin-top:44px; color:var(--muted); font-size:12.5px; }
 <p></p>
 <div class="meta"><span class="tag" data-tag="missiles">#missiles</span><span class="tag" data-tag="sources">#sources</span></div>
 </div></a></div></section>
-<section><h2>📅 Daily notes <span class="count">2</span></h2><div class="grid"><a class="card" href="daily/2026-07-06.md" data-search="2026-07-06 course week-2 " data-tags="course,week-2">
+<section><h2>📅 Daily notes <span class="count">4</span></h2><div class="grid"><a class="card" href="daily/2026-07-08.md" data-search="2026-07-08 course week-2 housekeeping " data-tags="course,week-2,housekeeping">
+<div class="card-top" style="background:#e9c46a"></div>
+<div class="card-body">
+<div class="card-head"><span class="type" style="color:#e9c46a">daily</span><span class="date">2026-07-08</span></div>
+<h3>2026-07-08</h3>
+<p></p>
+<div class="meta"><span class="tag" data-tag="course">#course</span><span class="tag" data-tag="week-2">#week-2</span><span class="tag" data-tag="housekeeping">#housekeeping</span></div>
+</div></a>
+<a class="card" href="daily/2026-07-07.md" data-search="2026-07-07 course week-2 hooks " data-tags="course,week-2,hooks">
+<div class="card-top" style="background:#e9c46a"></div>
+<div class="card-body">
+<div class="card-head"><span class="type" style="color:#e9c46a">daily</span><span class="date">2026-07-07</span></div>
+<h3>2026-07-07</h3>
+<p></p>
+<div class="meta"><span class="tag" data-tag="course">#course</span><span class="tag" data-tag="week-2">#week-2</span><span class="tag" data-tag="hooks">#hooks</span></div>
+</div></a>
+<a class="card" href="daily/2026-07-06.md" data-search="2026-07-06 course week-2 " data-tags="course,week-2">
 <div class="card-top" style="background:#e9c46a"></div>
 <div class="card-body">
 <div class="card-head"><span class="type" style="color:#e9c46a">daily</span><span class="date">2026-07-06</span></div>
@@ -150,7 +219,7 @@ footer { margin-top:44px; color:var(--muted); font-size:12.5px; }
 </div></a></div></section>
 
 
-<section><h2>🕐 Recent activity (git)</h2><div class="commits"><div class="commit"><code>fab466b</code><span class="date">2026-07-06 09:44</span><span>feed: course tracking — overview, week-1 analysis, week template, dashboard course section</span></div><div class="commit"><code>e5dbe0a</code><span class="date">2026-07-02 12:57</span><span>feed: warhouse-vault project (parts inventory, 4 verification flags)</span></div><div class="commit"><code>40f8922</code><span class="date">2026-07-02 12:27</span><span>Dashboard: animated twinkling starfield background</span></div><div class="commit"><code>f22e340</code><span class="date">2026-07-02 12:24</span><span>feed: dashboard build + standing feed-the-vault rule logged in daily note</span></div><div class="commit"><code>a30bb18</code><span class="date">2026-07-02 12:21</span><span>Add auto-updating HTML dashboard (.dashboard/generate.py + dashboard.html)</span></div><div class="commit"><code>a4bf80a</code><span class="date">2026-07-02 12:08</span><span>Vault: structure, rules, templates, feed-vault skill + first feeding (Next-Gen Warfare project)</span></div></div></section>
+<section><h2>🕐 Recent activity (git)</h2><div class="commits"><div class="commit"><code>af58083</code><span class="date">2026-07-06 10:03</span><span>Vault has a GitHub remote now: push after each feeding (course-vault)</span></div><div class="commit"><code>fab466b</code><span class="date">2026-07-06 09:44</span><span>feed: course tracking — overview, week-1 analysis, week template, dashboard course section</span></div><div class="commit"><code>e5dbe0a</code><span class="date">2026-07-02 12:57</span><span>feed: warhouse-vault project (parts inventory, 4 verification flags)</span></div><div class="commit"><code>40f8922</code><span class="date">2026-07-02 12:27</span><span>Dashboard: animated twinkling starfield background</span></div><div class="commit"><code>f22e340</code><span class="date">2026-07-02 12:24</span><span>feed: dashboard build + standing feed-the-vault rule logged in daily note</span></div><div class="commit"><code>a30bb18</code><span class="date">2026-07-02 12:21</span><span>Add auto-updating HTML dashboard (.dashboard/generate.py + dashboard.html)</span></div><div class="commit"><code>a4bf80a</code><span class="date">2026-07-02 12:08</span><span>Vault: structure, rules, templates, feed-vault skill + first feeding (Next-Gen Warfare project)</span></div></div></section>
 
 <footer>Generated by .dashboard/generate.py · rules in CLAUDE.md · feed me daily</footer>
 

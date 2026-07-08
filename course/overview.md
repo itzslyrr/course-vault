@@ -21,6 +21,12 @@ source: conversation (2026-07-06)
 | **Week 3** | Mon Jul 13 – Sun Jul 19 | week-3 (due Mon Jul 20) | ⏳ upcoming |
 | **Week 4** | Mon Jul 20 – **Thu Jul 23 (final day)** | week-4 | ⏳ upcoming |
 
+## Week 2 progress (in flight)
+
+- **Day 5 (Jul 6)** — built the `my-vault` skill (three verbs: capture · record-a-decision · recall) and learned [[the-house-rule]]: reads run free, writes wait for review. Recorded [[the-house-rule]] + ADR-001 (a `decisions/` folder). Visual explainer: `course/day5-explainer.html`.
+- **Day 6 (Jul 7)** — turned the promise into a law with a `PreToolUse` guard hook → [[the-guard-hook]]. Proved it live (blocked a real AI commit).
+- **Jul 8** — consolidated the vault into one folder, backfilled Day 5/6 records, added a finish-sound.
+
 ## Deliverables
 
 - **Weekly analysis** — at the end of each course week, a `course/week-N.md` note analyzing what was done, worked on, and learned (built from that week's daily notes, project logs, and git history).
