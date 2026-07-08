@@ -71,24 +71,31 @@ footer { margin-top:44px; color:var(--muted); font-size:12.5px; }
 <canvas id="stars"></canvas>
 <header>
 <h1>🗄️ <span>Vault Dashboard</span></h1>
-<div class="updated">Last updated: <b>Wednesday, July 8 2026 · 10:07:16</b> · regenerates automatically when the vault changes</div>
+<div class="updated">Last updated: <b>Wednesday, July 8 2026 · 10:15:19</b> · regenerates automatically when the vault changes</div>
 <div class="pages"><a class="page-link" href="review.html">📄 Review</a><a class="page-link" href="course/day5-explainer.html">📄 Day5 Explainer</a></div>
 </header>
 
 <div class="stats">
-<div class="stat"><div class="n">15</div><div class="l">total notes</div></div>
+<div class="stat"><div class="n">16</div><div class="l">total notes</div></div>
 <div class="stat"><div class="n">2</div><div class="l">projects</div></div>
-<div class="stat"><div class="n">5</div><div class="l">knowledge notes</div></div>
+<div class="stat"><div class="n">6</div><div class="l">knowledge notes</div></div>
 <div class="stat"><div class="n">1</div><div class="l">references</div></div>
 <div class="stat"><div class="n">4</div><div class="l">daily notes</div></div>
-<div class="stat"><div class="n">11</div><div class="l">recent commits</div></div>
-<a class="stat pending-stat" href="#pending"><div class="n">0</div><div class="l">pending writes</div></a>
+<div class="stat"><div class="n">12</div><div class="l">recent commits</div></div>
+<a class="stat pending-stat" href="#pending"><div class="n">4</div><div class="l">pending writes</div></a>
 </div>
 
-<section id="pending"><h2>⚖️ Pending review <span class="count">0</span></h2><div class="pending-box clean">Nothing awaiting approval — the vault is clean ✅</div></section>
+<section id="pending"><h2>⚖️ Pending review <span class="count">4</span></h2>
+<div class="pending-box">
+<div class="pending-row"><span class="pstate modified">✏️ modified</span><code>INDEX.md</code></div><div class="pending-row"><span class="pstate modified">✏️ modified</span><code>course/overview.md</code></div><div class="pending-row"><span class="pstate modified">✏️ modified</span><code>daily/2026-07-08.md</code></div><div class="pending-row"><span class="pstate new">🆕 new</span><code>knowledge/the-doctor.md</code></div>
+<div class="pending-actions">
+<a class="btn" href="review.html">Read the full diffs → review.html</a>
+<span class="hint">approve in terminal: <code>git add -A && git commit</code> · reject: <code>git checkout -- &lt;file&gt;</code></span>
+</div>
+</div></section>
 
 <input id="search" type="search" placeholder="Search notes, tags, text…">
-<div class="tagbar"><button class="tag big" data-tag="knowledge-management">#knowledge-management <b>9</b></button><button class="tag big" data-tag="ai-workflow">#ai-workflow <b>7</b></button><button class="tag big" data-tag="course">#course <b>5</b></button><button class="tag big" data-tag="missiles">#missiles <b>5</b></button><button class="tag big" data-tag="github">#github <b>4</b></button><button class="tag big" data-tag="week-2">#week-2 <b>3</b></button><button class="tag big" data-tag="hooks">#hooks <b>2</b></button><button class="tag big" data-tag="week-1">#week-1 <b>1</b></button><button class="tag big" data-tag="housekeeping">#housekeeping <b>1</b></button><button class="tag big" data-tag="warehouse">#warehouse <b>1</b></button><button class="tag big" data-tag="inventory">#inventory <b>1</b></button><button class="tag big" data-tag="sources">#sources <b>1</b></button></div>
+<div class="tagbar"><button class="tag big" data-tag="knowledge-management">#knowledge-management <b>10</b></button><button class="tag big" data-tag="ai-workflow">#ai-workflow <b>8</b></button><button class="tag big" data-tag="course">#course <b>5</b></button><button class="tag big" data-tag="missiles">#missiles <b>5</b></button><button class="tag big" data-tag="github">#github <b>4</b></button><button class="tag big" data-tag="week-2">#week-2 <b>3</b></button><button class="tag big" data-tag="hooks">#hooks <b>3</b></button><button class="tag big" data-tag="week-1">#week-1 <b>1</b></button><button class="tag big" data-tag="housekeeping">#housekeeping <b>1</b></button><button class="tag big" data-tag="warehouse">#warehouse <b>1</b></button><button class="tag big" data-tag="inventory">#inventory <b>1</b></button><button class="tag big" data-tag="sources">#sources <b>1</b></button></div>
 
 <section><h2>🎓 Course <span class="count">2</span></h2><div class="grid"><a class="card" href="course/overview.md" data-search="4-week course — overview course ai-workflow knowledge-management what: a 4-week hands-on course; the work products live in the bash 1 workspace (terminal, git/github, and ai-assisted knowledge building)." data-tags="course,ai-workflow,knowledge-management">
 <div class="card-top" style="background:#9d4edd"></div>
@@ -122,7 +129,15 @@ footer { margin-top:44px; color:var(--muted); font-size:12.5px; }
 <p>One-liner: a warehouse parts-inventory knowledge base — markdown notes tracking industrial parts (part number, NATO supply class, warehouse location, supplier, assembly) across two warehouses, with strict never-guess rul…</p>
 <div class="meta"><span class="tag" data-tag="warehouse">#warehouse</span><span class="tag" data-tag="inventory">#inventory</span><span class="tag" data-tag="knowledge-management">#knowledge-management</span><span class="tag" data-tag="github">#github</span><span class="rel">↔ next-gen-warfare</span><span class="rel">↔ the-eight-kb-moves</span></div>
 </div></a></div></section>
-<section><h2>🧠 Knowledge <span class="count">5</span></h2><div class="grid"><a class="card" href="knowledge/the-guard-hook.md" data-search="the guard hook (promise → law) ai-workflow knowledge-management hooks day 5&#x27;s the-house-rule made the ai promise to stop before a write. a hook makes that stop a law — enforced from outside the ai, every time, whether or not the ai remembers." data-tags="ai-workflow,knowledge-management,hooks">
+<section><h2>🧠 Knowledge <span class="count">6</span></h2><div class="grid"><a class="card" href="knowledge/the-doctor.md" data-search="the doctor (rules → checks) ai-workflow knowledge-management hooks the the-guard-hook guards what the ai does; it never reads what a note says. a wrong type, a missing created, a dead link walk straight past it. the doctor closes that gap: a read-only script that checks every note again…" data-tags="ai-workflow,knowledge-management,hooks">
+<div class="card-top" style="background:#2a9d8f"></div>
+<div class="card-body">
+<div class="card-head"><span class="type" style="color:#2a9d8f">note</span><span class="date">2026-07-08</span></div>
+<h3>The Doctor (rules → checks)</h3>
+<p>The the-guard-hook guards what the AI does; it never reads what a note says. A wrong type, a missing created, a dead link walk straight past it. The doctor closes that gap: a read-only script that checks every note again…</p>
+<div class="meta"><span class="tag" data-tag="ai-workflow">#ai-workflow</span><span class="tag" data-tag="knowledge-management">#knowledge-management</span><span class="tag" data-tag="hooks">#hooks</span><span class="rel">↔ the-guard-hook</span><span class="rel">↔ the-house-rule</span><span class="rel">↔ the-eight-kb-moves</span></div>
+</div></a>
+<a class="card" href="knowledge/the-guard-hook.md" data-search="the guard hook (promise → law) ai-workflow knowledge-management hooks day 5&#x27;s the-house-rule made the ai promise to stop before a write. a hook makes that stop a law — enforced from outside the ai, every time, whether or not the ai remembers." data-tags="ai-workflow,knowledge-management,hooks">
 <div class="card-top" style="background:#2a9d8f"></div>
 <div class="card-body">
 <div class="card-head"><span class="type" style="color:#2a9d8f">note</span><span class="date">2026-07-08</span></div>
@@ -212,7 +227,7 @@ footer { margin-top:44px; color:var(--muted); font-size:12.5px; }
 </div></a></div></section>
 
 
-<section><h2>🕐 Recent activity (git)</h2><div class="commits"><div class="commit"><code>98eb135</code><span class="date">2026-07-08 10:07</span><span>Merge course-vault remote into consolidated local vault</span></div><div class="commit"><code>be8320a</code><span class="date">2026-07-08 10:07</span><span>Consolidate vault + backfill Day 5/6 course records</span></div><div class="commit"><code>22169b0</code><span class="date">2026-07-07 10:17</span><span>Dashboard: link standalone HTML pages (day5 explainer) in header</span></div><div class="commit"><code>97541b3</code><span class="date">2026-07-07 10:15</span><span>Restore vault from GitHub after local wipe; add day5 explainer</span></div><div class="commit"><code>af58083</code><span class="date">2026-07-06 10:03</span><span>Vault has a GitHub remote now: push after each feeding (course-vault)</span></div><div class="commit"><code>fab466b</code><span class="date">2026-07-06 09:44</span><span>feed: course tracking — overview, week-1 analysis, week template, dashboard course section</span></div><div class="commit"><code>e5dbe0a</code><span class="date">2026-07-02 12:57</span><span>feed: warhouse-vault project (parts inventory, 4 verification flags)</span></div><div class="commit"><code>40f8922</code><span class="date">2026-07-02 12:27</span><span>Dashboard: animated twinkling starfield background</span></div><div class="commit"><code>f22e340</code><span class="date">2026-07-02 12:24</span><span>feed: dashboard build + standing feed-the-vault rule logged in daily note</span></div><div class="commit"><code>a30bb18</code><span class="date">2026-07-02 12:21</span><span>Add auto-updating HTML dashboard (.dashboard/generate.py + dashboard.html)</span></div><div class="commit"><code>a4bf80a</code><span class="date">2026-07-02 12:08</span><span>Vault: structure, rules, templates, feed-vault skill + first feeding (Next-Gen Warfare project)</span></div></div></section>
+<section><h2>🕐 Recent activity (git)</h2><div class="commits"><div class="commit"><code>15bae16</code><span class="date">2026-07-08 10:07</span><span>Regenerate dashboard after merge</span></div><div class="commit"><code>98eb135</code><span class="date">2026-07-08 10:07</span><span>Merge course-vault remote into consolidated local vault</span></div><div class="commit"><code>be8320a</code><span class="date">2026-07-08 10:07</span><span>Consolidate vault + backfill Day 5/6 course records</span></div><div class="commit"><code>22169b0</code><span class="date">2026-07-07 10:17</span><span>Dashboard: link standalone HTML pages (day5 explainer) in header</span></div><div class="commit"><code>97541b3</code><span class="date">2026-07-07 10:15</span><span>Restore vault from GitHub after local wipe; add day5 explainer</span></div><div class="commit"><code>af58083</code><span class="date">2026-07-06 10:03</span><span>Vault has a GitHub remote now: push after each feeding (course-vault)</span></div><div class="commit"><code>fab466b</code><span class="date">2026-07-06 09:44</span><span>feed: course tracking — overview, week-1 analysis, week template, dashboard course section</span></div><div class="commit"><code>e5dbe0a</code><span class="date">2026-07-02 12:57</span><span>feed: warhouse-vault project (parts inventory, 4 verification flags)</span></div><div class="commit"><code>40f8922</code><span class="date">2026-07-02 12:27</span><span>Dashboard: animated twinkling starfield background</span></div><div class="commit"><code>f22e340</code><span class="date">2026-07-02 12:24</span><span>feed: dashboard build + standing feed-the-vault rule logged in daily note</span></div><div class="commit"><code>a30bb18</code><span class="date">2026-07-02 12:21</span><span>Add auto-updating HTML dashboard (.dashboard/generate.py + dashboard.html)</span></div><div class="commit"><code>a4bf80a</code><span class="date">2026-07-02 12:08</span><span>Vault: structure, rules, templates, feed-vault skill + first feeding (Next-Gen Warfare project)</span></div></div></section>
 
 <footer>Generated by .dashboard/generate.py · rules in CLAUDE.md · feed me daily</footer>
 

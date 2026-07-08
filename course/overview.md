@@ -25,6 +25,7 @@ source: conversation (2026-07-06)
 
 - **Day 5 (Jul 6)** — built the `my-vault` skill (three verbs: capture · record-a-decision · recall) and learned [[the-house-rule]]: reads run free, writes wait for review. Recorded [[the-house-rule]] + ADR-001 (a `decisions/` folder). Visual explainer: `course/day5-explainer.html`.
 - **Day 6 (Jul 7)** — turned the promise into a law with a `PreToolUse` guard hook → [[the-guard-hook]]. Proved it live (blocked a real AI commit).
+- **Day 7 (Jul 8)** — built **the doctor** (`doctor.sh`), a read-only rule-checker that turns CLAUDE.md prose into pass/fail checks → [[the-doctor]]. Completes the Week-2 arc: promise → law → inspector.
 - **Jul 8** — consolidated the vault into one folder, backfilled Day 5/6 records, added a finish-sound.
 
 ## Deliverables

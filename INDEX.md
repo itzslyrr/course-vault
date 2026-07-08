@@ -5,6 +5,7 @@ Personal knowledge base. Fed daily. Rules in [CLAUDE.md](CLAUDE.md).
 
 ## 🕐 Recently added
 
+- 2026-07-08 · [The doctor](knowledge/the-doctor.md) — turning rules into pass/fail checks (Day 7)
 - 2026-07-08 · [The guard hook](knowledge/the-guard-hook.md) — turning the promise into a law (Day 6)
 - 2026-07-07 · [Day 6 log](daily/2026-07-07.md) — built & proved the vault-write-guard hook
 - 2026-07-06 · [ADR-001 — decisions folder](decisions/adr-001-decisions-folder.md) — keep decisions as numbered ADRs
@@ -25,7 +26,7 @@ Personal knowledge base. Fed daily. Rules in [CLAUDE.md](CLAUDE.md).
 | [course/](course/) | 4-week course: overview + weekly analyses | 2 |
 | [daily/](daily/) | Daily capture log | 4 |
 | [projects/](projects/) | Ongoing work | 2 |
-| [knowledge/](knowledge/) | Atomic evergreen notes | 5 |
+| [knowledge/](knowledge/) | Atomic evergreen notes | 6 |
 | [decisions/](decisions/) | Architecture decision records (ADRs) | 1 |
 | [references/](references/) | External sources | 1 |
 
