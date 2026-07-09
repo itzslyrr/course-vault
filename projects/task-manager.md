@@ -28,6 +28,10 @@ Every choice is a written decision, not an accident — and the whole project **
 ## v2 — Kanban board
 Instructor's next brief: research Kanban, apply it to v2. Built `app-v2.html` — a three-column board (**To Do / In Progress / Done**), cards move by **drag-and-drop or ◀ ▶ buttons**, with a **WIP limit of 3** on In Progress (the defining Kanban control). New `column` data model migrates v1 tasks; per-column newest-first; seeded with sample cards for instant preview. Documented in **ADR-006 → 010** + `wi-kanban-board` (shipped). Notably, v2 was originally "sync" — the instructor re-prioritized to Kanban, so **sync moved to v3** (recorded in ADR-006).
 
+## v2 on a real stack — SvelteKit + SQLite
+Instructor's next brief: put v2 on **SvelteKit + SQLite** (the direction ADR-001 always pointed at). Installed Node 22 (portably), then built a real server-backed app in `~/vault/projects/task-manager/v2-sveltekit/`: SvelteKit UI, **better-sqlite3** database, a **REST API** (GET/POST/PATCH/DELETE), and the **WIP limit enforced on the server** (returns HTTP 409 when In Progress is full). Runs at `localhost:5173` via `npm run dev`; data persists in `tasks.db`. Documented as **ADR-011/012/013**. This server-owns-the-data design is what unlocks v3 (device sync).
+
 ## Log
 - 2026-07-08 — Built app + 5 ADRs + work item (v1) in `~/vault/projects/task-manager/`; doctor clean; committed.
 - 2026-07-08 — Built **v2 Kanban board** (`app-v2.html`) + ADR-006…010 + wi-kanban-board; WIP limit, drag-and-drop, v1 migration; doctor clean; committed.
+- 2026-07-08 — Rebuilt **v2 on SvelteKit + SQLite** (`v2-sveltekit/`) + ADR-011…013; REST API, server-side WIP (409), runs at localhost:5173; doctor caught a cross-vault dangling link → fixed → clean.
