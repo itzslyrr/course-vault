@@ -67,6 +67,9 @@ ul.big{text-align:left;font-size:clamp(14px,1.9vw,20px);line-height:2;list-style
 ul.big li::before{content:"→ ";color:var(--doing);font-weight:800;}
 ul.big b{color:var(--doing);}
 .big-num{font-size:clamp(40px,8vw,90px);font-weight:800;background:linear-gradient(135deg,var(--todo),var(--done));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+.shot{max-width:min(94%,900px);max-height:58vh;border-radius:12px;border:1px solid var(--line);box-shadow:0 20px 60px rgba(0,0,0,.55);margin-top:16px;}
+.shot-badge{display:inline-block;background:rgba(42,157,143,.18);color:var(--done);border:1px solid rgba(42,157,143,.5);border-radius:20px;padding:3px 12px;font-size:12px;font-weight:700;margin-top:10px;}
+.shotcap{color:var(--muted);font-size:12.5px;margin-top:8px;}
 
 .progress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--todo),var(--done));transition:width .3s;z-index:1000;}
 .nav{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:18px;z-index:1000;}
@@ -187,6 +190,16 @@ ADR-013  the WIP rule is enforced on the server</pre>
   <div class="note">🎤 <b>Say:</b> "Now the browser owns nothing. It asks the server; the server reads and writes SQLite. This is the design cross-device sync will need in v3."</div>
 </div>
 
+<!-- 7b REAL SCREENSHOT -->
+<div class="slide">
+  <div class="kicker">The Real App · Screenshot</div>
+  <h2>This is it — <span class="hl">running on SvelteKit + SQLite</span></h2>
+  <img class="shot" src="screenshots/board-default.png" alt="Task Manager v2 Kanban board, running">
+  <div class="shot-badge">● real screenshot — not a mockup</div>
+  <div class="shotcap">Every card was loaded from the SQLite database on the server · In Progress showing 2 / 3</div>
+  <div class="note">🎤 <b>Say:</b> "This is an actual screenshot of the running app. Three columns, cards read from the database, and In Progress tracking 2 of its 3-card limit."</div>
+</div>
+
 <!-- 8 SAME UI DIFFERENT FOUNDATION -->
 <div class="slide">
   <div class="kicker">The Key Insight</div>
@@ -225,14 +238,22 @@ ADR-013  the WIP rule is enforced on the server</pre>
 <div class="slide">
   <div class="kicker">Proof · The Rule</div>
   <h2>The server refuses — with <span class="hl">no browser involved</span></h2>
-  <pre style="max-width:760px;"><span class="c"># raw commands — no WIP code in them at all</span>
-card 1 → In Progress : HTTP <span class="t">200</span>  (allowed)
-card 2 → In Progress : HTTP <span class="t">200</span>  (allowed)
-card 3 → In Progress : HTTP <span class="t">200</span>  (allowed)
-card 4 → In Progress : HTTP <span class="r">409</span>  <span class="r">← BLOCKED by the server</span>
-
-<span class="c"># read the database: In Progress held at 3, not 4</span></pre>
-  <p class="sub" style="margin-top:14px;">The rule lives in the database layer, so it holds against any client — a tab, a phone, a raw command.</p>
+  <div class="two" style="max-width:1000px;align-items:center;">
+    <div>
+      <div class="lbl">raw commands — no WIP code in them at all</div>
+      <pre><span class="c"># filling In Progress (limit 3)</span>
+card 1 → doing : HTTP <span class="t">200</span>  (allowed)
+card 2 → doing : HTTP <span class="t">200</span>  (allowed)
+card 3 → doing : HTTP <span class="t">200</span>  (allowed)
+card 4 → doing : HTTP <span class="r">409</span>  <span class="r">← BLOCKED</span>
+<span class="c"># DB: In Progress held at 3, not 4</span></pre>
+    </div>
+    <div>
+      <div class="lbl">the board at that moment — In Progress 3 / 3</div>
+      <img class="shot" style="max-height:42vh;margin-top:0;" src="screenshots/board-wip-full.png" alt="In Progress column full at 3/3">
+    </div>
+  </div>
+  <p class="sub" style="margin-top:12px;">The rule lives in the database layer — it holds against any client: a tab, a phone, or a raw command.</p>
   <div class="note">🎤 <b>Say:</b> "I moved cards with raw commands — no browser. The server still enforced the limit: a 409 on the fourth. The rule lives with the data, not in the page."</div>
 </div>
 
