@@ -25,5 +25,9 @@ source: ~/vault/projects/task-manager/
 ## Why it's a good submission
 Every choice is a written decision, not an accident — and the whole project **passed the [[the-doctor]]** (clean bill of health), proving the notes obey the vault rules. This is the course's thesis in one deliverable: *the AI drafts, the human decides, the decisions are recorded, a check enforces the rules.*
 
+## v2 — Kanban board
+Instructor's next brief: research Kanban, apply it to v2. Built `app-v2.html` — a three-column board (**To Do / In Progress / Done**), cards move by **drag-and-drop or ◀ ▶ buttons**, with a **WIP limit of 3** on In Progress (the defining Kanban control). New `column` data model migrates v1 tasks; per-column newest-first; seeded with sample cards for instant preview. Documented in **ADR-006 → 010** + `wi-kanban-board` (shipped). Notably, v2 was originally "sync" — the instructor re-prioritized to Kanban, so **sync moved to v3** (recorded in ADR-006).
+
 ## Log
-- 2026-07-08 — Built app + 5 ADRs + work item in `~/vault/projects/task-manager/`; doctor clean; committed to the course vault.
+- 2026-07-08 — Built app + 5 ADRs + work item (v1) in `~/vault/projects/task-manager/`; doctor clean; committed.
+- 2026-07-08 — Built **v2 Kanban board** (`app-v2.html`) + ADR-006…010 + wi-kanban-board; WIP limit, drag-and-drop, v1 migration; doctor clean; committed.
