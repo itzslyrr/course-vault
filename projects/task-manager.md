@@ -34,4 +34,8 @@ Instructor's next brief: put v2 on **SvelteKit + SQLite** (the direction ADR-001
 ## Log
 - 2026-07-08 — Built app + 5 ADRs + work item (v1) in `~/vault/projects/task-manager/`; doctor clean; committed.
 - 2026-07-08 — Built **v2 Kanban board** (`app-v2.html`) + ADR-006…010 + wi-kanban-board; WIP limit, drag-and-drop, v1 migration; doctor clean; committed.
-- 2026-07-08 — Rebuilt **v2 on SvelteKit + SQLite** (`v2-sveltekit/`) + ADR-011…013; REST API, server-side WIP (409), runs at localhost:5173; doctor caught a cross-vault dangling link → fixed → clean.
+- 2026-07-08 — Rebuilt **v2 on SvelteKit + SQLite** (`v2-sveltekit/`) + ADR-011…013; REST API, server-side WIP (409), runs at localhost:5180; doctor caught a cross-vault dangling link → fixed → clean.
+- 2026-07-08 — Built **v3: multi-user auth** (`v3-sveltekit-auth/`) + ADR-014…017 + wi-multi-user-auth. Username+password, scrypt-hashed, httpOnly session cookies, per-user tasks + per-user WIP. Verified in a real browser (Playwright): register/login/logout, data isolation (bob ≠ alice), persistence, wrong-password rejection. Runs at localhost:5181. Doctor clean.
+
+## v3 — multi-user authentication
+Instructor's third brief: **accounts**. Built a real login system on the SvelteKit + SQLite app — register / login / logout, each user gets a private board that persists. Passwords hashed with Node's built-in **scrypt** (no dependency); sessions are **httpOnly cookies** checked on every request in `hooks.server.js`; every task query is scoped by **`user_id`** so users can't see each other's data (proven: "bob" can't see "alice"'s task). Documented as **ADR-014…017**. The through-line holds: the isolation lives in the data-layer queries, so a forgotten filter can't leak data. Screenshots: `course/screenshots/v3-login.png`, `v3-board-alice.png`.
