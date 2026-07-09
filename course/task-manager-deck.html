@@ -107,7 +107,7 @@ ul.big b{color:var(--doing);}
 <div class="slide">
   <div class="kicker">The Method</div>
   <h2>Every choice is a <span class="hl">written decision</span> (ADR)</h2>
-  <p class="sub">Not "I coded it this way" — but "here's what I chose, what I rejected, and why." 13 ADRs across the versions.</p>
+  <p class="sub">Not "I coded it this way" — but "here's what I chose, what I rejected, and why." 17 ADRs across the versions.</p>
   <pre style="margin-top:18px;max-width:720px;"><span class="c"># the decision set grew with the app</span>
 ADR-001  v1 stack: self-contained web app
 ADR-002  newest-first ordering
@@ -115,7 +115,10 @@ ADR-004  v1 scope: CRUD only  <span class="c"># deciding what to LEAVE OUT</span
 ADR-006  v2 is a Kanban board
 ADR-009  WIP limit of 3 on In Progress  <span class="c"># the heart of Kanban</span>
 ADR-011  v2 stack → SvelteKit + SQLite
-ADR-013  the WIP rule is enforced on the server</pre>
+ADR-013  the WIP rule is enforced on the server
+ADR-014  v3 auth: username + password
+ADR-016  passwords hashed with scrypt
+ADR-017  per-user data isolation</pre>
   <div class="note">🎤 <b>Say:</b> "The ADRs are half the work. Even choosing what to leave out — no accounts, no sync in v1 — is a recorded decision, not an accident."</div>
 </div>
 
@@ -257,6 +260,25 @@ card 4 → doing : HTTP <span class="r">409</span>  <span class="r">← BLOCKED<
   <div class="note">🎤 <b>Say:</b> "I moved cards with raw commands — no browser. The server still enforced the limit: a 409 on the fourth. The rule lives with the data, not in the page."</div>
 </div>
 
+<!-- 10c V3 ACCOUNTS -->
+<div class="slide">
+  <div class="kicker">Version 3 · Accounts</div>
+  <h2>Multi-user — <span class="hl">everyone gets their own board</span></h2>
+  <img class="shot" src="screenshots/v3-login.png" alt="V3 login page">
+  <div class="shot-badge">● real screenshot</div>
+  <div class="shotcap">Register / login / logout · passwords hashed with <b>scrypt</b> · <b>httpOnly</b> session cookies checked on every request</div>
+  <div class="note">🎤 <b>Say:</b> "v3 adds accounts. You register, log in, and the board becomes yours. Passwords are hashed with scrypt, and a session cookie keeps you logged in — checked on every single request."</div>
+</div>
+
+<!-- 10d V3 ISOLATION -->
+<div class="slide">
+  <div class="kicker">Version 3 · Your Data, Yours Alone</div>
+  <h2>Logged in as <span class="hl">alice</span> — her board, her tasks</h2>
+  <img class="shot" src="screenshots/v3-board-alice.png" alt="alice's private board">
+  <div class="shotcap">Every task carries a <code>user_id</code> · proven: user "bob" cannot see alice's tasks · log out &amp; back in — it all persists</div>
+  <div class="note">🎤 <b>Say:</b> "Each task is tagged with a user id, and every query is scoped to the logged-in user. I proved it in a browser: bob can't see alice's tasks, and alice's tasks survive a logout and login."</div>
+</div>
+
 <!-- 11 THROUGH-LINE -->
 <div class="slide">
   <div class="kicker">The Deeper Lesson</div>
@@ -265,9 +287,10 @@ card 4 → doing : HTTP <span class="r">409</span>  <span class="r">← BLOCKED<
     <li>The <b>house rule</b> — a promise the AI makes (Day 5)</li>
     <li>The <b>guard hook</b> — a law outside the AI (Day 6)</li>
     <li>The <b>doctor</b> — checks the files from outside (Day 7)</li>
-    <li>The <b>server WIP limit</b> — the rule lives with the data (this project)</li>
+    <li>The <b>server WIP limit</b> — the rule lives with the data (v2)</li>
+    <li>The <b>per-user isolation</b> — every query scoped by user id (v3)</li>
   </ul>
-  <p class="sub" style="margin-top:12px;">Same idea, four times: a real rule belongs outside the thing it's guarding.</p>
+  <p class="sub" style="margin-top:12px;">Same idea, five times: a real rule belongs outside the thing it's guarding — in the data, not the page.</p>
   <div class="note">🎤 <b>Say:</b> "This ties the whole week together. A promise can be forgotten; a rule in the right place can't be bypassed."</div>
 </div>
 
@@ -275,8 +298,8 @@ card 4 → doing : HTTP <span class="r">409</span>  <span class="r">← BLOCKED<
 <div class="slide">
   <div class="kicker">Takeaway</div>
   <h1 style="font-size:clamp(26px,4.5vw,52px);">The UI is the tip.<br><span class="g">The foundation is the iceberg.</span></h1>
-  <p class="sub">v1 list → v2 Kanban → v2 on SvelteKit + SQLite. Same board on screen; a database, a server, and a bypass-proof rule underneath — every step a recorded decision.</p>
-  <p class="sub" style="font-size:13px;margin-top:18px;">13 ADRs · runs at localhost:5173 · validated by the doctor · on GitHub</p>
+  <p class="sub">v1 list → v2 Kanban → v2 on SvelteKit + SQLite → v3 multi-user. Same board on screen; a database, a server, private accounts, and bypass-proof rules underneath — every step a recorded decision.</p>
+  <p class="sub" style="font-size:13px;margin-top:18px;">17 ADRs · four versions · validated by the doctor · on GitHub</p>
   <div class="note">Navigate: ← → arrow keys, click, or the buttons below · 🎤 speaker notes are the italic lines</div>
 </div>
 
