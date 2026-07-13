@@ -31,14 +31,6 @@ Instructor's next brief: research Kanban, apply it to v2. Built `app-v2.html` �
 ## v2 on a real stack — SvelteKit + SQLite
 Instructor's next brief: put v2 on **SvelteKit + SQLite** (the direction ADR-001 always pointed at). Installed Node 22 (portably), then built a real server-backed app in `~/vault/projects/task-manager/v2-sveltekit/`: SvelteKit UI, **better-sqlite3** database, a **REST API** (GET/POST/PATCH/DELETE), and the **WIP limit enforced on the server** (returns HTTP 409 when In Progress is full). Runs at `localhost:5173` via `npm run dev`; data persists in `tasks.db`. Documented as **ADR-011/012/013**. This server-owns-the-data design is what unlocks v3 (device sync).
 
-## v4 roadmap (planned, via the doorway pipeline)
-Using the Day-9 `vault` CLI's new **plan** verb (a scope built on multiple ADRs) and **task --plan** (every task belongs to a scope), the v4 backlog from the ADRs was turned into two scoped plans:
-
-- **plan-v4-account-safety** (on ADR-014, ADR-016) → email verification · password reset · rate limiting on login · serve over HTTPS
-- **plan-v4-sync-across-devices** (on ADR-011, ADR-012) → auto-refresh the board · handle concurrent edits
-
-Every task traces up the chain: **task → plan → the ADRs that justified it.** Still in backlog (unscoped): OAuth login, board polish (drag-to-reorder, due dates, tags, search).
-
 ## Log
 - 2026-07-08 — Built app + 5 ADRs + work item (v1) in `~/vault/projects/task-manager/`; doctor clean; committed.
 - 2026-07-08 — Built **v2 Kanban board** (`app-v2.html`) + ADR-006…010 + wi-kanban-board; WIP limit, drag-and-drop, v1 migration; doctor clean; committed.
