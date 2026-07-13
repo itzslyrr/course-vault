@@ -18,7 +18,7 @@ source: conversation (2026-07-06)
 |---|---|---|---|
 | **Week 1** | Mon Jun 29 – Sun Jul 5 | [[week-1]] | ✅ done |
 | **Week 2** | Mon Jul 6 – Sun Jul 12 | week-2 (due Mon Jul 13) | ▶️ in progress |
-| **Week 3** | Mon Jul 13 – Sun Jul 19 | week-3 (due Mon Jul 20) | ⏳ upcoming |
+| **Week 3** | Mon Jul 13 – Sun Jul 19 | week-3 (due Mon Jul 20) | ▶️ in progress |
 | **Week 4** | Mon Jul 20 – **Thu Jul 23 (final day)** | week-4 | ⏳ upcoming |
 
 ## Week 2 progress (in flight)
@@ -28,6 +28,10 @@ source: conversation (2026-07-06)
 - **Day 7 (Jul 8)** — built **the doctor** (`doctor.sh`), a read-only rule-checker that turns CLAUDE.md prose into pass/fail checks → [[the-doctor]]. Completes the Week-2 arc: promise → law → inspector.
 - **End-of-week project (Jul 8)** — **Task Manager v1**: a working single-screen app + a set of 5 ADRs → [[task-manager]]. Decisions-first, doctor-clean.
 - **Jul 8** — consolidated the vault into one folder, backfilled Day 5/6 records, added a finish-sound.
+
+## Week 3 progress (in flight)
+
+- **Day 9 (Jul 13)** — built **the doorway**: a `vault` CLI that checks every write *at the entry* (before it lands), complementing the doctor (which checks after). Rewired the AI's skill to use it → [[the-doorway-cli]].
 
 ## Deliverables
 

@@ -5,6 +5,7 @@ Personal knowledge base. Fed daily. Rules in [CLAUDE.md](CLAUDE.md).
 
 ## 🕐 Recently added
 
+- 2026-07-13 · [The doorway (CLI)](knowledge/the-doorway-cli.md) — checks every write at the entry (Day 9)
 - 2026-07-08 · [Task Manager v1](projects/task-manager.md) — end-of-week project: working app + 5 ADRs
 - 2026-07-08 · [The doctor](knowledge/the-doctor.md) — turning rules into pass/fail checks (Day 7)
 - 2026-07-08 · [The guard hook](knowledge/the-guard-hook.md) — turning the promise into a law (Day 6)
@@ -25,9 +26,9 @@ Personal knowledge base. Fed daily. Rules in [CLAUDE.md](CLAUDE.md).
 | Section | What lives there | Count |
 |---|---|---|
 | [course/](course/) | 4-week course: overview + weekly analyses | 2 |
-| [daily/](daily/) | Daily capture log | 4 |
+| [daily/](daily/) | Daily capture log | 5 |
 | [projects/](projects/) | Ongoing work | 3 |
-| [knowledge/](knowledge/) | Atomic evergreen notes | 6 |
+| [knowledge/](knowledge/) | Atomic evergreen notes | 7 |
 | [decisions/](decisions/) | Architecture decision records (ADRs) | 1 |
 | [references/](references/) | External sources | 1 |
 
