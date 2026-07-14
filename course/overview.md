@@ -32,6 +32,7 @@ source: conversation (2026-07-06)
 ## Week 3 progress (in flight)
 
 - **Day 9 (Jul 13)** — built **the doorway**: a `vault` CLI that checks every write *at the entry* (before it lands), complementing the doctor (which checks after). Rewired the AI's skill to use it → [[the-doorway-cli]].
+- **Day 10 (Jul 14)** — **bricked up the wall**: gave the guard a **second law** so direct writes into the vault's note zones are blocked (notes must use the doorway), while tools stay editable and reads run free → [[the-second-law]].
 
 ## Deliverables
 
