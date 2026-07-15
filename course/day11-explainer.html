@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 11 — The Doctor at the Counter</title>
+<style>
+:root{--bg:#0d1321;--surface:#1b2436;--text:#f1faee;--muted:#8d99ae;--accent:#e9c46a;--teal:#2a9d8f;--blue:#457b9d;--red:#e63946;--line:rgba(255,255,255,.08);}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:radial-gradient(ellipse at 30% -20%,#101a33 0%,#060a14 55%,#03060d 100%);background-attachment:fixed;color:var(--text);font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;line-height:1.6;padding:44px clamp(16px,5vw,80px) 100px;}
+#stars{position:fixed;inset:0;z-index:-1;pointer-events:none;}
+.wrap{max-width:1000px;margin:0 auto;}
+header h1{font-size:clamp(28px,5vw,48px);font-weight:800;letter-spacing:-1px;background:linear-gradient(135deg,var(--teal),var(--accent));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+header p{color:var(--muted);margin-top:8px;font-size:clamp(14px,2vw,18px);}
+.kicker{text-transform:uppercase;letter-spacing:4px;font-size:12px;color:var(--teal);font-weight:700;margin-bottom:6px;}
+section{margin-top:38px;}h2{font-size:clamp(20px,3vw,30px);margin-bottom:6px;}
+.tagline{color:var(--muted);margin-bottom:16px;font-size:15px;}
+.card{background:rgba(27,36,54,.85);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin-top:14px;}
+p{margin:8px 0;}b{color:var(--accent);}
+pre{background:#0a0f1c;border:1px solid rgba(255,255,255,.09);border-radius:10px;padding:16px 18px;overflow-x:auto;font-family:"SF Mono",Menlo,monospace;font-size:13px;line-height:1.55;color:#cdd7e5;margin:12px 0;}
+pre .c{color:var(--muted);}pre .k{color:var(--accent);}pre .t{color:var(--teal);}pre .r{color:var(--red);}
+.tip{background:rgba(233,196,106,.1);border-radius:0 10px 10px 0;border-left:3px solid var(--accent);padding:12px 18px;margin:14px 0;font-size:15px;}.tip b{color:var(--accent);}
+.checks{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:16px;}
+.chk{background:rgba(27,36,54,.85);border:1px solid var(--line);border-left:4px solid var(--teal);border-radius:12px;padding:16px 18px;}
+.chk h3{font-size:15px;margin-bottom:6px;color:#8ecae6;}.chk p{font-size:13.5px;color:var(--muted);margin:4px 0;}.chk .flag{color:var(--red);font-family:monospace;font-size:12.5px;}
+table{border-collapse:collapse;width:100%;margin:14px 0;font-size:14.5px;}th,td{padding:11px 14px;border-bottom:1px solid var(--line);text-align:left;}th{color:var(--accent);text-transform:uppercase;font-size:11.5px;letter-spacing:1.5px;}
+.pass{color:var(--teal);font-weight:700;}.fail{color:var(--red);font-weight:700;}
+@media(max-width:640px){.checks{grid-template-columns:1fr;}}
+footer{margin-top:48px;color:var(--muted);font-size:13px;text-align:center;}
+</style>
+</head>
+<body>
+<canvas id="stars"></canvas>
+<div class="wrap">
+<header>
+  <div class="kicker">UAEN · Week 3 · Day 11</div>
+  <h1>🩺 The Doctor at the Counter</h1>
+  <p>The doorway stops filing garbage — it inspects the form <em>before</em> it writes.</p>
+</header>
+
+<section>
+  <h2>What changed</h2>
+  <div class="tagline">The counter was the only door — but it filed whatever it was handed.</div>
+  <div class="card">
+    <p>Day 7's doctor checked notes <b>after</b> filing; Day 9's doorway was the only way in. Day 11 puts the doctor <b>at the counter</b>: <code>vault capture</code> now validates the form <b>before</b> it writes. On a hard fail it <b>refuses and writes nothing</b>; on pass it files as <b>status: proposed</b> — every note arrives well-formed, ready to sign.</p>
+  </div>
+</section>
+
+<section>
+  <h2>The four checks</h2>
+  <div class="tagline">Each refusal names the fault and shows the fix. Repair fixes shape, never content.</div>
+  <div class="checks">
+    <div class="chk"><h3>1 · Required title</h3><p>an empty title is refused.</p><p class="flag">a note needs a non-empty title.</p></div>
+    <div class="chk"><h3>2 · Valid type (repair)</h3><p><code>note/task/idea</code>; a wrong-case near-miss is <b>lowercased</b>, not rejected.</p><p class="flag">Task → task</p></div>
+    <div class="chk"><h3>3 · Allowed zone (default)</h3><p><code>inbox/ knowledge/ tasks/</code>; empty <b>defaults to inbox/</b>.</p><p class="flag">'' → inbox/</p></div>
+    <div class="chk"><h3>4 · Non-sensitive only</h3><p>anything marked <code>sensitive</code> is refused — the vault's prime rule, now enforceable.</p><p class="flag">non-sensitive content only.</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>Repair vs reject</h2>
+  <div class="card">
+    <pre>vault capture "Call the vendor" --type <span class="k">Task</span>   <span class="c"># wrong-case, no zone</span>
+<span class="t">→ captured: inbox/call-the-vendor.md (type: task, status: proposed)</span>
+   <span class="c"># Task → task, empty zone → inbox/ — filed clean</span></pre>
+    <p>The doctor <b>repairs shape</b> (lowercases a type, defaults a zone) but <b>never invents content</b> — it will not write a title you didn't type.</p>
+  </div>
+</section>
+
+<section>
+  <h2>Enforce in the CLI, describe in the skill</h2>
+  <table>
+    <tr><th>where</th><th>role</th></tr>
+    <tr><td>the <code>my-vault</code> skill</td><td>describes the target shape so the AI sends it right</td></tr>
+    <tr><td>the <code>vault</code> CLI</td><td class="pass">enforces it, so it's true even when the AI gets it wrong</td></tr>
+  </table>
+  <div class="tip">Types grew in lockstep across <code>bin/vault</code>, <code>doctor.sh</code>, and <code>CLAUDE.md</code> — <b>they move together</b>, so nothing already filed broke.</div>
+</section>
+
+<section>
+  <h2>The governed write path — now complete</h2>
+  <div class="card" style="text-align:center;font-size:clamp(12px,1.8vw,16px);">
+    sentence → skill → counter → <b>doctor (checks the form)</b> → vault (<span style="color:var(--teal)">proposed</span>) → your signature
+  </div>
+</section>
+
+<footer>Day 11 · UAEN Week 3 · the inspector at the counter</footer>
+</div>
+<script>
+const c=document.getElementById('stars'),x=c.getContext('2d');let s=[];
+function seed(){c.width=innerWidth;c.height=innerHeight;const n=Math.floor(c.width*c.height/4200);s=Array.from({length:n},()=>({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*1.3+.3,b:Math.random()*.5+.25,a:Math.random()*.45+.15,sp:Math.random()*1.5+.3,p:Math.random()*6.28,h:Math.random()<.12?'233,196,106':(Math.random()<.08?'160,200,255':'241,250,238')}));}
+function d(t){x.clearRect(0,0,c.width,c.height);for(const o of s){const a=Math.max(0,Math.min(1,o.b+Math.sin(t/1000*o.sp+o.p)*o.a));x.beginPath();x.arc(o.x,o.y,o.r,0,6.28);x.fillStyle='rgba('+o.h+','+a.toFixed(3)+')';x.fill();}requestAnimationFrame(d);}
+seed();addEventListener('resize',seed);if(!matchMedia('(prefers-reduced-motion: reduce)').matches)requestAnimationFrame(d);else d(0);
+</script>
+</body>
+</html>

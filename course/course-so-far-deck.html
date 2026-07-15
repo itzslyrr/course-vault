@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Course So Far — Presentation</title>
+<style>
+:root{--bg:#0d1321;--surface:#1b2436;--surface2:#232f45;--text:#f1faee;--muted:#8d99ae;--accent:#e9c46a;--teal:#2a9d8f;--blue:#457b9d;--purple:#9d4edd;--red:#e63946;--line:rgba(255,255,255,.08);}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#060a14;color:var(--text);font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;overflow:hidden;}
+#stars{position:fixed;inset:0;z-index:0;pointer-events:none;}
+.deck{position:relative;width:100vw;height:100vh;overflow:hidden;z-index:1;}
+@media(min-width:769px){.deck{max-width:calc(100vh*16/9);max-height:calc(100vw*9/16);margin:auto;position:absolute;inset:0;}}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:clamp(24px,5vw,64px);opacity:0;visibility:hidden;transition:opacity .4s;overflow:hidden;background:radial-gradient(ellipse at 30% -20%,#101a33 0%,#060a14 60%);}
+.slide.active{opacity:1;visibility:visible;}
+.kicker{text-transform:uppercase;letter-spacing:4px;font-size:clamp(10px,1.3vw,13px);color:var(--accent);font-weight:700;margin-bottom:14px;}
+h1{font-size:clamp(30px,6vw,64px);font-weight:800;letter-spacing:-1px;line-height:1.08;}
+h1 .g{background:linear-gradient(135deg,var(--blue),var(--teal));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+h2{font-size:clamp(22px,4vw,40px);font-weight:800;letter-spacing:-.5px;margin-bottom:8px;}h2 .hl{color:var(--accent);}
+p.sub{color:var(--muted);font-size:clamp(14px,2vw,20px);max-width:840px;margin-top:6px;}
+.note{position:absolute;bottom:60px;left:50%;transform:translateX(-50%);width:min(88%,900px);color:var(--muted);font-size:clamp(11px,1.4vw,14px);font-style:italic;border-top:1px solid var(--line);padding-top:10px;}
+.note b{color:var(--accent);font-style:normal;}
+.row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;width:100%;max-width:940px;margin-top:20px;}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;text-align:left;}
+.tile .tag{font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:1.5px;}
+.tile h3{font-size:16px;margin:6px 0;}.tile p{color:var(--muted);font-size:13px;line-height:1.5;}
+.tile.a1{border-top:3px solid var(--teal);}.tile.a2{border-top:3px solid var(--purple);}.tile.a3{border-top:3px solid var(--accent);}.tile.a4{border-top:3px solid var(--blue);}
+ul.big{text-align:left;font-size:clamp(14px,1.9vw,21px);line-height:1.9;list-style:none;max-width:840px;}
+ul.big li::before{content:"→ ";color:var(--accent);font-weight:800;}ul.big b{color:var(--accent);}
+.path{background:rgba(10,15,28,.7);border:1px solid var(--line);border-radius:14px;padding:22px;margin-top:18px;font-size:clamp(12px,1.9vw,18px);line-height:2;max-width:920px;}
+.path b{color:var(--accent);}.path .stop{color:var(--teal);}
+pre{background:#0a0f1c;border:1px solid var(--line);border-radius:10px;padding:16px 18px;overflow:auto;font-family:"SF Mono",Menlo,monospace;font-size:clamp(11px,1.4vw,15px);line-height:1.6;text-align:left;color:#cdd7e5;}
+pre .c{color:var(--muted);}pre .k{color:var(--accent);}pre .t{color:var(--teal);}pre .r{color:var(--red);}
+table{border-collapse:collapse;width:100%;max-width:900px;margin-top:16px;font-size:clamp(12px,1.6vw,17px);}
+th,td{padding:10px 14px;border-bottom:1px solid var(--line);text-align:left;}th{color:var(--accent);text-transform:uppercase;font-size:11px;letter-spacing:1.5px;}
+td .no{color:var(--muted);}td .yes{color:var(--teal);font-weight:700;}
+.badge{display:inline-block;background:rgba(42,157,143,.15);color:var(--teal);border:1px solid rgba(42,157,143,.5);border-radius:20px;padding:3px 12px;font-size:13px;font-weight:700;margin-top:12px;}
+.big-num{font-size:clamp(40px,9vw,110px);font-weight:800;background:linear-gradient(135deg,var(--blue),var(--teal));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;line-height:1;}
+.progress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--blue),var(--teal));transition:width .3s;z-index:1000;}
+.nav{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:18px;z-index:1000;}
+.nav button{background:rgba(255,255,255,.08);border:1px solid var(--line);color:#fff;width:40px;height:40px;border-radius:50%;cursor:pointer;font-size:17px;}
+.nav button:hover{background:rgba(69,123,157,.4);}.counter{color:var(--muted);font-size:13px;}
+</style>
+</head>
+<body>
+<div class="progress" id="prog"></div>
+<canvas id="stars"></canvas>
+<div class="deck">
+
+<!-- 1 -->
+<div class="slide active">
+  <div class="kicker">UAEN · Weeks 1–3 · Course So Far</div>
+  <h1>Building a Vault<br><span class="g">the AI can't corrupt</span></h1>
+  <p class="sub">Three weeks turning a pile of notes into a governed knowledge system — where the AI drafts fast, and every change is checked, and I sign what lands.</p>
+  <div class="note">🎤 <b>Say:</b> "This is what I built over three weeks: a personal knowledge vault, and a set of rules that let an AI help me at speed without ever putting garbage — or unsigned changes — into it."</div>
+</div>
+
+<!-- 2 -->
+<div class="slide">
+  <div class="kicker">The Big Idea</div>
+  <h2>Fast AI + <span class="hl">human control</span>, not one or the other</h2>
+  <ul class="big">
+    <li>The AI <b>drafts</b> — notes, decisions, code — in seconds</li>
+    <li>Every write is <b>checked</b> before it lands (shape, rules, safety)</li>
+    <li>Nothing is real until <b>I sign it</b> (I review the diff, I commit)</li>
+  </ul>
+  <p class="sub" style="margin-top:12px;">The whole course is one question, answered five ways: <b style="color:var(--accent)">where does enforcement live so it can't be bypassed?</b></p>
+  <div class="note">🎤 <b>Say:</b> "The point isn't to slow the AI down — it's to let it move fast while a checkpoint I control catches anything wrong."</div>
+</div>
+
+<!-- 3 -->
+<div class="slide">
+  <div class="kicker">Weeks 1–2 · The Foundation</div>
+  <h2>A vault built on <span class="hl">eight moves</span></h2>
+  <div class="row">
+    <div class="tile a1"><div class="tag">structure</div><h3>Vault · Frontmatter · Wikilinks · Index</h3><p>plain-text under git; every note labeled, linked, and reachable from a front door.</p></div>
+    <div class="tile a2"><div class="tag">reuse</div><h3>Templates · Skills</h3><p>new notes start from a skeleton; the AI runs a saved pipeline consistently.</p></div>
+    <div class="tile a3"><div class="tag">control</div><h3>CLAUDE.md · The doorway</h3><p>standing rules travel with the folder; a human reviews every AI write.</p></div>
+  </div>
+  <div class="note">🎤 <b>Say:</b> "First I gave the vault structure — so both a human and an AI can find, filter, and extend it without re-reading everything."</div>
+</div>
+
+<!-- 4 -->
+<div class="slide">
+  <div class="kicker">Week 3 · The Spine</div>
+  <h2>The governed <span class="hl">write path</span></h2>
+  <div class="path">
+    your sentence → the <b>skill</b> → the <b>counter</b> (checked) → the <b>doctor</b> (form) → the vault (<span class="stop">status: proposed</span>) → <b>your signature</b>
+  </div>
+  <p class="sub" style="margin-top:14px;">Every step below is one lesson. Together they make this the <b>only road</b> a note can travel.</p>
+  <div class="note">🎤 <b>Say:</b> "Everything in Week 3 builds this one path. Let me walk each piece — each is a day of the course."</div>
+</div>
+
+<!-- 5 -->
+<div class="slide">
+  <div class="kicker">Day 5 · The Promise</div>
+  <h2>🤝 The house rule</h2>
+  <p class="sub"><b>Reads run free; writes wait for review.</b> The AI's vault skill drafts a note, then <b>STOPS</b> — I read the diff and commit.</p>
+  <div class="badge">a promise the AI makes</div>
+  <div class="note">🎤 <b>Say:</b> "Day 5: the AI promises to stop before a write. But a promise is just a line in its instructions — delete that line and nothing stops it."</div>
+</div>
+
+<!-- 6 -->
+<div class="slide">
+  <div class="kicker">Day 6 · The Law</div>
+  <h2>🛡️ The guard hook</h2>
+  <p class="sub">A <code>PreToolUse</code> hook that runs <b>outside the AI, before every action</b>. <code>exit 2</code> = blocked, <code>exit 0</code> = allowed. I proved it: a stolen <code>git commit</code> was refused with my own words.</p>
+  <div class="badge">a law the system enforces</div>
+  <div class="note">🎤 <b>Say:</b> "Day 6 turns the promise into a law — a guard that checks the AI every time and can't be talked past."</div>
+</div>
+
+<!-- 7 -->
+<div class="slide">
+  <div class="kicker">Day 7 · The Inspector</div>
+  <h2>🩺 The doctor</h2>
+  <p class="sub">A read-only script that checks every note against the rules — missing frontmatter, unknown type, dead <code>[[link]]</code>. <b>Same answer every time</b>; tired eyes skim a typo, a check never does.</p>
+  <div class="badge">checks the files — after</div>
+  <div class="note">🎤 <b>Say:</b> "Day 7: an automated inspector. It reads what a note SAYS — which the guard never does — and reports every flaw."</div>
+</div>
+
+<!-- 8 -->
+<div class="slide">
+  <div class="kicker">Day 9 · One Door</div>
+  <h2>🚪 The doorway</h2>
+  <p class="sub">A <code>vault</code> CLI — <b>capture · adr · plan · task · done</b> — that checks each write <b>at the entry</b>, before it lands. Refuse → reason + exit 2; accept → receipt + <code>proposed</code>. The AI's skill was rewired to use it.</p>
+  <div class="badge">checks the write — before</div>
+  <div class="note">🎤 <b>Say:</b> "Day 9: a single guarded door. The doctor checked after; the doorway checks before — and both the human and the AI use it."</div>
+</div>
+
+<!-- 9 -->
+<div class="slide">
+  <div class="kicker">Day 10 · The Wall</div>
+  <h2>🧱 The second law</h2>
+  <p class="sub">The guard learns a second law: a direct <code>Write</code>/<code>Edit</code> into a note zone is <b>blocked</b> — <em>"notes go through the doorway."</em> Tools stay editable, reads run free. The side door is walled.</p>
+  <div class="badge">the door is now the only way in</div>
+  <div class="note">🎤 <b>Say:</b> "Day 9's counter was opt-in — you could still bypass it. Day 10 bricks that hole shut: the door is the only way in."</div>
+</div>
+
+<!-- 10 -->
+<div class="slide">
+  <div class="kicker">Day 11 · The Guard at the Counter</div>
+  <h2>🩺 The doctor at the counter</h2>
+  <p class="sub">The counter now <b>inspects the form before filing</b>: required title · type repair · zone default · <b>non-sensitive only</b>. Refuse + write nothing, or file as <code>proposed</code>. Repair fixes shape, never content.</p>
+  <div class="badge">every note arrives well-formed</div>
+  <div class="note">🎤 <b>Say:</b> "Day 11: the doctor moves INTO the door. Now the counter won't even file garbage — and 'non-sensitive only' is enforced, not just written on a wall."</div>
+</div>
+
+<!-- 11 -->
+<div class="slide">
+  <div class="kicker">The Through-Line</div>
+  <h2>Enforcement lives <span class="hl">where it can't be bypassed</span></h2>
+  <table>
+    <tr><th>lesson</th><th>the rule lives…</th></tr>
+    <tr><td>House rule (Day 5)</td><td class="no">inside the AI — a promise</td></tr>
+    <tr><td>Guard hook (Day 6)</td><td class="yes">outside the AI — a law</td></tr>
+    <tr><td>Doctor (Day 7)</td><td class="yes">a check over the files</td></tr>
+    <tr><td>Doorway + wall (Day 9–10)</td><td class="yes">one door, the only way in</td></tr>
+    <tr><td>Doctor at the counter (Day 11)</td><td class="yes">at the entry, before the write</td></tr>
+  </table>
+  <div class="note">🎤 <b>Say:</b> "Same idea, five times: a real rule belongs outside the thing it's guarding. A promise can be forgotten; a wall in the right place can't."</div>
+</div>
+
+<!-- 12 -->
+<div class="slide">
+  <div class="kicker">The Applied Capstone</div>
+  <h2>Task Manager — <span class="hl">decisions-first, v1 → v3</span></h2>
+  <div class="row">
+    <div class="tile a4"><div class="tag">v1</div><h3>A list</h3><p>CRUD, one screen, localStorage.</p></div>
+    <div class="tile a1"><div class="tag">v2</div><h3>A Kanban board + server</h3><p>WIP limit, then SvelteKit + SQLite — the rule enforced in the database (409).</p></div>
+    <div class="tile a2"><div class="tag">v3</div><h3>Accounts</h3><p>login/logout, scrypt passwords, per-user data. + a click-to-open task detail with image attachments.</p></div>
+  </div>
+  <span class="badge">17 ADRs · every choice a written decision</span>
+  <div class="note">🎤 <b>Say:</b> "I applied the same discipline to a real app — built three times, deeper each time, with every decision recorded as an ADR. Same lesson: the WIP rule lives in the database, so it holds against any client."</div>
+</div>
+
+<!-- 13 -->
+<div class="slide">
+  <div class="kicker">Where It Lives</div>
+  <h2>All of it — <span class="hl">saved, revisable, backed up</span></h2>
+  <ul class="big">
+    <li>Every <b>lesson</b> is a linked note; every <b>day</b> a log — searchable on a live dashboard</li>
+    <li>Every <b>tool</b> (the doorway, doctor, guard) and the <b>app</b> — committed in git</li>
+    <li>All of it <b>pushed to GitHub</b> — readable and shareable from anywhere</li>
+  </ul>
+  <div class="note">🎤 <b>Say:</b> "None of this is trapped in my head or one machine. It's plain text, on a dashboard, backed up on GitHub — I can revise it or present it any time."</div>
+</div>
+
+<!-- 14 -->
+<div class="slide">
+  <div class="kicker">Takeaway</div>
+  <h1 style="font-size:clamp(26px,4.5vw,54px);">The AI drafts.<br><span class="g">The system checks. I sign.</span></h1>
+  <p class="sub">Three weeks, one write path — a knowledge vault fast enough to use daily and governed enough to trust.</p>
+  <p class="sub" style="font-size:13px;margin-top:16px;">Navigate: ← → arrows, click, or the buttons · speaker notes are the italic lines</p>
+</div>
+
+</div>
+<div class="nav"><button onclick="go(-1,event)">←</button><span class="counter"><span id="cur">1</span> / <span id="tot">14</span></span><button onclick="go(1,event)">→</button></div>
+<script>
+let i=1;const sl=document.querySelectorAll('.slide');const tot=sl.length;document.getElementById('tot').textContent=tot;
+function show(n){i=Math.max(1,Math.min(tot,n));sl.forEach((s,x)=>s.classList.toggle('active',x===i-1));document.getElementById('cur').textContent=i;document.getElementById('prog').style.width=(i/tot*100)+'%';}
+function go(d,e){if(e)e.stopPropagation();show(i+d);}
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();show(i+1);}if(e.key==='ArrowLeft'){e.preventDefault();show(i-1);}});
+document.addEventListener('click',e=>{if(!e.target.closest('.nav'))show(i+1);});
+const c=document.getElementById('stars'),x=c.getContext('2d');let st=[];
+function seed(){c.width=innerWidth;c.height=innerHeight;const n=Math.floor(c.width*c.height/5000);st=Array.from({length:n},()=>({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*1.2+.3,b:Math.random()*.5+.25,a:Math.random()*.4+.15,s:Math.random()*1.4+.3,p:Math.random()*6.28,h:Math.random()<.12?'233,196,106':(Math.random()<.08?'160,200,255':'241,250,238')}));}
+function draw(t){x.clearRect(0,0,c.width,c.height);for(const o of st){const a=Math.max(0,Math.min(1,o.b+Math.sin(t/1000*o.s+o.p)*o.a));x.beginPath();x.arc(o.x,o.y,o.r,0,6.28);x.fillStyle='rgba('+o.h+','+a.toFixed(3)+')';x.fill();}requestAnimationFrame(draw);}
+seed();addEventListener('resize',seed);if(!matchMedia('(prefers-reduced-motion: reduce)').matches)requestAnimationFrame(draw);else draw(0);
+show(1);
+</script>
+</body>
+</html>
