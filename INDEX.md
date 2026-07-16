@@ -5,6 +5,8 @@ Personal knowledge base. Fed daily. Rules in [CLAUDE.md](CLAUDE.md).
 
 ## 🕐 Recently added
 
+- 2026-07-16 · [The Pulse](projects/the-pulse.md) — Day 12 project shipped: live X data + a free AI summary via headless Claude Code
+- 2026-07-16 · [Headless Claude as a free backend](knowledge/headless-claude-as-a-free-backend.md) — `claude -p` puts real Claude behind an app for free
 - 2026-07-16 · [The door reads both ways](knowledge/the-door-reads-both-ways.md) — the vault CLI gains its read side: search/recent/tree (Day 12)
 - 2026-07-16 · [The three-channel loop](knowledge/the-three-channel-loop.md) — command · action · perception; the loop every build runs on (Day 12)
 - 2026-07-15 · [The doctor at the counter](knowledge/the-doctor-at-the-counter.md) — validate the form before filing (Day 11)
@@ -31,8 +33,8 @@ Personal knowledge base. Fed daily. Rules in [CLAUDE.md](CLAUDE.md).
 |---|---|---|
 | [course/](course/) | 4-week course: overview + weekly analyses | 2 |
 | [daily/](daily/) | Daily capture log | 8 |
-| [projects/](projects/) | Ongoing work | 3 |
-| [knowledge/](knowledge/) | Atomic evergreen notes | 11 |
+| [projects/](projects/) | Ongoing work | 4 |
+| [knowledge/](knowledge/) | Atomic evergreen notes | 12 |
 | [decisions/](decisions/) | Architecture decision records (ADRs) | 1 |
 | [references/](references/) | External sources | 1 |
 
@@ -40,7 +42,8 @@ Personal knowledge base. Fed daily. Rules in [CLAUDE.md](CLAUDE.md).
 
 - [Next-Gen Warfare](projects/next-gen-warfare.md) — **active** · missile KB on GitHub, presentation upcoming
 - [Warhouse Vault](projects/warhouse-vault.md) — **active** · parts inventory on GitHub, 4 parts need supplier/assembly verification
+- [The Pulse](projects/the-pulse.md) — **active** · Day 12 build, shipped · live X data + free AI summary via headless Claude Code
 
 ## 🏷️ Tag cloud (grows over time)
 
-`missiles` · `warehouse` · `inventory` · `knowledge-management` · `ai-workflow` · `hooks` · `course` · `github` · `cli` · `retrieval`
+`missiles` · `warehouse` · `inventory` · `knowledge-management` · `ai-workflow` · `hooks` · `course` · `github` · `cli` · `retrieval` · `the-pulse`
