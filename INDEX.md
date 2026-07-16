@@ -5,6 +5,8 @@ Personal knowledge base. Fed daily. Rules in [CLAUDE.md](CLAUDE.md).
 
 ## 🕐 Recently added
 
+- 2026-07-16 · [The door reads both ways](knowledge/the-door-reads-both-ways.md) — the vault CLI gains its read side: search/recent/tree (Day 12)
+- 2026-07-16 · [The three-channel loop](knowledge/the-three-channel-loop.md) — command · action · perception; the loop every build runs on (Day 12)
 - 2026-07-15 · [The doctor at the counter](knowledge/the-doctor-at-the-counter.md) — validate the form before filing (Day 11)
 - 2026-07-14 · [The second law](knowledge/the-second-law.md) — bricking up the wall; notes must use the doorway (Day 10)
 - 2026-07-13 · [The doorway (CLI)](knowledge/the-doorway-cli.md) — checks every write at the entry (Day 9)
@@ -28,9 +30,9 @@ Personal knowledge base. Fed daily. Rules in [CLAUDE.md](CLAUDE.md).
 | Section | What lives there | Count |
 |---|---|---|
 | [course/](course/) | 4-week course: overview + weekly analyses | 2 |
-| [daily/](daily/) | Daily capture log | 7 |
+| [daily/](daily/) | Daily capture log | 8 |
 | [projects/](projects/) | Ongoing work | 3 |
-| [knowledge/](knowledge/) | Atomic evergreen notes | 9 |
+| [knowledge/](knowledge/) | Atomic evergreen notes | 11 |
 | [decisions/](decisions/) | Architecture decision records (ADRs) | 1 |
 | [references/](references/) | External sources | 1 |
 
@@ -41,4 +43,4 @@ Personal knowledge base. Fed daily. Rules in [CLAUDE.md](CLAUDE.md).
 
 ## 🏷️ Tag cloud (grows over time)
 
-`missiles` · `warehouse` · `inventory` · `knowledge-management` · `ai-workflow` · `hooks` · `course` · `github`
+`missiles` · `warehouse` · `inventory` · `knowledge-management` · `ai-workflow` · `hooks` · `course` · `github` · `cli` · `retrieval`
