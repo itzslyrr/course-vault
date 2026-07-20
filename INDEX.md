@@ -5,6 +5,7 @@ Personal knowledge base. Fed daily. Rules in [CLAUDE.md](CLAUDE.md).
 
 ## 🕐 Recently added
 
+- 2026-07-20 · [The Face (frontend)](knowledge/the-face-frontend.md) — Day 13: giving the vault a visual face; chose SvelteKit; wireframe first
 - 2026-07-16 · [The Pulse](projects/the-pulse.md) — Day 12 project shipped: live X data + a free AI summary via headless Claude Code
 - 2026-07-16 · [Headless Claude as a free backend](knowledge/headless-claude-as-a-free-backend.md) — `claude -p` puts real Claude behind an app for free
 - 2026-07-16 · [The door reads both ways](knowledge/the-door-reads-both-ways.md) — the vault CLI gains its read side: search/recent/tree (Day 12)
@@ -34,7 +35,7 @@ Personal knowledge base. Fed daily. Rules in [CLAUDE.md](CLAUDE.md).
 | [course/](course/) | 4-week course: overview + weekly analyses | 2 |
 | [daily/](daily/) | Daily capture log | 8 |
 | [projects/](projects/) | Ongoing work | 4 |
-| [knowledge/](knowledge/) | Atomic evergreen notes | 12 |
+| [knowledge/](knowledge/) | Atomic evergreen notes | 13 |
 | [decisions/](decisions/) | Architecture decision records (ADRs) | 1 |
 | [references/](references/) | External sources | 1 |
 
@@ -46,4 +47,4 @@ Personal knowledge base. Fed daily. Rules in [CLAUDE.md](CLAUDE.md).
 
 ## 🏷️ Tag cloud (grows over time)
 
-`missiles` · `warehouse` · `inventory` · `knowledge-management` · `ai-workflow` · `hooks` · `course` · `github` · `cli` · `retrieval` · `the-pulse`
+`missiles` · `warehouse` · `inventory` · `knowledge-management` · `ai-workflow` · `hooks` · `course` · `github` · `cli` · `retrieval` · `the-pulse` · `frontend` · `design`

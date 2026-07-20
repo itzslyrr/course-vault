@@ -19,7 +19,7 @@ source: conversation (2026-07-06)
 | **Week 1** | Mon Jun 29 – Sun Jul 5 | [[week-1]] | ✅ done |
 | **Week 2** | Mon Jul 6 – Sun Jul 12 | week-2 (due Mon Jul 13) | ▶️ in progress |
 | **Week 3** | Mon Jul 13 – Sun Jul 19 | week-3 (due Mon Jul 20) | ▶️ in progress |
-| **Week 4** | Mon Jul 20 – **Thu Jul 23 (final day)** | week-4 | ⏳ upcoming |
+| **Week 4** | Mon Jul 20 – **Thu Jul 23 (final day)** | week-4 | ▶️ in progress |
 
 ## Week 2 progress (in flight)
 
@@ -34,6 +34,11 @@ source: conversation (2026-07-06)
 - **Day 9 (Jul 13)** — built **the doorway**: a `vault` CLI that checks every write *at the entry* (before it lands), complementing the doctor (which checks after). Rewired the AI's skill to use it → [[the-doorway-cli]].
 - **Day 10 (Jul 14)** — **bricked up the wall**: gave the guard a **second law** so direct writes into the vault's note zones are blocked (notes must use the doorway), while tools stay editable and reads run free → [[the-second-law]].
 - **Day 11 (Jul 15)** — **the doctor at the counter**: `vault capture` now validates the form *before* filing (required title · type repair · zone default · non-sensitive only), landing every note as `status: proposed` → [[the-doctor-at-the-counter]].
+- **Day 12 (Jul 16)** — **the door reads both ways** + **the three-channel loop**: the CLI gains its read side (search/recent/tree) and end-of-week project **The Pulse** ships (live X data + a free AI summary via headless Claude Code) → [[the-pulse]].
+
+## Week 4 progress (in flight)
+
+- **Day 13 (Jul 20)** — **the face**: gave the vault a *frontend* — channel ③ ("perceive") in visual form. Chose **SvelteKit** against a scorecard (readable output = stays mine; same as the real product), learned the words of design (UX/UI, hierarchy, affordance, state…), and sketched the "recent notes" view as a boxes-only **wireframe** → [[the-face-frontend]]. Day 14 designs it, Day 15 builds it.
 
 ## Deliverables
 
