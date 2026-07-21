@@ -137,14 +137,14 @@ def render(notes, pending):
 
     # optional wallpaper: drop any image into .dashboard/assets/ and it becomes the background
     wall, humans = None, []
-    assets_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets")
+    assets_dir = os.path.join(VAULT, "assets")
     if os.path.isdir(assets_dir):
         for fn in sorted(os.listdir(assets_dir)):
             ext = fn.lower().rsplit(".", 1)[-1]
             if fn.lower().startswith("prof") and ext in ("png", "webp"):
-                humans.append(".dashboard/assets/" + fn)          # scene figures
+                humans.append("assets/" + fn)                     # scene figures
             elif ext in ("jpg", "jpeg", "png", "webp") and not wall:
-                wall = ".dashboard/assets/" + fn                  # first non-prof image = wallpaper
+                wall = "assets/" + fn                             # first non-prof image = wallpaper
     body_class = "has-wall" if wall else ""
     if wall and humans:
         # real photographic scholars, cut out with transparent backgrounds
@@ -218,6 +218,7 @@ def render(notes, pending):
             tag_html += f'<span class="tag more">+{extra}</span>'
         status = f'<span class="status">{html.escape(n["status"])}</span>' if n["status"] else ""
         return f'''<a class="card" href="{html.escape(n["file"])}" data-search="{html.escape((n["title"] + " " + " ".join(n["tags"]) + " " + n["excerpt"]).lower())}" data-tags="{html.escape(",".join(n["tags"]))}">
+<button class="edit" data-path="{html.escape(n["file"])}">Edit</button>
 <div class="card-body">
 <div class="card-head"><span class="dot" style="background:{color}"></span><span class="type">{html.escape(n["type"])}</span>{status}<span class="date">{html.escape(n["created"])}</span></div>
 <h3>{html.escape(n["title"])}</h3>
@@ -363,7 +364,22 @@ section {{ margin-top:46px; }}
 section h2 {{ font-family:Georgia,'Times New Roman',serif; font-size:18px; font-weight:400; letter-spacing:.5px; margin-bottom:20px; padding-bottom:12px; border-bottom:1px solid var(--line); text-transform:uppercase; letter-spacing:2px; color:var(--muted); }}
 .count {{ color:var(--faint); font-size:13px; margin-left:6px; }}
 .grid {{ display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:16px; }}
-.card {{ background:var(--surface); border:1px solid var(--line); border-radius:14px; overflow:hidden; text-decoration:none; color:var(--text); transition:border-color .2s,background .2s; display:block; }}
+.card {{ position:relative; background:var(--surface); border:1px solid var(--line); border-radius:14px; overflow:hidden; text-decoration:none; color:var(--text); transition:border-color .2s,background .2s; display:block; }}
+.edit {{ position:absolute; top:11px; right:11px; z-index:2; background:rgba(18,14,10,.75); border:1px solid var(--line2); color:var(--muted); border-radius:14px; padding:3px 11px; font-size:10.5px; font-family:inherit; letter-spacing:1px; text-transform:uppercase; cursor:pointer; opacity:0; transition:opacity .2s,color .2s,border-color .2s; }}
+.card:hover .edit {{ opacity:1; }}
+.edit:hover {{ color:var(--accent); border-color:var(--accent); }}
+html.readonly .edit {{ display:none; }}
+html.readonly .pending-actions .approve {{ display:none; }}
+.editor-overlay {{ position:fixed; inset:0; z-index:100; background:rgba(6,5,4,.72); backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center; padding:24px; }}
+.editor-overlay.hidden {{ display:none; }}
+.editor-box {{ width:min(780px,100%); max-height:86vh; display:flex; flex-direction:column; background:var(--surface2); border:1px solid var(--line2); border-radius:14px; overflow:hidden; }}
+.editor-head {{ display:flex; align-items:center; justify-content:space-between; padding:14px 18px; border-bottom:1px solid var(--line); }}
+.editor-head .t {{ font-family:var(--font-mono,ui-monospace,Menlo,monospace); font-size:12.5px; color:var(--muted); word-break:break-all; }}
+.editor-head button {{ background:none; border:none; color:var(--muted); font-size:18px; cursor:pointer; line-height:1; }}
+.editor-head button:hover {{ color:var(--text); }}
+#editor-text {{ flex:1; min-height:48vh; resize:vertical; border:none; outline:none; background:#100d0a; color:var(--text); font-family:ui-monospace,Menlo,monospace; font-size:13px; line-height:1.6; padding:18px; }}
+.editor-actions {{ display:flex; align-items:center; gap:14px; padding:14px 18px; border-top:1px solid var(--line); }}
+#editor-msg {{ color:var(--muted); font-size:12px; }}
 .card:hover {{ border-color:var(--line2); background:var(--surface2); }}
 .card-body {{ padding:20px; display:flex; flex-direction:column; height:100%; }}
 .card-head {{ display:flex; gap:9px; align-items:center; font-size:10.5px; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:12px; color:var(--muted); }}
@@ -435,7 +451,17 @@ footer {{ margin-top:56px; color:var(--faint); font-size:11.5px; letter-spacing:
 
 <footer>Generated by .dashboard/generate.py · rules in CLAUDE.md</footer>
 
+<div id="editor" class="editor-overlay hidden" aria-hidden="true">
+  <div class="editor-box">
+    <div class="editor-head"><span class="t" id="editor-title"></span><button id="editor-close" aria-label="Close">&#10005;</button></div>
+    <textarea id="editor-text" spellcheck="false"></textarea>
+    <div class="editor-actions"><button class="btn" id="editor-save">Save</button><button class="btn ghost" id="editor-cancel">Cancel</button><span id="editor-msg"></span></div>
+  </div>
+</div>
+
 <script>
+const canEdit = location.hostname === '127.0.0.1' || location.hostname === 'localhost';
+if (!canEdit) document.documentElement.classList.add('readonly');
 // --- twinkling starfield background ---
 const canvas = document.getElementById('stars');
 const ctx = canvas.getContext('2d');
@@ -525,6 +551,45 @@ async function approve(push, btn) {{
   function reset(txt) {{ document.querySelectorAll('.approve').forEach(b => b.disabled = false); btn.textContent = txt; }}
 }}
 document.querySelectorAll('.approve').forEach(b => b.addEventListener('click', () => approve(b.dataset.push, b)));
+
+// --- edit notes in the browser (localhost only) ---
+const editor = document.getElementById('editor');
+let editPath = null;
+function closeEditor() {{ editor.classList.add('hidden'); }}
+async function openEditor(path) {{
+  editPath = path;
+  document.getElementById('editor-title').textContent = path;
+  const ta = document.getElementById('editor-text');
+  ta.value = 'Loading…';
+  document.getElementById('editor-msg').textContent = '';
+  editor.classList.remove('hidden');
+  try {{
+    const res = await fetch('/api/note?path=' + encodeURIComponent(path));
+    const data = await res.json();
+    ta.value = data.ok ? data.content : ('Error: ' + (data.message || 'could not load'));
+    ta.focus();
+  }} catch (e) {{
+    closeEditor();
+    alert('Editing needs the local server:\\n  python3 .dashboard/serve.py\\nthen open  http://127.0.0.1:8791/dashboard.html');
+  }}
+}}
+async function saveNote() {{
+  const msg = document.getElementById('editor-msg');
+  msg.textContent = 'Saving…';
+  try {{
+    const res = await fetch('/api/save', {{ method:'POST', headers:{{'Content-Type':'application/json'}}, body: JSON.stringify({{ path: editPath, content: document.getElementById('editor-text').value }}) }});
+    const data = await res.json();
+    if (data.ok) {{ msg.textContent = 'Saved — reloading…'; setTimeout(() => location.reload(), 700); }}
+    else {{ msg.textContent = ''; alert('Save failed: ' + (data.message || '')); }}
+  }} catch (e) {{ msg.textContent = ''; alert('Save failed — is the server running?'); }}
+}}
+if (canEdit) {{
+  document.querySelectorAll('.edit').forEach(b => b.addEventListener('click', e => {{ e.preventDefault(); e.stopPropagation(); openEditor(b.dataset.path); }}));
+  document.getElementById('editor-save').addEventListener('click', saveNote);
+  document.getElementById('editor-close').addEventListener('click', closeEditor);
+  document.getElementById('editor-cancel').addEventListener('click', closeEditor);
+  editor.addEventListener('click', e => {{ if (e.target === editor) closeEditor(); }});
+}}
 
 const search = document.getElementById('search');
 let activeTag = null;

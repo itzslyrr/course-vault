@@ -25,6 +25,24 @@ def git(args):
     return subprocess.run(["git", *args], cwd=VAULT, capture_output=True, text=True)
 
 
+def safe_note_path(rel):
+    """Resolve a request path to a real .md file strictly inside the vault, or None."""
+    if not rel:
+        return None
+    full = os.path.realpath(os.path.join(VAULT, rel.lstrip("/")))
+    root = os.path.realpath(VAULT)
+    if not (full == root or full.startswith(root + os.sep)):
+        return None
+    if not full.endswith(".md"):
+        return None
+    return full
+
+
+def regenerate():
+    subprocess.run([sys.executable, os.path.join(HERE, "generate.py")],
+                   cwd=VAULT, capture_output=True)
+
+
 class Handler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *a, **k):
         super().__init__(*a, directory=VAULT, **k)
@@ -45,8 +63,34 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         self.send_header("Access-Control-Allow-Headers", "Content-Type")
         self.end_headers()
 
+    def do_GET(self):
+        parsed = urllib.parse.urlparse(self.path)
+        if parsed.path == "/api/note":
+            rel = urllib.parse.parse_qs(parsed.query).get("path", [""])[0]
+            full = safe_note_path(rel)
+            if not full or not os.path.isfile(full):
+                return self._json(400, {"ok": False, "message": "invalid path"})
+            with open(full, encoding="utf-8") as f:
+                return self._json(200, {"ok": True, "path": rel, "content": f.read()})
+        return super().do_GET()
+
     def do_POST(self):
         parsed = urllib.parse.urlparse(self.path)
+        if parsed.path == "/api/save":
+            length = int(self.headers.get("Content-Length", 0) or 0)
+            raw = self.rfile.read(length) if length else b"{}"
+            try:
+                data = json.loads(raw)
+            except Exception:
+                return self._json(400, {"ok": False, "message": "bad JSON"})
+            full = safe_note_path(data.get("path", ""))
+            if not full:
+                return self._json(400, {"ok": False, "message": "invalid path"})
+            with open(full, "w", encoding="utf-8") as f:
+                f.write(data.get("content", ""))
+            regenerate()
+            return self._json(200, {"ok": True, "message": "saved"})
+
         if parsed.path != "/api/approve":
             return self._json(404, {"ok": False, "message": "unknown endpoint"})
         push = urllib.parse.parse_qs(parsed.query).get("push", ["0"])[0] == "1"

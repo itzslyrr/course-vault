@@ -81,7 +81,22 @@ section { margin-top:46px; }
 section h2 { font-family:Georgia,'Times New Roman',serif; font-size:18px; font-weight:400; letter-spacing:.5px; margin-bottom:20px; padding-bottom:12px; border-bottom:1px solid var(--line); text-transform:uppercase; letter-spacing:2px; color:var(--muted); }
 .count { color:var(--faint); font-size:13px; margin-left:6px; }
 .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:16px; }
-.card { background:var(--surface); border:1px solid var(--line); border-radius:14px; overflow:hidden; text-decoration:none; color:var(--text); transition:border-color .2s,background .2s; display:block; }
+.card { position:relative; background:var(--surface); border:1px solid var(--line); border-radius:14px; overflow:hidden; text-decoration:none; color:var(--text); transition:border-color .2s,background .2s; display:block; }
+.edit { position:absolute; top:11px; right:11px; z-index:2; background:rgba(18,14,10,.75); border:1px solid var(--line2); color:var(--muted); border-radius:14px; padding:3px 11px; font-size:10.5px; font-family:inherit; letter-spacing:1px; text-transform:uppercase; cursor:pointer; opacity:0; transition:opacity .2s,color .2s,border-color .2s; }
+.card:hover .edit { opacity:1; }
+.edit:hover { color:var(--accent); border-color:var(--accent); }
+html.readonly .edit { display:none; }
+html.readonly .pending-actions .approve { display:none; }
+.editor-overlay { position:fixed; inset:0; z-index:100; background:rgba(6,5,4,.72); backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center; padding:24px; }
+.editor-overlay.hidden { display:none; }
+.editor-box { width:min(780px,100%); max-height:86vh; display:flex; flex-direction:column; background:var(--surface2); border:1px solid var(--line2); border-radius:14px; overflow:hidden; }
+.editor-head { display:flex; align-items:center; justify-content:space-between; padding:14px 18px; border-bottom:1px solid var(--line); }
+.editor-head .t { font-family:var(--font-mono,ui-monospace,Menlo,monospace); font-size:12.5px; color:var(--muted); word-break:break-all; }
+.editor-head button { background:none; border:none; color:var(--muted); font-size:18px; cursor:pointer; line-height:1; }
+.editor-head button:hover { color:var(--text); }
+#editor-text { flex:1; min-height:48vh; resize:vertical; border:none; outline:none; background:#100d0a; color:var(--text); font-family:ui-monospace,Menlo,monospace; font-size:13px; line-height:1.6; padding:18px; }
+.editor-actions { display:flex; align-items:center; gap:14px; padding:14px 18px; border-top:1px solid var(--line); }
+#editor-msg { color:var(--muted); font-size:12px; }
 .card:hover { border-color:var(--line2); background:var(--surface2); }
 .card-body { padding:20px; display:flex; flex-direction:column; height:100%; }
 .card-head { display:flex; gap:9px; align-items:center; font-size:10.5px; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:12px; color:var(--muted); }
@@ -125,15 +140,15 @@ footer { margin-top:56px; color:var(--faint); font-size:11.5px; letter-spacing:.
 </style>
 </head>
 <body class="has-wall">
-<div class="wall" style="background-image:url('.dashboard/assets/wallpaper.jpg')"></div><div class="wall-tint"></div>
-<div class="scene" aria-hidden="true"><div class="human human1"><img src=".dashboard/assets/prof1.png" alt=""></div></div>
+<div class="wall" style="background-image:url('assets/wallpaper.jpg')"></div><div class="wall-tint"></div>
+<div class="scene" aria-hidden="true"><div class="human human1"><img src="assets/prof1.png" alt=""></div></div>
 <canvas id="stars"></canvas>
 <header>
 <div class="wordmark">The Vault</div>
-<div class="updated">Updated Tuesday, July 21 2026 · 11:12:38 · regenerates automatically when the vault changes</div>
+<div class="updated">Updated Tuesday, July 21 2026 · 11:17:20 · regenerates automatically when the vault changes</div>
 </header>
 
-<div class="tabnav"><button class="tabbtn active" data-tab="__all__">All</button><button class="tabbtn" data-tab="course">Course</button><button class="tabbtn" data-tab="projects">Projects</button><button class="tabbtn" data-tab="knowledge">Knowledge</button><button class="tabbtn" data-tab="decisions">Decisions</button><button class="tabbtn" data-tab="references">References</button><button class="tabbtn" data-tab="daily">Daily notes</button><button class="tabbtn" data-tab="__tracker__">Tracker</button><button class="tabbtn pendtab blink" data-scroll="pending">Pending · 3</button></div>
+<div class="tabnav"><button class="tabbtn active" data-tab="__all__">All</button><button class="tabbtn" data-tab="course">Course</button><button class="tabbtn" data-tab="projects">Projects</button><button class="tabbtn" data-tab="knowledge">Knowledge</button><button class="tabbtn" data-tab="decisions">Decisions</button><button class="tabbtn" data-tab="references">References</button><button class="tabbtn" data-tab="daily">Daily notes</button><button class="tabbtn" data-tab="__tracker__">Tracker</button><button class="tabbtn pendtab blink" data-scroll="pending">Pending · 4</button></div>
 
 <div class="controls">
 <input id="search" type="search" placeholder="Search notes, tags, text…">
@@ -144,9 +159,9 @@ footer { margin-top:56px; color:var(--faint); font-size:11.5px; letter-spacing:.
 <div class="tagbar"><button class="tag big" data-tag="ai-workflow">#ai-workflow <b>16</b></button><button class="tag big" data-tag="course">#course <b>15</b></button><button class="tag big" data-tag="knowledge-management">#knowledge-management <b>15</b></button><button class="tag big" data-tag="cli">#cli <b>10</b></button><button class="tag big" data-tag="missiles">#missiles <b>5</b></button><button class="tag big" data-tag="hooks">#hooks <b>5</b></button><button class="tag big" data-tag="github">#github <b>4</b></button><button class="tag big" data-tag="week-3">#week-3 <b>4</b></button><button class="tag big" data-tag="week-2">#week-2 <b>3</b></button><button class="tag big" data-tag="task-manager">#task-manager <b>2</b></button><button class="tag big" data-tag="retrieval">#retrieval <b>2</b></button><button class="tag big" data-tag="frontend">#frontend <b>2</b></button><button class="tag big" data-tag="design">#design <b>2</b></button><button class="tag big" data-tag="the-pulse">#the-pulse <b>2</b></button><button class="tag big" data-tag="week-1">#week-1 <b>1</b></button><button class="tag big" data-tag="housekeeping">#housekeeping <b>1</b></button><button class="tag big" data-tag="adr">#adr <b>1</b></button><button class="tag big" data-tag="project">#project <b>1</b></button><button class="tag big" data-tag="day-12">#day-12 <b>1</b></button><button class="tag big" data-tag="warehouse">#warehouse <b>1</b></button><button class="tag big" data-tag="inventory">#inventory <b>1</b></button><button class="tag big" data-tag="sources">#sources <b>1</b></button></div>
 </details>
 
-<section id="pending"><h2>Pending review <span class="count">3</span></h2>
+<section id="pending"><h2>Pending review <span class="count">4</span></h2>
 <div class="pending-box">
-<div class="pending-row"><span class="pstate modified">modified</span><code>.dashboard/generate.py</code></div><div class="pending-row"><span class="pstate new">new</span><code>.dashboard/assets/prof1.png</code></div><div class="pending-row"><span class="pstate new">new</span><code>.dashboard/serve.py</code></div>
+<div class="pending-row"><span class="pstate modified">modified</span><code>.dashboard/generate.py</code></div><div class="pending-row"><span class="pstate modified">modified</span><code>.dashboard/serve.py</code></div><div class="pending-row"><span class="pstate modified">modified</span><code>.dashboard/assets/prof1.png -&gt; assets/prof1.png</code></div><div class="pending-row"><span class="pstate modified">modified</span><code>.dashboard/assets/wallpaper.jpg -&gt; assets/wallpaper.jpg</code></div>
 <div class="pending-actions">
 <button class="btn approve" data-push="0">Approve</button>
 <button class="btn ghost approve" data-push="1">Approve &amp; push</button>
@@ -156,6 +171,7 @@ footer { margin-top:56px; color:var(--faint); font-size:11.5px; letter-spacing:.
 </div></section>
 
 <section class="tabpanel" data-tab="course"><h2>Course <span class="count">2</span></h2><div class="grid"><a class="card" href="course/overview.md" data-search="4-week course — overview course ai-workflow knowledge-management what: a 4-week hands-on course; the work products live in the bash 1 workspace (terminal, git/github, and ai-assisted knowledge building)." data-tags="course,ai-workflow,knowledge-management">
+<button class="edit" data-path="course/overview.md">Edit</button>
 <div class="card-body">
 <div class="card-head"><span class="dot" style="background:#9d4edd"></span><span class="type">course</span><span class="status">active</span><span class="date">2026-07-06</span></div>
 <h3>4-Week Course — Overview</h3>
@@ -163,6 +179,7 @@ footer { margin-top:56px; color:var(--faint); font-size:11.5px; letter-spacing:.
 <div class="meta"><span class="tag" data-tag="course">#course</span><span class="tag" data-tag="ai-workflow">#ai-workflow</span><span class="tag" data-tag="knowledge-management">#knowledge-management</span></div>
 </div></a>
 <a class="card" href="course/week-1.md" data-search="week 1 analysis (jun 29 – jul 5) course week-1 github knowledge-management ai-workflow 1. warhouse vault (~jul 1, &quot;day 2&quot;) — first knowledge-base build: a warehouse parts inventory (warhouse-vault) with 12 parts across 2 warehouses, strict frontmatter (partno, natoclass, warehouse), a never-guess rule with…" data-tags="course,week-1,github,knowledge-management,ai-workflow">
+<button class="edit" data-path="course/week-1.md">Edit</button>
 <div class="card-body">
 <div class="card-head"><span class="dot" style="background:#9d4edd"></span><span class="type">week</span><span class="date">2026-07-06</span></div>
 <h3>Week 1 Analysis (Jun 29 – Jul 5)</h3>
@@ -172,6 +189,7 @@ footer { margin-top:56px; color:var(--faint); font-size:11.5px; letter-spacing:.
 <section class="tabpanel" data-tab="projects"><h2>Projects <span class="count">4</span></h2><div class="grid"><a class="card" href="projects/the-pulse.md" data-search="the pulse the-pulse course day-12 ai-workflow cli one-liner: the day 12 &quot;ship something real&quot; build — give it a topic and it shows, in
 one clean view, what people are saying about it right now, then an ai-synthesized
 summary on top. my topic: ai agents. first platform: …" data-tags="the-pulse,course,day-12,ai-workflow,cli">
+<button class="edit" data-path="projects/the-pulse.md">Edit</button>
 <div class="card-body">
 <div class="card-head"><span class="dot" style="background:#e63946"></span><span class="type">project</span><span class="status">active</span><span class="date">2026-07-16</span></div>
 <h3>The Pulse</h3>
@@ -181,6 +199,7 @@ summary on top. My topic: AI agents. First platform: …</p>
 <div class="meta"><span class="tag" data-tag="the-pulse">#the-pulse</span><span class="tag" data-tag="course">#course</span><span class="tag" data-tag="day-12">#day-12</span><span class="tag more">+2</span></div>
 </div></a>
 <a class="card" href="projects/task-manager.md" data-search="task manager v1 (end-of-week project) course task-manager adr project one-liner: the instructor&#x27;s end-of-week build — a working version 1 task manager (a single-screen app) delivered together with a set of 5 adrs that justify every design choice. decisions-first, exactly as the course teac…" data-tags="course,task-manager,adr,project">
+<button class="edit" data-path="projects/task-manager.md">Edit</button>
 <div class="card-body">
 <div class="card-head"><span class="dot" style="background:#e63946"></span><span class="type">project</span><span class="status">shipped</span><span class="date">2026-07-08</span></div>
 <h3>Task Manager v1 (end-of-week project)</h3>
@@ -188,6 +207,7 @@ summary on top. My topic: AI agents. First platform: …</p>
 <div class="meta"><span class="tag" data-tag="course">#course</span><span class="tag" data-tag="task-manager">#task-manager</span><span class="tag" data-tag="adr">#adr</span><span class="tag more">+1</span></div>
 </div></a>
 <a class="card" href="projects/next-gen-warfare.md" data-search="next-gen warfare missiles knowledge-management ai-workflow github one-liner: a non-sensitive, public-data missile knowledge base — 11 systems profiled across inventory/classes/armory, with photos, custom svg infographics, and an 11-slide presentation — built in one day by instructing a…" data-tags="missiles,knowledge-management,ai-workflow,github">
+<button class="edit" data-path="projects/next-gen-warfare.md">Edit</button>
 <div class="card-body">
 <div class="card-head"><span class="dot" style="background:#e63946"></span><span class="type">project</span><span class="status">active</span><span class="date">2026-07-02</span></div>
 <h3>Next-Gen Warfare</h3>
@@ -195,6 +215,7 @@ summary on top. My topic: AI agents. First platform: …</p>
 <div class="meta"><span class="tag" data-tag="missiles">#missiles</span><span class="tag" data-tag="knowledge-management">#knowledge-management</span><span class="tag" data-tag="ai-workflow">#ai-workflow</span><span class="tag more">+1</span></div>
 </div></a>
 <a class="card" href="projects/warhouse-vault.md" data-search="warhouse vault warehouse inventory knowledge-management github one-liner: a warehouse parts-inventory knowledge base — markdown notes tracking industrial parts (part number, nato supply class, warehouse location, supplier, assembly) across two warehouses, with strict never-guess rul…" data-tags="warehouse,inventory,knowledge-management,github">
+<button class="edit" data-path="projects/warhouse-vault.md">Edit</button>
 <div class="card-body">
 <div class="card-head"><span class="dot" style="background:#e63946"></span><span class="type">project</span><span class="status">active</span><span class="date">2026-07-02</span></div>
 <h3>Warhouse Vault</h3>
@@ -204,6 +225,7 @@ summary on top. My topic: AI agents. First platform: …</p>
 <section class="tabpanel" data-tab="knowledge"><h2>Knowledge <span class="count">13</span></h2><div class="grid"><a class="card" href="knowledge/the-face-frontend.md" data-search="the face (a frontend for the vault) ai-workflow frontend design weeks 1–3 built the vault&#x27;s brain (notes, the vault cli, the doctor, the guard) — but
 it&#x27;s only met as a list of files in the terminal. week 4 gives it a face: a visual
 frontend so notes can be seen (grouped, dated, clic…" data-tags="ai-workflow,frontend,design">
+<button class="edit" data-path="knowledge/the-face-frontend.md">Edit</button>
 <div class="card-body">
 <div class="card-head"><span class="dot" style="background:#2a9d8f"></span><span class="type">note</span><span class="date">2026-07-20</span></div>
 <h3>The Face (a frontend for the vault)</h3>
@@ -215,6 +237,7 @@ frontend so notes can be seen (grouped, dated, clic…</p>
 <a class="card" href="knowledge/headless-claude-as-a-free-backend.md" data-search="headless claude code as a free ai backend ai-workflow cli the-pulse course an app that needs an llm doesn&#x27;t have to pay a per-token api bill. if you already have
 claude code installed and logged in, your own app can shell out to it in headless
 mode — real claude, no separate api key, free on yo…" data-tags="ai-workflow,cli,the-pulse,course">
+<button class="edit" data-path="knowledge/headless-claude-as-a-free-backend.md">Edit</button>
 <div class="card-body">
 <div class="card-head"><span class="dot" style="background:#2a9d8f"></span><span class="type">note</span><span class="date">2026-07-16</span></div>
 <h3>Headless Claude Code as a free AI backend</h3>
@@ -224,6 +247,7 @@ mode — real Claude, no separate API key, free on yo…</p>
 <div class="meta"><span class="tag" data-tag="ai-workflow">#ai-workflow</span><span class="tag" data-tag="cli">#cli</span><span class="tag" data-tag="the-pulse">#the-pulse</span><span class="tag more">+1</span></div>
 </div></a>
 <a class="card" href="knowledge/the-three-channel-loop.md" data-search="the three-channel loop ai-workflow knowledge-management cli course working with an ai on a real build is one loop with three channels:" data-tags="ai-workflow,knowledge-management,cli,course">
+<button class="edit" data-path="knowledge/the-three-channel-loop.md">Edit</button>
 <div class="card-body">
 <div class="card-head"><span class="dot" style="background:#2a9d8f"></span><span class="type">note</span><span class="date">2026-07-16</span></div>
 <h3>The three-channel loop</h3>
@@ -231,6 +255,7 @@ mode — real Claude, no separate API key, free on yo…</p>
 <div class="meta"><span class="tag" data-tag="ai-workflow">#ai-workflow</span><span class="tag" data-tag="knowledge-management">#knowledge-management</span><span class="tag" data-tag="cli">#cli</span><span class="tag more">+1</span></div>
 </div></a>
 <a class="card" href="knowledge/the-door-reads-both-ways.md" data-search="the door reads both ways ai-workflow knowledge-management cli retrieval course the the-doorway-cli|doorway began as a write-only door: capture, adr, plan, task, done — every one a checked write. its help text admitted the gap: &quot;reads arrive on day 11.&quot; a door you can only put things into is a drawe…" data-tags="ai-workflow,knowledge-management,cli,retrieval,course">
+<button class="edit" data-path="knowledge/the-door-reads-both-ways.md">Edit</button>
 <div class="card-body">
 <div class="card-head"><span class="dot" style="background:#2a9d8f"></span><span class="type">note</span><span class="date">2026-07-16</span></div>
 <h3>The door reads both ways</h3>
@@ -240,6 +265,7 @@ mode — real Claude, no separate API key, free on yo…</p>
 <a class="card" href="knowledge/the-doctor-at-the-counter.md" data-search="the doctor at the counter (validate before you file) ai-workflow knowledge-management cli day 7&#x27;s the-doctor checked notes after they were filed. day 9&#x27;s the-doorway-cli
 made the counter the only door. but the counter still filed whatever it was handed.
 day 11 posts the doctor at the counter: vault capture no…" data-tags="ai-workflow,knowledge-management,cli">
+<button class="edit" data-path="knowledge/the-doctor-at-the-counter.md">Edit</button>
 <div class="card-body">
 <div class="card-head"><span class="dot" style="background:#2a9d8f"></span><span class="type">note</span><span class="date">2026-07-15</span></div>
 <h3>The Doctor at the Counter (validate before you file)</h3>
@@ -251,6 +277,7 @@ Day 11 posts the doctor at the counter: vault capture no…</p>
 <a class="card" href="knowledge/the-second-law.md" data-search="the second law (bricking up the wall) ai-workflow knowledge-management hooks cli day 9&#x27;s the-doorway-cli was opt-in: you could write notes through the vault
 counter, but the ai (or an editor, or a script) could still write files directly and
 skip every check. day 10 closes that hole by giving the day…" data-tags="ai-workflow,knowledge-management,hooks,cli">
+<button class="edit" data-path="knowledge/the-second-law.md">Edit</button>
 <div class="card-body">
 <div class="card-head"><span class="dot" style="background:#2a9d8f"></span><span class="type">note</span><span class="date">2026-07-14</span></div>
 <h3>The Second Law (bricking up the wall)</h3>
@@ -260,6 +287,7 @@ skip every check. Day 10 closes that hole by giving the Day…</p>
 <div class="meta"><span class="tag" data-tag="ai-workflow">#ai-workflow</span><span class="tag" data-tag="knowledge-management">#knowledge-management</span><span class="tag" data-tag="hooks">#hooks</span><span class="tag more">+1</span></div>
 </div></a>
 <a class="card" href="knowledge/the-doorway-cli.md" data-search="the doorway (a cli that checks before the write) ai-workflow knowledge-management cli day 7&#x27;s the-doctor checks the notes after they&#x27;re written. the doorway (a vault cli) checks the same rules before anything lands — a single, guarded entrance that both the human and the ai use." data-tags="ai-workflow,knowledge-management,cli">
+<button class="edit" data-path="knowledge/the-doorway-cli.md">Edit</button>
 <div class="card-body">
 <div class="card-head"><span class="dot" style="background:#2a9d8f"></span><span class="type">note</span><span class="date">2026-07-13</span></div>
 <h3>The Doorway (a CLI that checks before the write)</h3>
@@ -267,6 +295,7 @@ skip every check. Day 10 closes that hole by giving the Day…</p>
 <div class="meta"><span class="tag" data-tag="ai-workflow">#ai-workflow</span><span class="tag" data-tag="knowledge-management">#knowledge-management</span><span class="tag" data-tag="cli">#cli</span></div>
 </div></a>
 <a class="card" href="knowledge/the-doctor.md" data-search="the doctor (rules → checks) ai-workflow knowledge-management hooks the the-guard-hook guards what the ai does; it never reads what a note says. a wrong type, a missing created, a dead link walk straight past it. the doctor closes that gap: a read-only script that checks every note again…" data-tags="ai-workflow,knowledge-management,hooks">
+<button class="edit" data-path="knowledge/the-doctor.md">Edit</button>
 <div class="card-body">
 <div class="card-head"><span class="dot" style="background:#2a9d8f"></span><span class="type">note</span><span class="date">2026-07-08</span></div>
 <h3>The Doctor (rules → checks)</h3>
@@ -274,6 +303,7 @@ skip every check. Day 10 closes that hole by giving the Day…</p>
 <div class="meta"><span class="tag" data-tag="ai-workflow">#ai-workflow</span><span class="tag" data-tag="knowledge-management">#knowledge-management</span><span class="tag" data-tag="hooks">#hooks</span></div>
 </div></a>
 <a class="card" href="knowledge/the-guard-hook.md" data-search="the guard hook (promise → law) ai-workflow knowledge-management hooks day 5&#x27;s the-house-rule made the ai promise to stop before a write. a hook makes that stop a law — enforced from outside the ai, every time, whether or not the ai remembers." data-tags="ai-workflow,knowledge-management,hooks">
+<button class="edit" data-path="knowledge/the-guard-hook.md">Edit</button>
 <div class="card-body">
 <div class="card-head"><span class="dot" style="background:#2a9d8f"></span><span class="type">note</span><span class="date">2026-07-08</span></div>
 <h3>The Guard Hook (promise → law)</h3>
@@ -281,6 +311,7 @@ skip every check. Day 10 closes that hole by giving the Day…</p>
 <div class="meta"><span class="tag" data-tag="ai-workflow">#ai-workflow</span><span class="tag" data-tag="knowledge-management">#knowledge-management</span><span class="tag" data-tag="hooks">#hooks</span></div>
 </div></a>
 <a class="card" href="knowledge/the-house-rule.md" data-search="the house rule ai-workflow knowledge-management reads run free, writes wait for your review. when an ai tool acts on your vault, any verb that reads (a lookup, a recall) can run on its own — nothing changes, so there is nothing to check. any verb that writes (a new no…" data-tags="ai-workflow,knowledge-management">
+<button class="edit" data-path="knowledge/the-house-rule.md">Edit</button>
 <div class="card-body">
 <div class="card-head"><span class="dot" style="background:#2a9d8f"></span><span class="type">note</span><span class="date">2026-07-06</span></div>
 <h3>The House Rule</h3>
@@ -288,6 +319,7 @@ skip every check. Day 10 closes that hole by giving the Day…</p>
 <div class="meta"><span class="tag" data-tag="ai-workflow">#ai-workflow</span><span class="tag" data-tag="knowledge-management">#knowledge-management</span></div>
 </div></a>
 <a class="card" href="knowledge/mirv.md" data-search="mirv missiles one missile carries several warheads, each steered to a different target. introduced by the us minuteman iii (1970); now standard on heavy icbms (sarmat: 10+, df-41: up to 10) and demonstrated by india in 2024 (agni-v, &quot;…" data-tags="missiles">
+<button class="edit" data-path="knowledge/mirv.md">Edit</button>
 <div class="card-body">
 <div class="card-head"><span class="dot" style="background:#2a9d8f"></span><span class="type">note</span><span class="date">2026-07-02</span></div>
 <h3>MIRV</h3>
@@ -295,6 +327,7 @@ skip every check. Day 10 closes that hole by giving the Day…</p>
 <div class="meta"><span class="tag" data-tag="missiles">#missiles</span></div>
 </div></a>
 <a class="card" href="knowledge/hypersonic-weapons.md" data-search="hypersonic weapons missiles &quot;hypersonic&quot; ≠ just fast. every icbm warhead re-enters at mach 20+. a true hypersonic weapon sustains mach 5+ and maneuvers inside the atmosphere — the combination that defeats defenses, because interceptors rely on pred…" data-tags="missiles">
+<button class="edit" data-path="knowledge/hypersonic-weapons.md">Edit</button>
 <div class="card-body">
 <div class="card-head"><span class="dot" style="background:#2a9d8f"></span><span class="type">note</span><span class="date">2026-07-02</span></div>
 <h3>Hypersonic Weapons</h3>
@@ -302,6 +335,7 @@ skip every check. Day 10 closes that hole by giving the Day…</p>
 <div class="meta"><span class="tag" data-tag="missiles">#missiles</span></div>
 </div></a>
 <a class="card" href="knowledge/the-eight-kb-moves.md" data-search="the eight knowledge-base moves knowledge-management ai-workflow a method for building knowledge bases that are readable by humans and consumable by ai:" data-tags="knowledge-management,ai-workflow">
+<button class="edit" data-path="knowledge/the-eight-kb-moves.md">Edit</button>
 <div class="card-body">
 <div class="card-head"><span class="dot" style="background:#2a9d8f"></span><span class="type">note</span><span class="date">2026-07-02</span></div>
 <h3>The Eight Knowledge-Base Moves</h3>
@@ -309,6 +343,7 @@ skip every check. Day 10 closes that hole by giving the Day…</p>
 <div class="meta"><span class="tag" data-tag="knowledge-management">#knowledge-management</span><span class="tag" data-tag="ai-workflow">#ai-workflow</span></div>
 </div></a></div></section>
 <section class="tabpanel" data-tab="decisions"><h2>Decisions <span class="count">1</span></h2><div class="grid"><a class="card" href="decisions/adr-001-decisions-folder.md" data-search="adr-001 — keep decisions as numbered adrs in a decisions/ folder knowledge-management ai-workflow " data-tags="knowledge-management,ai-workflow">
+<button class="edit" data-path="decisions/adr-001-decisions-folder.md">Edit</button>
 <div class="card-body">
 <div class="card-head"><span class="dot" style="background:#f4a261"></span><span class="type">adr</span><span class="status">proposed</span><span class="date">2026-07-06</span></div>
 <h3>ADR-001 — Keep decisions as numbered ADRs in a decisions/ folder</h3>
@@ -316,6 +351,7 @@ skip every check. Day 10 closes that hole by giving the Day…</p>
 <div class="meta"><span class="tag" data-tag="knowledge-management">#knowledge-management</span><span class="tag" data-tag="ai-workflow">#ai-workflow</span></div>
 </div></a></div></section>
 <section class="tabpanel" data-tab="references"><h2>References <span class="count">1</span></h2><div class="grid"><a class="card" href="references/missile-sources.md" data-search="missile info sources missiles sources " data-tags="missiles,sources">
+<button class="edit" data-path="references/missile-sources.md">Edit</button>
 <div class="card-body">
 <div class="card-head"><span class="dot" style="background:#457b9d"></span><span class="type">reference</span><span class="date">2026-07-02</span></div>
 <h3>Missile Info Sources</h3>
@@ -325,6 +361,7 @@ skip every check. Day 10 closes that hole by giving the Day…</p>
 <section class="tabpanel" data-tab="daily"><h2>Daily notes <span class="count">9</span></h2><div class="grid"><a class="card" href="daily/2026-07-20.md" data-search="2026-07-20 — day 13, the face (frontend) course frontend design week 4 opens. weeks 1–3 gave the vault a brain (notes, the vault cli, the doctor, the
 guard); this week gives it a face — a visual frontend so notes can be seen, not just
 dug for in the terminal." data-tags="course,frontend,design">
+<button class="edit" data-path="daily/2026-07-20.md">Edit</button>
 <div class="card-body">
 <div class="card-head"><span class="dot" style="background:#e9c46a"></span><span class="type">daily</span><span class="date">2026-07-20</span></div>
 <h3>2026-07-20 — Day 13, the face (frontend)</h3>
@@ -334,6 +371,7 @@ dug for in the terminal.</p>
 <div class="meta"><span class="tag" data-tag="course">#course</span><span class="tag" data-tag="frontend">#frontend</span><span class="tag" data-tag="design">#design</span></div>
 </div></a>
 <a class="card" href="daily/2026-07-16.md" data-search="2026-07-16 course week-3 cli retrieval " data-tags="course,week-3,cli,retrieval">
+<button class="edit" data-path="daily/2026-07-16.md">Edit</button>
 <div class="card-body">
 <div class="card-head"><span class="dot" style="background:#e9c46a"></span><span class="type">daily</span><span class="date">2026-07-16</span></div>
 <h3>2026-07-16</h3>
@@ -341,6 +379,7 @@ dug for in the terminal.</p>
 <div class="meta"><span class="tag" data-tag="course">#course</span><span class="tag" data-tag="week-3">#week-3</span><span class="tag" data-tag="cli">#cli</span><span class="tag more">+1</span></div>
 </div></a>
 <a class="card" href="daily/2026-07-15.md" data-search="2026-07-15 course week-3 cli " data-tags="course,week-3,cli">
+<button class="edit" data-path="daily/2026-07-15.md">Edit</button>
 <div class="card-body">
 <div class="card-head"><span class="dot" style="background:#e9c46a"></span><span class="type">daily</span><span class="date">2026-07-15</span></div>
 <h3>2026-07-15</h3>
@@ -348,6 +387,7 @@ dug for in the terminal.</p>
 <div class="meta"><span class="tag" data-tag="course">#course</span><span class="tag" data-tag="week-3">#week-3</span><span class="tag" data-tag="cli">#cli</span></div>
 </div></a>
 <a class="card" href="daily/2026-07-14.md" data-search="2026-07-14 course week-3 hooks task-manager " data-tags="course,week-3,hooks,task-manager">
+<button class="edit" data-path="daily/2026-07-14.md">Edit</button>
 <div class="card-body">
 <div class="card-head"><span class="dot" style="background:#e9c46a"></span><span class="type">daily</span><span class="date">2026-07-14</span></div>
 <h3>2026-07-14</h3>
@@ -355,6 +395,7 @@ dug for in the terminal.</p>
 <div class="meta"><span class="tag" data-tag="course">#course</span><span class="tag" data-tag="week-3">#week-3</span><span class="tag" data-tag="hooks">#hooks</span><span class="tag more">+1</span></div>
 </div></a>
 <a class="card" href="daily/2026-07-13.md" data-search="2026-07-13 course week-3 cli " data-tags="course,week-3,cli">
+<button class="edit" data-path="daily/2026-07-13.md">Edit</button>
 <div class="card-body">
 <div class="card-head"><span class="dot" style="background:#e9c46a"></span><span class="type">daily</span><span class="date">2026-07-13</span></div>
 <h3>2026-07-13</h3>
@@ -362,6 +403,7 @@ dug for in the terminal.</p>
 <div class="meta"><span class="tag" data-tag="course">#course</span><span class="tag" data-tag="week-3">#week-3</span><span class="tag" data-tag="cli">#cli</span></div>
 </div></a>
 <a class="card" href="daily/2026-07-08.md" data-search="2026-07-08 course week-2 housekeeping " data-tags="course,week-2,housekeeping">
+<button class="edit" data-path="daily/2026-07-08.md">Edit</button>
 <div class="card-body">
 <div class="card-head"><span class="dot" style="background:#e9c46a"></span><span class="type">daily</span><span class="date">2026-07-08</span></div>
 <h3>2026-07-08</h3>
@@ -369,6 +411,7 @@ dug for in the terminal.</p>
 <div class="meta"><span class="tag" data-tag="course">#course</span><span class="tag" data-tag="week-2">#week-2</span><span class="tag" data-tag="housekeeping">#housekeeping</span></div>
 </div></a>
 <a class="card" href="daily/2026-07-07.md" data-search="2026-07-07 course week-2 hooks " data-tags="course,week-2,hooks">
+<button class="edit" data-path="daily/2026-07-07.md">Edit</button>
 <div class="card-body">
 <div class="card-head"><span class="dot" style="background:#e9c46a"></span><span class="type">daily</span><span class="date">2026-07-07</span></div>
 <h3>2026-07-07</h3>
@@ -376,6 +419,7 @@ dug for in the terminal.</p>
 <div class="meta"><span class="tag" data-tag="course">#course</span><span class="tag" data-tag="week-2">#week-2</span><span class="tag" data-tag="hooks">#hooks</span></div>
 </div></a>
 <a class="card" href="daily/2026-07-06.md" data-search="2026-07-06 course week-2 " data-tags="course,week-2">
+<button class="edit" data-path="daily/2026-07-06.md">Edit</button>
 <div class="card-body">
 <div class="card-head"><span class="dot" style="background:#e9c46a"></span><span class="type">daily</span><span class="date">2026-07-06</span></div>
 <h3>2026-07-06</h3>
@@ -383,6 +427,7 @@ dug for in the terminal.</p>
 <div class="meta"><span class="tag" data-tag="course">#course</span><span class="tag" data-tag="week-2">#week-2</span></div>
 </div></a>
 <a class="card" href="daily/2026-07-02.md" data-search="2026-07-02 missiles github knowledge-management " data-tags="missiles,github,knowledge-management">
+<button class="edit" data-path="daily/2026-07-02.md">Edit</button>
 <div class="card-body">
 <div class="card-head"><span class="dot" style="background:#e9c46a"></span><span class="type">daily</span><span class="date">2026-07-02</span></div>
 <h3>2026-07-02</h3>
@@ -392,11 +437,21 @@ dug for in the terminal.</p>
 
 <section class="tabpanel hidden" data-tab="__tracker__"><h2>Tracker <span class="count">14</span></h2><div class="pagegrid"><a class="pagecard" href="review.html"><span class="pagecard-t">Review</span><span class="pagecard-go">Open</span></a><a class="pagecard" href="course/course-so-far-deck.html"><span class="pagecard-t">Course So Far Deck</span><span class="pagecard-go">Open</span></a><a class="pagecard" href="course/day10-explainer.html"><span class="pagecard-t">Day10 Explainer</span><span class="pagecard-go">Open</span></a><a class="pagecard" href="course/day11-explainer.html"><span class="pagecard-t">Day11 Explainer</span><span class="pagecard-go">Open</span></a><a class="pagecard" href="course/day5-explainer.html"><span class="pagecard-t">Day5 Explainer</span><span class="pagecard-go">Open</span></a><a class="pagecard" href="course/day6-explainer.html"><span class="pagecard-t">Day6 Explainer</span><span class="pagecard-go">Open</span></a><a class="pagecard" href="course/day7-explainer.html"><span class="pagecard-t">Day7 Explainer</span><span class="pagecard-go">Open</span></a><a class="pagecard" href="course/day9-explainer.html"><span class="pagecard-t">Day9 Explainer</span><span class="pagecard-go">Open</span></a><a class="pagecard" href="course/task-manager-deck.html"><span class="pagecard-t">Task Manager Deck</span><span class="pagecard-go">Open</span></a><a class="pagecard" href="course/the-pulse-filled.html"><span class="pagecard-t">The Pulse Filled</span><span class="pagecard-go">Open</span></a><a class="pagecard" href="course/wireframe-explainer.html"><span class="pagecard-t">Wireframe Explainer</span><span class="pagecard-go">Open</span></a><a class="pagecard" href="course/wireframe-journey-deck.html"><span class="pagecard-t">Wireframe Journey Deck</span><span class="pagecard-go">Open</span></a><a class="pagecard" href="course/wireframe-the-pulse.html"><span class="pagecard-t">Wireframe The Pulse</span><span class="pagecard-go">Open</span></a><a class="pagecard" href="course/wireframe.html"><span class="pagecard-t">Wireframe</span><span class="pagecard-go">Open</span></a></div></section>
 
-<section><h2>Recent activity</h2><div class="commits"><div class="commit"><span class="date">2026-07-21 10:29</span><span>Dashboard redesign: minimal luxury skin, Tracker tab, library wallpaper + gold starfield; Day 13 wireframes &amp; journey deck</span></div><div class="commit"><span class="date">2026-07-20 11:06</span><span>Day 13: the face — frontend concept, SvelteKit choice, wireframe; deck + overview + index</span></div><div class="commit"><span class="date">2026-07-16 12:19</span><span>feed: The Pulse shipped (Day 12 project) — live X data + free AI summary</span></div><div class="commit"><span class="date">2026-07-16 09:51</span><span>feed: Day 12 — three-channel loop + the door&#x27;s read side</span></div><div class="commit"><span class="date">2026-07-15 11:58</span><span>Add Day 9/10/11 explainers + comprehensive &#x27;Course So Far&#x27; deck</span></div><div class="commit"><span class="date">2026-07-15 11:26</span><span>feed: Day 11 — the doctor at the counter (capture validation + sensitive check)</span></div><div class="commit"><span class="date">2026-07-14 12:17</span><span>feed: Day 10 (the second law) + task image/detail feature + catch-up</span></div><div class="commit"><span class="date">2026-07-13 13:46</span><span>Un-mix: remove v4 roadmap artifacts wrongly tied to task-manager</span></div><div class="commit"><span class="date">2026-07-13 13:37</span><span>Add v4 roadmap HTML preview (generated from plan/task files)</span></div><div class="commit"><span class="date">2026-07-13 12:49</span><span>feed: v4 roadmap set via the plan/task pipeline (account-safety + sync scopes)</span></div><div class="commit"><span class="date">2026-07-13 09:56</span><span>feed: Day 9 — the doorway CLI (checks writes at the entry)</span></div><div class="commit"><span class="date">2026-07-09 12:41</span><span>Deck: add V3 (accounts) slides + real screenshots; enable Pages (.nojekyll)</span></div></div></section>
+<section><h2>Recent activity</h2><div class="commits"><div class="commit"><span class="date">2026-07-21 11:12</span><span>Approve pending vault changes (from dashboard)</span></div><div class="commit"><span class="date">2026-07-21 10:29</span><span>Dashboard redesign: minimal luxury skin, Tracker tab, library wallpaper + gold starfield; Day 13 wireframes &amp; journey deck</span></div><div class="commit"><span class="date">2026-07-20 11:06</span><span>Day 13: the face — frontend concept, SvelteKit choice, wireframe; deck + overview + index</span></div><div class="commit"><span class="date">2026-07-16 12:19</span><span>feed: The Pulse shipped (Day 12 project) — live X data + free AI summary</span></div><div class="commit"><span class="date">2026-07-16 09:51</span><span>feed: Day 12 — three-channel loop + the door&#x27;s read side</span></div><div class="commit"><span class="date">2026-07-15 11:58</span><span>Add Day 9/10/11 explainers + comprehensive &#x27;Course So Far&#x27; deck</span></div><div class="commit"><span class="date">2026-07-15 11:26</span><span>feed: Day 11 — the doctor at the counter (capture validation + sensitive check)</span></div><div class="commit"><span class="date">2026-07-14 12:17</span><span>feed: Day 10 (the second law) + task image/detail feature + catch-up</span></div><div class="commit"><span class="date">2026-07-13 13:46</span><span>Un-mix: remove v4 roadmap artifacts wrongly tied to task-manager</span></div><div class="commit"><span class="date">2026-07-13 13:37</span><span>Add v4 roadmap HTML preview (generated from plan/task files)</span></div><div class="commit"><span class="date">2026-07-13 12:49</span><span>feed: v4 roadmap set via the plan/task pipeline (account-safety + sync scopes)</span></div><div class="commit"><span class="date">2026-07-13 09:56</span><span>feed: Day 9 — the doorway CLI (checks writes at the entry)</span></div></div></section>
 
 <footer>Generated by .dashboard/generate.py · rules in CLAUDE.md</footer>
 
+<div id="editor" class="editor-overlay hidden" aria-hidden="true">
+  <div class="editor-box">
+    <div class="editor-head"><span class="t" id="editor-title"></span><button id="editor-close" aria-label="Close">&#10005;</button></div>
+    <textarea id="editor-text" spellcheck="false"></textarea>
+    <div class="editor-actions"><button class="btn" id="editor-save">Save</button><button class="btn ghost" id="editor-cancel">Cancel</button><span id="editor-msg"></span></div>
+  </div>
+</div>
+
 <script>
+const canEdit = location.hostname === '127.0.0.1' || location.hostname === 'localhost';
+if (!canEdit) document.documentElement.classList.add('readonly');
 // --- twinkling starfield background ---
 const canvas = document.getElementById('stars');
 const ctx = canvas.getContext('2d');
@@ -486,6 +541,45 @@ async function approve(push, btn) {
   function reset(txt) { document.querySelectorAll('.approve').forEach(b => b.disabled = false); btn.textContent = txt; }
 }
 document.querySelectorAll('.approve').forEach(b => b.addEventListener('click', () => approve(b.dataset.push, b)));
+
+// --- edit notes in the browser (localhost only) ---
+const editor = document.getElementById('editor');
+let editPath = null;
+function closeEditor() { editor.classList.add('hidden'); }
+async function openEditor(path) {
+  editPath = path;
+  document.getElementById('editor-title').textContent = path;
+  const ta = document.getElementById('editor-text');
+  ta.value = 'Loading…';
+  document.getElementById('editor-msg').textContent = '';
+  editor.classList.remove('hidden');
+  try {
+    const res = await fetch('/api/note?path=' + encodeURIComponent(path));
+    const data = await res.json();
+    ta.value = data.ok ? data.content : ('Error: ' + (data.message || 'could not load'));
+    ta.focus();
+  } catch (e) {
+    closeEditor();
+    alert('Editing needs the local server:\n  python3 .dashboard/serve.py\nthen open  http://127.0.0.1:8791/dashboard.html');
+  }
+}
+async function saveNote() {
+  const msg = document.getElementById('editor-msg');
+  msg.textContent = 'Saving…';
+  try {
+    const res = await fetch('/api/save', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ path: editPath, content: document.getElementById('editor-text').value }) });
+    const data = await res.json();
+    if (data.ok) { msg.textContent = 'Saved — reloading…'; setTimeout(() => location.reload(), 700); }
+    else { msg.textContent = ''; alert('Save failed: ' + (data.message || '')); }
+  } catch (e) { msg.textContent = ''; alert('Save failed — is the server running?'); }
+}
+if (canEdit) {
+  document.querySelectorAll('.edit').forEach(b => b.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); openEditor(b.dataset.path); }));
+  document.getElementById('editor-save').addEventListener('click', saveNote);
+  document.getElementById('editor-close').addEventListener('click', closeEditor);
+  document.getElementById('editor-cancel').addEventListener('click', closeEditor);
+  editor.addEventListener('click', e => { if (e.target === editor) closeEditor(); });
+}
 
 const search = document.getElementById('search');
 let activeTag = null;
