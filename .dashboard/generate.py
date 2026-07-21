@@ -288,7 +288,7 @@ def render(notes, pending):
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vault Dashboard</title>
 <style>
-:root {{ --bg:#0b0c10; --surface:#131419; --surface2:#181920; --text:#e9e6df; --muted:#8f8c85; --faint:#6a6862; --accent:#c8a86a; --line:rgba(255,255,255,.07); --line2:rgba(255,255,255,.11); }}
+:root {{ --bg:#0b0c10; --surface:#1c1e26; --surface2:#22242d; --text:#f4f1ec; --muted:#b0ada4; --faint:#8a877e; --accent:#d8b878; --line:rgba(255,255,255,.10); --line2:rgba(255,255,255,.15); }}
 * {{ margin:0; padding:0; box-sizing:border-box; }}
 body {{ background:linear-gradient(180deg,#0d0e13 0%,#08090c 60%,#060608 100%); background-attachment:fixed; color:var(--text); font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; font-weight:300; padding:56px clamp(18px,6vw,84px) 100px; min-height:100vh; letter-spacing:.2px; }}
 #stars {{ position:fixed; inset:0; width:100%; height:100%; z-index:-1; pointer-events:none; }}
@@ -314,11 +314,11 @@ body {{ background:linear-gradient(180deg,#0d0e13 0%,#08090c 60%,#060608 100%); 
 @keyframes bob {{ 0%,100% {{ transform:translateY(0); }} 50% {{ transform:translateY(-4px); }} }}
 @media (max-width:820px) {{ .human1 {{ height:42vh; opacity:.7; }} .human2 {{ display:none; }} }}
 @media (prefers-reduced-motion: reduce) {{ .prof, .arm, .human img {{ animation:none; }} }}
-.wall-tint {{ position:fixed; inset:0; z-index:-2; background:linear-gradient(180deg, rgba(12,9,6,.50) 0%, rgba(11,8,5,.74) 48%, rgba(8,6,4,.90) 100%); }}
+.wall-tint {{ position:fixed; inset:0; z-index:-2; background:linear-gradient(180deg, rgba(20,15,10,.28) 0%, rgba(16,12,8,.46) 48%, rgba(12,9,6,.62) 100%); }}
 body.has-wall {{ background:#0a0806; }}
-body.has-wall .stats, body.has-wall .stat {{ background:rgba(18,14,10,.60); backdrop-filter:blur(9px); -webkit-backdrop-filter:blur(9px); }}
-body.has-wall .card, body.has-wall .pagecard, body.has-wall .commits, body.has-wall .pending-box, body.has-wall #search {{ background:rgba(18,14,10,.58); backdrop-filter:blur(9px); -webkit-backdrop-filter:blur(9px); }}
-body.has-wall .card:hover, body.has-wall .pagecard:hover {{ background:rgba(26,20,14,.72); }}
+body.has-wall .stats, body.has-wall .stat {{ background:rgba(30,26,20,.88); backdrop-filter:blur(11px); -webkit-backdrop-filter:blur(11px); }}
+body.has-wall .card, body.has-wall .pagecard, body.has-wall .commits, body.has-wall .pending-box, body.has-wall #search {{ background:rgba(30,26,20,.86); backdrop-filter:blur(11px); -webkit-backdrop-filter:blur(11px); }}
+body.has-wall .card:hover, body.has-wall .pagecard:hover {{ background:rgba(40,34,26,.93); }}
 body.has-wall .tabbtn, body.has-wall .tag {{ backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); }}
 header {{ margin-bottom:26px; }}
 .wordmark {{ font-family:Georgia,'Times New Roman',serif; font-size:clamp(30px,4vw,46px); font-weight:400; letter-spacing:.5px; color:var(--text); }}
