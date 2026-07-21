@@ -506,26 +506,7 @@ if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {{
   drawStars(0); // static stars, no animation loop
 }}
 
-// --- interactive: background + scholars drift with the cursor (parallax) ---
-const wallEl = document.querySelector('.wall');
-const figs = document.querySelectorAll('.fig, .human');
-if ((wallEl || figs.length) && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {{
-  let raf = null;
-  window.addEventListener('mousemove', e => {{
-    if (raf) return;
-    raf = requestAnimationFrame(() => {{
-      raf = null;
-      const cx = e.clientX / window.innerWidth - 0.5;
-      const cy = e.clientY / window.innerHeight - 0.5;
-      if (wallEl) wallEl.style.transform = `scale(1.06) translate(${{(-cx*16).toFixed(1)}}px, ${{(-cy*11).toFixed(1)}}px)`;
-      figs.forEach((f, i) => {{
-        const depth = (i + 1) * 8;
-        const base = f.classList.contains('fig2') ? 'scaleX(-1) ' : '';
-        f.style.transform = base + `translateX(${{(cx*depth).toFixed(1)}}px)`;
-      }});
-    }});
-  }});
-}}
+// background stays fixed — cursor parallax intentionally disabled
 
 // click a scholar to keep them "awake" (fully lit)
 document.querySelectorAll('.human').forEach(h => h.addEventListener('click', () => h.classList.toggle('awake')));
