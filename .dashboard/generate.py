@@ -136,14 +136,37 @@ def render(notes, pending):
     commits = git_log()
 
     # optional wallpaper: drop any image into .dashboard/assets/ and it becomes the background
-    wall = None
+    wall, humans = None, []
     assets_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets")
     if os.path.isdir(assets_dir):
         for fn in sorted(os.listdir(assets_dir)):
-            if fn.lower().rsplit(".", 1)[-1] in ("jpg", "jpeg", "png", "webp"):
-                wall = ".dashboard/assets/" + fn
-                break
+            ext = fn.lower().rsplit(".", 1)[-1]
+            if fn.lower().startswith("prof") and ext in ("png", "webp"):
+                humans.append(".dashboard/assets/" + fn)          # scene figures
+            elif ext in ("jpg", "jpeg", "png", "webp") and not wall:
+                wall = ".dashboard/assets/" + fn                  # first non-prof image = wallpaper
     body_class = "has-wall" if wall else ""
+    if wall and humans:
+        # real photographic scholars, cut out with transparent backgrounds
+        figs = "".join(
+            f'<div class="human human{i}"><img src="{html.escape(src)}" alt=""></div>'
+            for i, src in enumerate(humans[:2], start=1))
+        scene_html = f'<div class="scene" aria-hidden="true">{figs}</div>'
+    elif wall:
+        # fallback: simple scholar silhouettes if no photos are present
+        prof_svg = ('<g class="prof"><path d="M50,205 L47,252 L56,252 L59,208 Z"/>'
+                    '<path d="M62,205 L66,252 L75,252 L70,208 Z"/>'
+                    '<path d="M58,54 C46,54 44,66 44,86 L39,210 L81,210 L76,86 C76,66 74,54 62,54 Z"/>'
+                    '<circle cx="60" cy="39" r="15"/>'
+                    '<path d="M46,86 C36,94 34,112 41,122" stroke="currentColor" stroke-width="9" stroke-linecap="round" fill="none"/>'
+                    '<rect x="33" y="114" width="16" height="21" rx="2"/>'
+                    '<g class="arm"><path d="M74,72 C89,60 99,44 105,30" stroke="currentColor" stroke-width="9" stroke-linecap="round" fill="none"/>'
+                    '<rect x="99" y="19" width="17" height="13" rx="2"/></g></g>')
+        scene_html = (f'<div class="scene" aria-hidden="true">'
+                      f'<svg class="fig fig1" viewBox="0 0 130 260">{prof_svg}</svg>'
+                      f'<svg class="fig fig2" viewBox="0 0 130 260">{prof_svg}</svg></div>')
+    else:
+        scene_html = ""
     wall_layers = (f'<div class="wall" style="background-image:url(\'{html.escape(wall)}\')"></div>'
                    '<div class="wall-tint"></div>') if wall else ""
 
@@ -175,8 +198,10 @@ def render(notes, pending):
 <div class="pending-box">
 {rows}
 <div class="pending-actions">
-<a class="btn" href="review.html">Read the full diffs</a>
-<span class="hint">approve in terminal: <code>git add -A &amp;&amp; git commit</code> · reject: <code>git checkout -- &lt;file&gt;</code></span>
+<button class="btn approve" data-push="0">Approve</button>
+<button class="btn ghost approve" data-push="1">Approve &amp; push</button>
+<a class="btn ghost" href="review.html">View diffs</a>
+<span class="hint">or in terminal: <code>git add -A &amp;&amp; git commit</code></span>
 </div>
 </div></section>'''
     else:
@@ -223,6 +248,8 @@ def render(notes, pending):
         tab_buttons.append(f'<button class="tabbtn" data-tab="{key}">{html.escape(label)}</button>')
     if pages:
         tab_buttons.append('<button class="tabbtn" data-tab="__tracker__">Tracker</button>')
+    if pending:
+        tab_buttons.append(f'<button class="tabbtn pendtab blink" data-scroll="pending">Pending · {len(pending)}</button>')
     tabs_html = f'<div class="tabnav">{"".join(tab_buttons)}</div>'
 
     # top stat squares — clickable ones filter to their section (same mechanism as the tabs)
@@ -250,7 +277,7 @@ def render(notes, pending):
         for t, c in sorted(tags.items(), key=lambda kv: -kv[1]))
 
     commit_html = "".join(
-        f'<div class="commit"><code>{html.escape(h)}</code><span class="date">{html.escape(d)}</span><span>{html.escape(s)}</span></div>'
+        f'<div class="commit"><span class="date">{html.escape(d)}</span><span>{html.escape(s)}</span></div>'
         for h, d, s in commits) or '<div class="commit"><span>no commits yet</span></div>'
 
     return f'''<!DOCTYPE html>
@@ -265,14 +292,34 @@ def render(notes, pending):
 body {{ background:linear-gradient(180deg,#0d0e13 0%,#08090c 60%,#060608 100%); background-attachment:fixed; color:var(--text); font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; font-weight:300; padding:56px clamp(18px,6vw,84px) 100px; min-height:100vh; letter-spacing:.2px; }}
 #stars {{ position:fixed; inset:0; width:100%; height:100%; z-index:-1; pointer-events:none; }}
 /* wallpaper mode: a fixed cover image + a warm tint for legibility; cards turn to glass */
-.wall {{ position:fixed; inset:0; z-index:-3; background-position:center; background-size:cover; background-repeat:no-repeat; }}
+.wall {{ position:fixed; inset:0; z-index:-3; background-position:center; background-size:cover; background-repeat:no-repeat; transform:scale(1.06); transition:transform .35s ease-out; }}
+.scene {{ position:fixed; inset:0; z-index:-1; pointer-events:none; overflow:hidden; }}
+.fig {{ position:absolute; bottom:0; height:44vh; width:auto; color:rgba(20,14,8,.52); fill:currentColor; transition:transform .4s ease-out; }}
+.fig1 {{ left:1.5%; height:47vh; }}
+.fig2 {{ right:3%; height:38vh; transform:scaleX(-1); }}
+.prof {{ transform-box:fill-box; animation:sway 7s ease-in-out infinite; }}
+.fig2 .prof {{ animation-duration:8.5s; animation-delay:-2.5s; }}
+.arm {{ transform-box:fill-box; transform-origin:74px 72px; animation:reach 7s ease-in-out infinite; }}
+.fig2 .arm {{ animation-duration:8.5s; animation-delay:-3.5s; }}
+@keyframes reach {{ 0%,100% {{ transform:rotate(8deg); }} 42% {{ transform:rotate(-34deg); }} 60% {{ transform:rotate(-34deg); }} }}
+@keyframes sway {{ 0%,100% {{ transform:translateY(0); }} 50% {{ transform:translateY(-3px); }} }}
+.human {{ position:absolute; bottom:0; transition:transform .4s ease-out; will-change:transform; pointer-events:auto; cursor:pointer; }}
+.human1 {{ right:3%; height:60vh; z-index:1; }}
+.human2 {{ left:2.5%; height:49vh; }}
+.human::after {{ content:""; position:absolute; left:50%; bottom:1%; width:62%; height:22px; transform:translateX(-50%); background:radial-gradient(ellipse at center, rgba(0,0,0,.55), rgba(0,0,0,0) 72%); filter:blur(5px); pointer-events:none; z-index:-1; }}
+.human img {{ position:relative; height:100%; width:auto; display:block; opacity:.86; filter:brightness(.58) contrast(1.05) sepia(.16) saturate(.88) drop-shadow(0 10px 20px rgba(0,0,0,.5)); animation:bob 7.5s ease-in-out infinite; transition:filter .35s ease, opacity .35s ease; }}
+.human2 img {{ animation-duration:9s; animation-delay:-3s; }}
+.human:hover img, .human.awake img {{ opacity:1; filter:brightness(.96) contrast(1.05) sepia(.04) saturate(1) drop-shadow(0 16px 28px rgba(0,0,0,.6)); }}
+@keyframes bob {{ 0%,100% {{ transform:translateY(0); }} 50% {{ transform:translateY(-4px); }} }}
+@media (max-width:820px) {{ .human1 {{ height:42vh; opacity:.7; }} .human2 {{ display:none; }} }}
+@media (prefers-reduced-motion: reduce) {{ .prof, .arm, .human img {{ animation:none; }} }}
 .wall-tint {{ position:fixed; inset:0; z-index:-2; background:linear-gradient(180deg, rgba(12,9,6,.50) 0%, rgba(11,8,5,.74) 48%, rgba(8,6,4,.90) 100%); }}
 body.has-wall {{ background:#0a0806; }}
 body.has-wall .stats, body.has-wall .stat {{ background:rgba(18,14,10,.60); backdrop-filter:blur(9px); -webkit-backdrop-filter:blur(9px); }}
 body.has-wall .card, body.has-wall .pagecard, body.has-wall .commits, body.has-wall .pending-box, body.has-wall #search {{ background:rgba(18,14,10,.58); backdrop-filter:blur(9px); -webkit-backdrop-filter:blur(9px); }}
 body.has-wall .card:hover, body.has-wall .pagecard:hover {{ background:rgba(26,20,14,.72); }}
 body.has-wall .tabbtn, body.has-wall .tag {{ backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); }}
-header {{ margin-bottom:44px; }}
+header {{ margin-bottom:26px; }}
 .wordmark {{ font-family:Georgia,'Times New Roman',serif; font-size:clamp(30px,4vw,46px); font-weight:400; letter-spacing:.5px; color:var(--text); }}
 .updated {{ color:var(--faint); font-size:12.5px; margin-top:10px; letter-spacing:.4px; }}
 .stats {{ display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:1px; margin:0 0 40px; background:var(--line); border:1px solid var(--line); border-radius:14px; overflow:hidden; }}
@@ -299,12 +346,19 @@ button.stat {{ font-family:inherit; color:var(--text); cursor:pointer; border:no
 .tag.active {{ background:var(--accent); color:#12100b; border-color:var(--accent); }}
 .tag.more {{ border-style:dashed; cursor:default; color:var(--faint); }}
 .tag b {{ opacity:.55; font-weight:400; }}
-.tabnav {{ display:flex; flex-wrap:wrap; gap:18px; margin:30px 0 6px; }}
+.tabnav {{ display:flex; flex-wrap:wrap; gap:18px; margin:0 0 8px; padding-bottom:20px; border-bottom:1px solid var(--line); }}
 .tabbtn {{ background:transparent; color:var(--muted); border:1px solid var(--line2); border-radius:24px; padding:10px 22px; font-size:13px; font-family:inherit; cursor:pointer; letter-spacing:.6px; transition:border-color .2s,color .2s; }}
 .tabbtn:hover {{ border-color:var(--accent); color:var(--text); }}
 .tabbtn b {{ opacity:.5; font-weight:400; margin-left:5px; }}
 .tabbtn.active {{ background:var(--accent); color:#12100b; border-color:var(--accent); }}
 .tabbtn.active b {{ opacity:.7; }}
+.pendtab {{ border-color:var(--accent); color:var(--accent); }}
+.pendtab.blink {{ animation:blinkgold 1.15s ease-in-out infinite; }}
+@keyframes blinkgold {{
+  0%,100% {{ background:transparent; color:var(--accent); border-color:var(--accent); box-shadow:0 0 0 rgba(200,168,106,0); }}
+  50% {{ background:var(--accent); color:#12100b; border-color:var(--accent); box-shadow:0 0 16px rgba(200,168,106,.65); }}
+}}
+@media (prefers-reduced-motion: reduce) {{ .pendtab.blink {{ animation:none; background:var(--accent); color:#12100b; }} }}
 section {{ margin-top:46px; }}
 section h2 {{ font-family:Georgia,'Times New Roman',serif; font-size:18px; font-weight:400; letter-spacing:.5px; margin-bottom:20px; padding-bottom:12px; border-bottom:1px solid var(--line); text-transform:uppercase; letter-spacing:2px; color:var(--muted); }}
 .count {{ color:var(--faint); font-size:13px; margin-left:6px; }}
@@ -343,34 +397,36 @@ footer {{ margin-top:56px; color:var(--faint); font-size:11.5px; letter-spacing:
 .pstate.modified {{ color:var(--accent); }}
 .pstate.new {{ color:var(--muted); }}
 .pending-actions {{ display:flex; flex-wrap:wrap; gap:16px; align-items:center; padding-top:16px; margin-top:6px; border-top:1px solid var(--line); }}
-.btn {{ background:var(--accent); color:#12100b; font-size:12px; text-decoration:none; border-radius:7px; padding:9px 16px; letter-spacing:.4px; }}
+.btn {{ background:var(--accent); color:#12100b; font-size:12px; font-family:inherit; text-decoration:none; border:1px solid var(--accent); border-radius:7px; padding:9px 16px; letter-spacing:.4px; cursor:pointer; }}
 .btn:hover {{ filter:brightness(1.08); }}
+.btn.ghost {{ background:transparent; color:var(--accent); }}
+.btn.ghost:hover {{ background:rgba(200,168,106,.12); filter:none; }}
+.btn:disabled {{ opacity:.6; cursor:default; }}
 .hint {{ color:var(--faint); font-size:12px; }}
 .hint code {{ color:var(--muted); }}
 </style>
 </head>
 <body class="{body_class}">
 {wall_layers}
+{scene_html}
 <canvas id="stars"></canvas>
 <header>
 <div class="wordmark">The Vault</div>
 <div class="updated">Updated {now} · regenerates automatically when the vault changes</div>
 </header>
 
-{stats_html}
-
-{pending_html}
+{tabs_html}
 
 <div class="controls">
 <input id="search" type="search" placeholder="Search notes, tags, text…">
 </div>
 
-{tabs_html}
-
 <details class="tagwrap">
 <summary>Filter by tag <span class="tcount">{len(tags)}</span></summary>
 <div class="tagbar">{tag_html}</div>
 </details>
+
+{pending_html}
 
 {section_html}
 {tracker_panel}
@@ -424,6 +480,52 @@ if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {{
   drawStars(0); // static stars, no animation loop
 }}
 
+// --- interactive: background + scholars drift with the cursor (parallax) ---
+const wallEl = document.querySelector('.wall');
+const figs = document.querySelectorAll('.fig, .human');
+if ((wallEl || figs.length) && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {{
+  let raf = null;
+  window.addEventListener('mousemove', e => {{
+    if (raf) return;
+    raf = requestAnimationFrame(() => {{
+      raf = null;
+      const cx = e.clientX / window.innerWidth - 0.5;
+      const cy = e.clientY / window.innerHeight - 0.5;
+      if (wallEl) wallEl.style.transform = `scale(1.06) translate(${{(-cx*16).toFixed(1)}}px, ${{(-cy*11).toFixed(1)}}px)`;
+      figs.forEach((f, i) => {{
+        const depth = (i + 1) * 8;
+        const base = f.classList.contains('fig2') ? 'scaleX(-1) ' : '';
+        f.style.transform = base + `translateX(${{(cx*depth).toFixed(1)}}px)`;
+      }});
+    }});
+  }});
+}}
+
+// click a scholar to keep them "awake" (fully lit)
+document.querySelectorAll('.human').forEach(h => h.addEventListener('click', () => h.classList.toggle('awake')));
+
+// approve pending writes from the page (needs the local approve server running)
+async function approve(push, btn) {{
+  const original = btn.textContent;
+  document.querySelectorAll('.approve').forEach(b => b.disabled = true);
+  btn.textContent = push === '1' ? 'Committing & pushing…' : 'Committing…';
+  const served = location.protocol === 'http:' || location.protocol === 'https:';
+  const base = served ? '' : 'http://127.0.0.1:8791';
+  try {{
+    const res = await fetch(base + '/api/approve?push=' + push, {{
+      method: 'POST', headers: {{ 'Content-Type': 'application/json' }}, body: '{{}}'
+    }});
+    const data = await res.json();
+    if (data.ok) {{ btn.textContent = 'Approved ✓'; setTimeout(() => location.reload(), 800); }}
+    else {{ alert('Approve failed:\\n\\n' + (data.message || 'unknown error')); reset(original); }}
+  }} catch (e) {{
+    alert('The approve server is not running.\\n\\nStart it in a terminal:\\n  python3 .dashboard/serve.py\\n\\nthen open  http://127.0.0.1:8791/dashboard.html');
+    reset(original);
+  }}
+  function reset(txt) {{ document.querySelectorAll('.approve').forEach(b => b.disabled = false); btn.textContent = txt; }}
+}}
+document.querySelectorAll('.approve').forEach(b => b.addEventListener('click', () => approve(b.dataset.push, b)));
+
 const search = document.getElementById('search');
 let activeTag = null;
 let activeSection = '__all__';
@@ -453,7 +555,14 @@ function activateTab(key, scroll) {{
     if (nav) nav.scrollIntoView({{ behavior: 'smooth', block: 'start' }});
   }}
 }}
-document.querySelectorAll('.tabbtn').forEach(b => b.addEventListener('click', () => activateTab(b.dataset.tab, false)));
+document.querySelectorAll('.tabbtn').forEach(b => b.addEventListener('click', () => {{
+  if (b.dataset.scroll) {{
+    const el = document.getElementById(b.dataset.scroll);
+    if (el) el.scrollIntoView({{ behavior:'smooth', block:'start' }});
+    return;
+  }}
+  activateTab(b.dataset.tab, false);
+}}));
 document.querySelectorAll('.stat-tab').forEach(s => s.addEventListener('click', () => activateTab(s.dataset.tab, true)));
 document.querySelectorAll('.tag').forEach(t => t.addEventListener('click', e => {{
   e.preventDefault(); e.stopPropagation();
