@@ -79,6 +79,7 @@ def collect_notes():
                 "created": meta.get("created", ""),
                 "status": meta.get("status", ""),
                 "source": meta.get("source", ""),
+                "url": meta.get("url", "") or meta.get("repo", "") or meta.get("link", ""),
                 "tags": parse_list(meta.get("tags", "")),
                 "related": re.findall(r"\[\[([^\]]+)\]\]", meta.get("related", "")),
                 "excerpt": excerpt(text),
@@ -217,10 +218,14 @@ def render(notes, pending):
         if extra > 0:
             tag_html += f'<span class="tag more">+{extra}</span>'
         status = f'<span class="status">{html.escape(n["status"])}</span>' if n["status"] else ""
-        return f'''<a class="card" href="{html.escape(n["file"])}" data-search="{html.escape((n["title"] + " " + " ".join(n["tags"]) + " " + n["excerpt"]).lower())}" data-tags="{html.escape(",".join(n["tags"]))}">
+        # a note with a url opens the actual project (repo/app) in a new tab; otherwise the note
+        href = html.escape(n["url"]) if n["url"] else html.escape(n["file"])
+        target = ' target="_blank" rel="noopener"' if n["url"] else ""
+        openmark = '<span class="ext">open ↗</span>' if n["url"] else ""
+        return f'''<a class="card" href="{href}"{target} data-search="{html.escape((n["title"] + " " + " ".join(n["tags"]) + " " + n["excerpt"]).lower())}" data-tags="{html.escape(",".join(n["tags"]))}">
 <button class="edit" data-path="{html.escape(n["file"])}">Edit</button>
 <div class="card-body">
-<div class="card-head"><span class="dot" style="background:{color}"></span><span class="type">{html.escape(n["type"])}</span>{status}<span class="date">{html.escape(n["created"])}</span></div>
+<div class="card-head"><span class="dot" style="background:{color}"></span><span class="type">{html.escape(n["type"])}</span>{status}{openmark}<span class="date">{html.escape(n["created"])}</span></div>
 <h3>{html.escape(n["title"])}</h3>
 <p>{html.escape(n["excerpt"])}</p>
 <div class="meta">{tag_html}</div>
@@ -390,6 +395,7 @@ html.readonly .pending-actions .approve {{ display:none; }}
 .card .meta {{ margin-top:auto; padding-top:16px; }}
 .date {{ color:var(--faint); margin-left:auto; letter-spacing:.5px; }}
 .status {{ background:transparent; color:var(--accent); border:1px solid var(--line2); border-radius:5px; padding:2px 9px; font-size:12px; }}
+.ext {{ color:var(--accent); font-size:11px; letter-spacing:1px; border:1px solid var(--accent); border-radius:5px; padding:2px 8px; }}
 .meta {{ margin-top:10px; display:flex; flex-wrap:wrap; gap:7px; }}
 .pagegrid {{ display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:14px; }}
 .pagecard {{ display:flex; align-items:center; justify-content:space-between; gap:12px; background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:17px 19px; text-decoration:none; color:var(--text); transition:border-color .2s,background .2s; }}

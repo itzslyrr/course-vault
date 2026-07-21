@@ -3,6 +3,7 @@ title: Warhouse Vault
 type: project
 created: 2026-07-02
 status: active
+url: https://github.com/itzslyrr/warhouse-vault
 tags: [warehouse, inventory, knowledge-management, github]
 related: ["[[next-gen-warfare]]", "[[the-eight-kb-moves]]"]
 source: https://github.com/itzslyrr/warhouse-vault
