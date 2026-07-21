@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wireframe — The Pulse</title>
+<style>
+  /* A WIREFRAME for THE PULSE. Grey boxes, borders and labels only.
+     No colour, no real data, no JavaScript. It shows WHAT GOES WHERE. */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Helvetica, Arial, sans-serif; background: #e9e9ec; color: #555;
+         padding: 28px 16px 48px; display: flex; flex-direction: column; align-items: center; }
+
+  .caption { font-size: 12px; color: #999; letter-spacing: 1px; text-transform: uppercase;
+             margin-bottom: 14px; }
+
+  .screen { width: min(600px, 100%); background: #f6f6f7; border: 2px solid #adadad;
+            border-radius: 8px; padding: 16px; }
+
+  .wbox { border: 2px dashed #a5a5a5; border-radius: 6px; background: #fff; }
+  .lbl  { font-size: 10px; color: #9a9a9a; letter-spacing: 1px; text-transform: uppercase; }
+
+  /* header */
+  .header { display: flex; justify-content: space-between; align-items: center;
+            padding: 14px 16px; margin-bottom: 12px; }
+  .header .name { font-size: 18px; font-weight: bold; color: #666; }
+  .header .platform { border: 1px solid #b7b7b7; border-radius: 4px; padding: 6px 12px; font-size: 11px; color: #888; }
+
+  /* topic bar */
+  .topic { display: flex; gap: 10px; margin-bottom: 14px; }
+  .topic .field { flex: 1; padding: 12px 14px; color: #aaa; font-size: 13px; }
+  .topic .btn { flex: 0 0 96px; display: flex; align-items: center; justify-content: center;
+                background: #e0e0e0; border-color: #9a9a9a; font-size: 12px; font-weight: bold; color: #777; }
+
+  /* AI summary card — the hero, biggest */
+  .summary { border-width: 3px; border-color: #8f8f8f; padding: 18px 16px; margin-bottom: 16px; }
+  .summary .tag { font-size: 9px; color: #999; letter-spacing: 1px; text-transform: uppercase; }
+  .summary .badge { float: right; border: 1px solid #b7b7b7; border-radius: 10px; padding: 1px 9px;
+                    font-size: 9px; color: #999; }
+
+  /* feed */
+  .feedlbl { display: block; margin: 4px 2px 10px; }
+  .post { padding: 12px 14px; margin-bottom: 10px; }
+  .post .who { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .post .pic { width: 26px; height: 26px; border: 2px solid #b0b0b0; border-radius: 50%; background: #e6e6e6; }
+  .post .meta { display: flex; gap: 14px; margin-top: 8px; }
+
+  /* grey placeholder lines = where text/numbers will go */
+  .line { height: 10px; background: #d2d2d2; border-radius: 3px; margin: 7px 0; }
+  .summary .line { margin: 9px 0; }
+  .w80 { width: 80%; } .w65 { width: 65%; } .w40 { width: 40%; } .w25 { width: 25%; }
+  .chip { height: 8px; width: 42px; background: #dedede; border-radius: 3px; }
+  .stack { flex: 1; }
+</style>
+</head>
+<body>
+
+  <div class="caption">Wireframe · The Pulse · main screen</div>
+
+  <div class="screen">
+
+    <!-- 1 · HEADER -->
+    <div class="wbox header">
+      <span class="name">The Pulse</span>
+      <span class="platform">platform: X ▾</span>
+    </div>
+
+    <!-- 2 · TOPIC BAR -->
+    <div class="topic">
+      <div class="wbox field">enter a topic…  (e.g. AI agents)</div>
+      <div class="wbox btn">Pulse ⟳</div>
+    </div>
+
+    <!-- 3 · AI SUMMARY CARD (hero) -->
+    <div class="wbox summary">
+      <span class="badge">source</span>
+      <span class="tag">AI summary</span>
+      <div class="line w80"></div>
+      <div class="line w65"></div>
+      <div class="line w40"></div>
+    </div>
+
+    <!-- 4 · FEED OF POSTS -->
+    <span class="lbl feedlbl">Live posts</span>
+
+    <div class="wbox post">
+      <div class="who"><div class="pic"></div><div class="stack"><div class="line w40" style="margin:0 0 5px"></div><div class="line w25" style="height:7px;margin:0"></div></div></div>
+      <div class="line w80"></div>
+      <div class="line w65"></div>
+      <div class="meta"><div class="chip"></div><div class="chip"></div><div class="chip"></div></div>
+    </div>
+
+    <div class="wbox post">
+      <div class="who"><div class="pic"></div><div class="stack"><div class="line w40" style="margin:0 0 5px"></div><div class="line w25" style="height:7px;margin:0"></div></div></div>
+      <div class="line w80"></div>
+      <div class="meta"><div class="chip"></div><div class="chip"></div><div class="chip"></div></div>
+    </div>
+
+    <div class="wbox post">
+      <div class="who"><div class="pic"></div><div class="stack"><div class="line w40" style="margin:0 0 5px"></div><div class="line w25" style="height:7px;margin:0"></div></div></div>
+      <div class="line w80"></div>
+      <div class="line w65"></div>
+      <div class="meta"><div class="chip"></div><div class="chip"></div><div class="chip"></div></div>
+    </div>
+
+  </div>
+
+  <p class="caption" style="margin-top:18px; text-transform:none; font-style:italic; max-width:600px; text-align:center;">
+    Boxes and labels only — no colour, no real posts, no code. The big card up top is the AI-synthesized
+    "Pulse" summary; the cards below are the live posts. The summary is drawn biggest so it reads first.
+  </p>
+
+</body>
+</html>

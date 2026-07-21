@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Pulse — filled &amp; linked</title>
+<style>
+  /* WIREFRAME SKIN: greyscale, dashed boxes, placeholder feel — but real content + interactive. */
+  :root{--bg:#e9e9ec;--card:#fff;--panel:#f6f6f7;--line:#a8a8ae;--soft:#cfcfd4;--ink:#575760;--mut:#9a9aa2;--ink2:#6f6f78;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink);
+        padding:26px 16px 60px;line-height:1.5;}
+  .wrap{max-width:920px;margin:0 auto;display:grid;grid-template-columns:1fr 320px;gap:22px;align-items:start;}
+  @media(max-width:780px){.wrap{grid-template-columns:1fr;}}
+  .cap{grid-column:1/-1;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mut);margin-bottom:2px;}
+  .screen{background:var(--panel);border:2px solid var(--line);border-radius:8px;padding:16px;}
+  .hd{display:flex;justify-content:space-between;align-items:center;border:2px dashed var(--line);
+       border-radius:6px;padding:12px 14px;margin-bottom:12px;background:var(--card);}
+  .hd .name{font-size:18px;font-weight:700;color:var(--ink2);}
+  .hd .plat{border:1px solid var(--soft);border-radius:4px;padding:6px 12px;font-size:12px;color:var(--mut);}
+  .topic{display:flex;gap:10px;margin-bottom:16px;}
+  .field{flex:1;border:2px dashed var(--line);border-radius:6px;padding:11px 14px;font-size:13px;color:var(--mut);background:var(--card);}
+  .field b{color:var(--ink2);}
+  .go{flex:0 0 92px;background:#dedee2;border:2px dashed var(--line);color:var(--ink2);border-radius:6px;
+       display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;}
+  .summary{background:var(--card);border:3px dashed #8f8f96;border-radius:8px;padding:16px 18px;margin-bottom:18px;}
+  .summary .tag{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--mut);font-weight:700;}
+  .summary .src{float:right;font-size:9px;color:var(--mut);border:1px solid var(--soft);border-radius:10px;padding:1px 9px;}
+  .summary h3{font-size:17px;margin:6px 0 8px;color:var(--ink2);}
+  .summary p{color:var(--ink);}
+  .summary .themes{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
+  .summary .themes span{background:var(--panel);border:1px dashed var(--soft);border-radius:12px;padding:2px 10px;font-size:11px;color:var(--mut);}
+  .flbl{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mut);margin:2px 2px 10px;display:block;}
+  .post{border:2px dashed var(--line);border-radius:6px;padding:13px 15px;margin-bottom:10px;background:var(--card);}
+  .who{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+  .pic{width:30px;height:30px;border-radius:50%;background:#e4e4ea;border:2px solid var(--soft);flex:0 0 30px;}
+  .who .n{font-weight:600;font-size:14px;color:var(--ink2);} .who .h{color:var(--mut);font-size:12px;}
+  .post p{font-size:13.5px;color:var(--ink);}
+  .metrics{display:flex;gap:18px;margin-top:9px;color:var(--mut);font-size:12px;}
+  /* tabbed trail — wireframe style */
+  .trail{background:var(--panel);border:2px solid var(--line);border-radius:8px;padding:16px;position:sticky;top:20px;}
+  .trail > h3{font-size:14px;margin-bottom:4px;color:var(--ink2);}
+  .trail > p{font-size:12px;color:var(--mut);margin-bottom:12px;}
+  .ttabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;}
+  .ttab{border:2px dashed var(--line);background:var(--card);border-radius:16px;padding:5px 11px;font-size:11.5px;
+         color:var(--mut);cursor:pointer;font-family:inherit;}
+  .ttab b{opacity:.7;margin-left:2px;}
+  .ttab.active{background:#d8d8dd;border-style:solid;color:var(--ink2);font-weight:700;}
+  .tpanel{display:none;} .tpanel.active{display:block;}
+  .item{border:2px dashed var(--line);border-radius:6px;margin-bottom:8px;overflow:hidden;background:var(--card);}
+  .ihead{width:100%;display:flex;align-items:center;gap:8px;background:transparent;border:none;
+          padding:10px 12px;text-align:left;cursor:pointer;font-family:inherit;font-size:12.5px;color:var(--ink2);}
+  .ihead:hover{background:#efeff3;}
+  .ar{color:var(--mut);font-size:11px;transition:transform .15s;flex:0 0 auto;}
+  .item.open .ar{transform:rotate(90deg);}
+  .it{flex:1;font-weight:600;}
+  .ibody{display:none;padding:10px 14px 12px;font-size:12px;color:var(--ink);border-top:1px dashed var(--line);}
+  .item.open .ibody{display:block;}
+  .ibody p{margin-bottom:8px;}
+  .ibody a{color:var(--ink2);text-decoration:underline;font-size:11.5px;}
+  .st{font-size:9px;text-transform:uppercase;border:1px solid var(--soft);border-radius:8px;padding:1px 6px;white-space:nowrap;color:var(--mut);}
+  .foot{grid-column:1/-1;font-size:11px;color:var(--mut);text-align:center;margin-top:6px;font-style:italic;}
+</style></head>
+<body><div class="wrap">
+
+  <div class="cap">The Pulse · filled screen + a tabbed decision trail (click a tab, then a note)</div>
+
+  <div class="screen">
+    <div class="hd"><span class="name">The Pulse</span><span class="plat">platform: X &#9662;</span></div>
+    <div class="topic"><div class="field">topic: <b>AI agents</b></div><div class="go">Pulse &#10227;</div></div>
+
+    <div class="summary">
+      <span class="src">AI summary · headless Claude</span>
+      <span class="tag">the pulse</span>
+      <h3>Agents are moving from demos to daily tools — the hard part is now reliability.</h3>
+      <p style="font-size:13.5px;color:#3a3a44;">People are shipping agents into real workflows (support triage, coding, research), but the loudest debate is evaluation and trust: how do you know an autonomous loop did the right thing? Multi-agent setups and tool-use are the momentum; cost is falling fast.</p>
+      <div class="themes"><span>#reliability</span><span>#multi-agent</span><span>#tool-use</span><span>#evaluation</span><span>#cost</span></div>
+    </div>
+
+    <span class="flbl">Live posts</span>
+
+    <div class="post">
+      <div class="who"><div class="pic"></div><div><div class="n">Dana Osei</div><div class="h">@ai_researcher</div></div></div>
+      <p>Put an agent on our support triage this week. Handles ~70% end-to-end, escalates the rest. The win wasn't the model — it was writing good evals first.</p>
+      <div class="metrics"><span>&#9825; 1.2k</span><span>&#8635; 340</span><span>&#128172; 88</span></div>
+    </div>
+    <div class="post">
+      <div class="who"><div class="pic"></div><div><div class="n">Marco Reyes</div><div class="h">@devtools</div></div></div>
+      <p>Multi-agent beats one big prompt for long tasks — but only if each agent has a narrow job. Otherwise they just argue. Orchestration is the real product.</p>
+      <div class="metrics"><span>&#9825; 860</span><span>&#8635; 210</span><span>&#128172; 54</span></div>
+    </div>
+    <div class="post">
+      <div class="who"><div class="pic"></div><div><div class="n">Priya Nair</div><div class="h">@founderlog</div></div></div>
+      <p>Cost per task dropped ~60% after we swapped to smaller models + tool use instead of one giant call. Agents are finally cheap enough to leave running.</p>
+      <div class="metrics"><span>&#9825; 2.0k</span><span>&#8635; 510</span><span>&#128172; 130</span></div>
+    </div>
+  </div>
+
+  <aside class="trail">
+    <h3>&#128220; Decision trail</h3>
+    <p>Click a tab to open it, then a note to read it.</p>
+    <div class="ttabs"><button class="ttab active" data-g="adr">Decisions (ADRs) <b>3</b></button><button class="ttab" data-g="plan">Plan <b>1</b></button><button class="ttab" data-g="scope">Scopes <b>2</b></button><button class="ttab" data-g="work-item">Work items <b>7</b></button></div>
+    <div class="tpanel active" data-g="adr"><div class="item"><button class="ihead" onclick="tog(this)"><span class="ar">&#9656;</span><span class="it">how The Pulse fetches from apidirect + shapes results</span><span class="st accepted">accepted</span></button><div class="ibody"><p>The Pulse takes a topic and shows what people are saying about it across platforms. apidirect.io offers one standard API across X/Reddit/YouTube/etc. The API needs a key, and the rule is: keys stay out of code and out of the browser. A tiny local server (server.py, Python stdlib, no dependencies) sits between the brows…</p><a href="file:///Users/abd/vault/projects/the-pulse/adr-001-how-the-pulse-fetches-from-apidirect-shapes-results.md">open full note &#8599;</a></div></div><div class="item"><button class="ihead" onclick="tog(this)"><span class="ar">&#9656;</span><span class="it">apidirect serves X at /v1/twitter/posts returning {posts:[]}, not /v1/x/posts</span><span class="st accepted">accepted</span></button><div class="ibody"><p>The Day 12 handout only documented the Reddit endpoint (/v1/reddit/posts → {results:[…]}). We guessed X would mirror it at /v1/x/posts returning {results:[…]}. With a real key, that path returned HTTP 404 and no data — so the guess was wrong. Probing the live API revealed the true contract. X lives at /v1/twitter/posts…</p><a href="file:///Users/abd/vault/projects/the-pulse/adr-002-apidirect-serves-x-at-v1-twitter-posts-returning-posts-not-v1-x-posts.md">open full note &#8599;</a></div></div><div class="item"><button class="ihead" onclick="tog(this)"><span class="ar">&#9656;</span><span class="it">summarize for free via headless Claude Code (claude -p), with Ollama and offline heuristic fallbacks</span><span class="st accepted">accepted</span></button><div class="ibody"><p>The upgrade brief: don&#x27;t just copy-paste posts — synthesize what people are saying with AI. That needs an LLM. The constraint added later: do it for free. The options, weighed: Anthropic API — real Claude, but a paid key (only a small trial credit is free). Local Ollama — real local LLM, free, but a ~2 GB install (and …</p><a href="file:///Users/abd/vault/projects/the-pulse/adr-003-summarize-for-free-via-headless-claude-code-claude-p-with-ollama-and-offline-heuristic-fallbacks.md">open full note &#8599;</a></div></div></div><div class="tpanel" data-g="plan"><div class="item"><button class="ihead" onclick="tog(this)"><span class="ar">&#9656;</span><span class="it">a scannable one-topic pulse view</span><span class="st accepted">accepted</span></button><div class="ibody"><p>The outcome: a topic in, and one clean, scannable view of what people are saying about it right now — first the raw posts, then (the upgrade) an AI synthesis on top. adr-001-how-the-pulse-fetches-from-apidirect-shapes-results — server holds the key, one shape per platform adr-002-apidirect-serves-x-at-v1-twitter-posts-…</p><a href="file:///Users/abd/vault/projects/the-pulse/plan-a-scannable-one-topic-pulse-view.md">open full note &#8599;</a></div></div></div><div class="tpanel" data-g="scope"><div class="item"><button class="ihead" onclick="tog(this)"><span class="ar">&#9656;</span><span class="it">an AI-synthesized pulse, for free</span><span class="st accepted">accepted</span></button><div class="ibody"><p>The upgrade slice of plan-a-scannable-one-topic-pulse-view — turn the raw list into a synthesized summary of what people are saying, without paying for it. Rests on adr-003-summarize-for-free-via-headless-claude-code-claude-p-with-ollama-and-offline-heuristic-fallbacks. All tasks done. wi-synthesize-posts-into-a-headli…</p><a href="file:///Users/abd/vault/projects/the-pulse/scope-an-ai-synthesized-pulse-for-free.md">open full note &#8599;</a></div></div><div class="item"><button class="ihead" onclick="tog(this)"><span class="ar">&#9656;</span><span class="it">topic in, clean list out</span><span class="st accepted">accepted</span></button><div class="ibody"><p>The core slice of plan-a-scannable-one-topic-pulse-view — the minimum that counts as shipped: one topic, one platform, one clean list, sad path handled. All tasks done. wi-fetch-posts-for-a-topic-from-apidirect-x-endpoint — done wi-shape-raw-results-into-title-author-date-snippet-url — done wi-render-one-clean-scannabl…</p><a href="file:///Users/abd/vault/projects/the-pulse/scope-topic-in-clean-list-out.md">open full note &#8599;</a></div></div></div><div class="tpanel" data-g="work-item"><div class="item"><button class="ihead" onclick="tog(this)"><span class="ar">&#9656;</span><span class="it">fetch posts for a topic from apidirect X endpoint</span><span class="st done">done</span></button><div class="ibody"><p>Part of scope-topic-in-clean-list-out.</p><a href="file:///Users/abd/vault/projects/the-pulse/wi-fetch-posts-for-a-topic-from-apidirect-x-endpoint.md">open full note &#8599;</a></div></div><div class="item"><button class="ihead" onclick="tog(this)"><span class="ar">&#9656;</span><span class="it">handle the empty and error case (no results / api down)</span><span class="st done">done</span></button><div class="ibody"><p>Part of scope-topic-in-clean-list-out.</p><a href="file:///Users/abd/vault/projects/the-pulse/wi-handle-the-empty-and-error-case-no-results-api-down.md">open full note &#8599;</a></div></div><div class="item"><button class="ihead" onclick="tog(this)"><span class="ar">&#9656;</span><span class="it">make the summary engine swappable and free via PULSE_AI (claude/ollama/heuristic)</span><span class="st done">done</span></button><div class="ibody"><p>Part of scope-an-ai-synthesized-pulse-for-free.</p><a href="file:///Users/abd/vault/projects/the-pulse/wi-make-the-summary-engine-swappable-and-free-via-pulse-ai-claude-ollama-heuristic.md">open full note &#8599;</a></div></div><div class="item"><button class="ihead" onclick="tog(this)"><span class="ar">&#9656;</span><span class="it">render a distinct pulsing AI-summary card, honestly labelled by source</span><span class="st done">done</span></button><div class="ibody"><p>Part of scope-an-ai-synthesized-pulse-for-free.</p><a href="file:///Users/abd/vault/projects/the-pulse/wi-render-a-distinct-pulsing-ai-summary-card-honestly-labelled-by-source.md">open full note &#8599;</a></div></div><div class="item"><button class="ihead" onclick="tog(this)"><span class="ar">&#9656;</span><span class="it">render one clean scannable list in the browser</span><span class="st done">done</span></button><div class="ibody"><p>Part of scope-topic-in-clean-list-out.</p><a href="file:///Users/abd/vault/projects/the-pulse/wi-render-one-clean-scannable-list-in-the-browser.md">open full note &#8599;</a></div></div><div class="item"><button class="ihead" onclick="tog(this)"><span class="ar">&#9656;</span><span class="it">shape raw results into title/author/date/snippet/url</span><span class="st done">done</span></button><div class="ibody"><p>Part of scope-topic-in-clean-list-out.</p><a href="file:///Users/abd/vault/projects/the-pulse/wi-shape-raw-results-into-title-author-date-snippet-url.md">open full note &#8599;</a></div></div><div class="item"><button class="ihead" onclick="tog(this)"><span class="ar">&#9656;</span><span class="it">synthesize posts into a headline plus themes with an LLM</span><span class="st done">done</span></button><div class="ibody"><p>Part of scope-an-ai-synthesized-pulse-for-free.</p><a href="file:///Users/abd/vault/projects/the-pulse/wi-synthesize-posts-into-a-headline-plus-themes-with-an-llm.md">open full note &#8599;</a></div></div></div>
+  </aside>
+
+  <div class="foot">Left: the wireframe layout, filled. Right: the 14 real vault notes behind it —
+  tabbed by kind, each expands to its summary. Sample posts are illustrative; the app pulls live X data.</div>
+
+</div>
+<script>
+document.querySelectorAll('.ttab').forEach(t=>t.addEventListener('click',()=>{
+  const g=t.dataset.g;
+  document.querySelectorAll('.ttab').forEach(x=>x.classList.toggle('active',x===t));
+  document.querySelectorAll('.tpanel').forEach(p=>p.classList.toggle('active',p.dataset.g===g));
+}));
+function tog(btn){ btn.parentElement.classList.toggle('open'); }
+</script>
+</body></html>

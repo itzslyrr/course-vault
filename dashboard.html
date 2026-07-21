@@ -5,292 +5,297 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vault Dashboard</title>
 <style>
-:root { --bg:#0d1321; --surface:#1b2436; --text:#f1faee; --muted:#8d99ae; --accent:#e9c46a; --red:#e63946; }
+:root { --bg:#0b0c10; --surface:#131419; --surface2:#181920; --text:#e9e6df; --muted:#8f8c85; --faint:#6a6862; --accent:#c8a86a; --line:rgba(255,255,255,.07); --line2:rgba(255,255,255,.11); }
 * { margin:0; padding:0; box-sizing:border-box; }
-body { background:radial-gradient(ellipse at 30% -20%, #101a33 0%, #060a14 55%, #03060d 100%); background-attachment:fixed; color:var(--text); font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; padding:36px clamp(16px,4vw,60px) 80px; min-height:100vh; }
+body { background:linear-gradient(180deg,#0d0e13 0%,#08090c 60%,#060608 100%); background-attachment:fixed; color:var(--text); font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; font-weight:300; padding:56px clamp(18px,6vw,84px) 100px; min-height:100vh; letter-spacing:.2px; }
 #stars { position:fixed; inset:0; width:100%; height:100%; z-index:-1; pointer-events:none; }
-header h1 { font-size:clamp(28px,4vw,44px); letter-spacing:-1px; }
-header h1 span { background:linear-gradient(135deg,var(--red),var(--accent)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
-.updated { color:var(--muted); font-size:14px; margin-top:6px; }
-.updated b { color:var(--accent); font-weight:600; }
-.pages { margin-top:14px; display:flex; flex-wrap:wrap; gap:10px; }
-.page-link { display:inline-flex; align-items:center; gap:6px; background:rgba(157,78,221,.15); border:1px solid rgba(157,78,221,.5); color:#f1faee; text-decoration:none; border-radius:20px; padding:7px 15px; font-size:13.5px; transition:background .15s; }
-.page-link:hover { background:rgba(157,78,221,.35); }
-.stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:12px; margin:26px 0; }
-.stat { background:var(--surface); border:1px solid rgba(255,255,255,.07); border-radius:12px; padding:16px; text-align:center; }
-.stat, .card, .commits { background:rgba(27,36,54,.88); backdrop-filter:blur(2px); }
-.stat .n { font-size:32px; font-weight:800; background:linear-gradient(135deg,var(--red),var(--accent)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
-.stat .l { color:var(--muted); font-size:12.5px; margin-top:2px; }
-#search { width:100%; max-width:520px; background:var(--surface); border:1px solid rgba(255,255,255,.12); border-radius:10px; color:var(--text); font-size:15px; padding:12px 16px; outline:none; }
+/* wallpaper mode: a fixed cover image + a warm tint for legibility; cards turn to glass */
+.wall { position:fixed; inset:0; z-index:-3; background-position:center; background-size:cover; background-repeat:no-repeat; }
+.wall-tint { position:fixed; inset:0; z-index:-2; background:linear-gradient(180deg, rgba(12,9,6,.50) 0%, rgba(11,8,5,.74) 48%, rgba(8,6,4,.90) 100%); }
+body.has-wall { background:#0a0806; }
+body.has-wall .stats, body.has-wall .stat { background:rgba(18,14,10,.60); backdrop-filter:blur(9px); -webkit-backdrop-filter:blur(9px); }
+body.has-wall .card, body.has-wall .pagecard, body.has-wall .commits, body.has-wall .pending-box, body.has-wall #search { background:rgba(18,14,10,.58); backdrop-filter:blur(9px); -webkit-backdrop-filter:blur(9px); }
+body.has-wall .card:hover, body.has-wall .pagecard:hover { background:rgba(26,20,14,.72); }
+body.has-wall .tabbtn, body.has-wall .tag { backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); }
+header { margin-bottom:44px; }
+.wordmark { font-family:Georgia,'Times New Roman',serif; font-size:clamp(30px,4vw,46px); font-weight:400; letter-spacing:.5px; color:var(--text); }
+.updated { color:var(--faint); font-size:12.5px; margin-top:10px; letter-spacing:.4px; }
+.stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:1px; margin:0 0 40px; background:var(--line); border:1px solid var(--line); border-radius:14px; overflow:hidden; }
+.stat { background:var(--surface); padding:22px 18px; text-align:center; }
+button.stat { font-family:inherit; color:var(--text); cursor:pointer; border:none; }
+.stat-tab { transition:background .2s; }
+.stat-tab:hover { background:var(--surface2); }
+.stat .n { font-family:Georgia,'Times New Roman',serif; font-size:34px; font-weight:400; color:var(--accent); }
+.stat .l { color:var(--muted); font-size:11px; margin-top:6px; text-transform:uppercase; letter-spacing:1.4px; }
+#search { width:100%; max-width:560px; background:var(--surface); border:1px solid var(--line2); border-radius:10px; color:var(--text); font-size:14px; font-family:inherit; padding:13px 17px; outline:none; transition:border-color .2s; }
+#search::placeholder { color:var(--faint); }
 #search:focus { border-color:var(--accent); }
+.controls { margin-top:8px; }
+.tagwrap { margin:20px 0 4px; }
+.tagwrap summary { cursor:pointer; color:var(--muted); font-size:12px; list-style:none; display:inline-flex; align-items:center; gap:9px; padding:6px 0; user-select:none; text-transform:uppercase; letter-spacing:1.2px; }
+.tagwrap summary::-webkit-details-marker { display:none; }
+.tagwrap summary::before { content:"+"; color:var(--accent); font-size:15px; display:inline-block; width:12px; }
+.tagwrap[open] summary::before { content:"–"; }
+.tcount { color:var(--faint); font-size:11px; }
 .tagbar { margin:14px 0 4px; display:flex; flex-wrap:wrap; gap:8px; }
-.tag { display:inline-block; background:rgba(233,196,106,.12); color:var(--accent); border:none; border-radius:20px; padding:3px 10px; font-size:12px; cursor:pointer; }
-.tag.big { font-size:13px; padding:6px 14px; }
-.tag.active { background:var(--accent); color:#0d1321; font-weight:700; }
-.tag b { opacity:.7; font-weight:600; }
-section { margin-top:34px; }
-section h2 { font-size:21px; margin-bottom:14px; }
-.count { color:var(--muted); font-size:15px; font-weight:400; }
-.grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(290px,1fr)); gap:14px; }
-.card { background:var(--surface); border:1px solid rgba(255,255,255,.07); border-radius:12px; overflow:hidden; text-decoration:none; color:var(--text); transition:transform .15s, border-color .15s; display:block; }
-.card:hover { transform:translateY(-3px); border-color:rgba(233,196,106,.5); }
-.card-top { height:4px; }
-.card-body { padding:16px; }
-.card-head { display:flex; gap:10px; align-items:center; font-size:11.5px; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:8px; }
-.card h3 { font-size:17px; margin-bottom:8px; }
-.card p { color:var(--muted); font-size:13.5px; line-height:1.5; }
-.date { color:var(--muted); margin-left:auto; letter-spacing:0; }
-.status { background:rgba(42,157,143,.2); color:#2a9d8f; border-radius:6px; padding:1px 8px; }
-.meta { margin-top:10px; display:flex; flex-wrap:wrap; gap:6px; }
-.rel { color:var(--muted); font-size:12px; padding:3px 4px; }
-.commits { background:var(--surface); border:1px solid rgba(255,255,255,.07); border-radius:12px; padding:8px 18px; max-width:760px; }
-.commit { display:flex; gap:14px; padding:9px 0; border-bottom:1px solid rgba(255,255,255,.05); font-size:13.5px; align-items:baseline; }
+.tag { display:inline-block; background:transparent; color:var(--muted); border:1px solid var(--line2); border-radius:16px; padding:4px 12px; font-size:11.5px; cursor:pointer; transition:border-color .2s,color .2s; }
+.tag:hover { border-color:var(--accent); color:var(--accent); }
+.tag.big { font-size:12px; padding:6px 14px; }
+.tag.active { background:var(--accent); color:#12100b; border-color:var(--accent); }
+.tag.more { border-style:dashed; cursor:default; color:var(--faint); }
+.tag b { opacity:.55; font-weight:400; }
+.tabnav { display:flex; flex-wrap:wrap; gap:18px; margin:30px 0 6px; }
+.tabbtn { background:transparent; color:var(--muted); border:1px solid var(--line2); border-radius:24px; padding:10px 22px; font-size:13px; font-family:inherit; cursor:pointer; letter-spacing:.6px; transition:border-color .2s,color .2s; }
+.tabbtn:hover { border-color:var(--accent); color:var(--text); }
+.tabbtn b { opacity:.5; font-weight:400; margin-left:5px; }
+.tabbtn.active { background:var(--accent); color:#12100b; border-color:var(--accent); }
+.tabbtn.active b { opacity:.7; }
+section { margin-top:46px; }
+section h2 { font-family:Georgia,'Times New Roman',serif; font-size:18px; font-weight:400; letter-spacing:.5px; margin-bottom:20px; padding-bottom:12px; border-bottom:1px solid var(--line); text-transform:uppercase; letter-spacing:2px; color:var(--muted); }
+.count { color:var(--faint); font-size:13px; margin-left:6px; }
+.grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:16px; }
+.card { background:var(--surface); border:1px solid var(--line); border-radius:14px; overflow:hidden; text-decoration:none; color:var(--text); transition:border-color .2s,background .2s; display:block; }
+.card:hover { border-color:var(--line2); background:var(--surface2); }
+.card-body { padding:20px; display:flex; flex-direction:column; height:100%; }
+.card-head { display:flex; gap:9px; align-items:center; font-size:10.5px; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:12px; color:var(--muted); }
+.dot { width:6px; height:6px; border-radius:50%; flex:0 0 auto; opacity:.85; }
+.type { color:var(--muted); }
+.card h3 { font-family:Georgia,'Times New Roman',serif; font-size:17px; font-weight:400; margin-bottom:9px; line-height:1.35; color:var(--text); }
+.card p { color:var(--muted); font-size:13px; font-weight:300; line-height:1.6; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+.card .meta { margin-top:auto; padding-top:16px; }
+.date { color:var(--faint); margin-left:auto; letter-spacing:.5px; }
+.status { background:transparent; color:var(--accent); border:1px solid var(--line2); border-radius:5px; padding:1px 8px; font-size:10px; }
+.meta { margin-top:10px; display:flex; flex-wrap:wrap; gap:7px; }
+.pagegrid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:14px; }
+.pagecard { display:flex; align-items:center; justify-content:space-between; gap:12px; background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:17px 19px; text-decoration:none; color:var(--text); transition:border-color .2s,background .2s; }
+.pagecard:hover { border-color:var(--accent); background:var(--surface2); }
+.pagecard-t { font-family:Georgia,'Times New Roman',serif; font-size:15px; }
+.pagecard-go { color:var(--accent); font-size:11px; text-transform:uppercase; letter-spacing:1.3px; flex:0 0 auto; }
+.commits { background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:6px 20px; max-width:820px; }
+.commit { display:flex; gap:16px; padding:12px 0; border-bottom:1px solid var(--line); font-size:13px; align-items:baseline; }
 .commit:last-child { border-bottom:none; }
-.commit code { color:var(--accent); }
-.commit .date { margin-left:0; white-space:nowrap; }
+.commit code { color:var(--accent); font-size:12px; }
+.commit .date { margin-left:0; white-space:nowrap; color:var(--faint); }
 .hidden { display:none; }
-footer { margin-top:44px; color:var(--muted); font-size:12.5px; }
-.pending-stat { text-decoration:none; border-color:rgba(233,196,106,.45) !important; }
-.pending-stat .n { background:none; -webkit-text-fill-color:var(--accent); color:var(--accent); }
-.pending-box { background:rgba(27,36,54,.88); border:1px solid rgba(233,196,106,.35); border-left:4px solid var(--accent); border-radius:12px; padding:12px 18px; max-width:760px; }
-.pending-box.clean { border-color:rgba(42,157,143,.4); border-left-color:#2a9d8f; color:var(--muted); }
-.pending-row { display:flex; gap:12px; align-items:baseline; padding:7px 0; border-bottom:1px solid rgba(255,255,255,.05); font-size:13.5px; }
+footer { margin-top:56px; color:var(--faint); font-size:11.5px; letter-spacing:.4px; }
+.pending-stat { text-decoration:none; }
+.pending-box { background:var(--surface); border:1px solid var(--line); border-left:2px solid var(--accent); border-radius:12px; padding:16px 22px; max-width:820px; }
+.pending-box.clean { border-left-color:var(--line2); color:var(--muted); }
+.pending-row { display:flex; gap:14px; align-items:baseline; padding:9px 0; border-bottom:1px solid var(--line); font-size:13px; }
 .pending-row:last-of-type { border-bottom:none; }
-.pending-row code { color:var(--text); }
-.pstate { font-size:11.5px; white-space:nowrap; width:96px; }
+.pending-row code { color:var(--text); font-size:12px; }
+.pstate { font-size:10px; white-space:nowrap; width:74px; text-transform:uppercase; letter-spacing:1.2px; color:var(--muted); }
 .pstate.modified { color:var(--accent); }
-.pstate.new { color:#7ddba3; }
-.pending-actions { display:flex; flex-wrap:wrap; gap:14px; align-items:center; padding-top:12px; margin-top:4px; border-top:1px solid rgba(255,255,255,.08); }
-.btn { background:var(--accent); color:#0d1321; font-weight:700; font-size:13px; text-decoration:none; border-radius:8px; padding:8px 14px; }
-.btn:hover { filter:brightness(1.1); }
-.hint { color:var(--muted); font-size:12.5px; }
-.hint code { color:var(--accent); }
+.pstate.new { color:var(--muted); }
+.pending-actions { display:flex; flex-wrap:wrap; gap:16px; align-items:center; padding-top:16px; margin-top:6px; border-top:1px solid var(--line); }
+.btn { background:var(--accent); color:#12100b; font-size:12px; text-decoration:none; border-radius:7px; padding:9px 16px; letter-spacing:.4px; }
+.btn:hover { filter:brightness(1.08); }
+.hint { color:var(--faint); font-size:12px; }
+.hint code { color:var(--muted); }
 </style>
 </head>
-<body>
+<body class="has-wall">
+<div class="wall" style="background-image:url('.dashboard/assets/wallpaper.jpg')"></div><div class="wall-tint"></div>
 <canvas id="stars"></canvas>
 <header>
-<h1>🗄️ <span>Vault Dashboard</span></h1>
-<div class="updated">Last updated: <b>Monday, July 20 2026 · 11:06:36</b> · regenerates automatically when the vault changes</div>
-<div class="pages"><a class="page-link" href="review.html">📄 Review</a><a class="page-link" href="course/course-so-far-deck.html">📄 Course So Far Deck</a><a class="page-link" href="course/day10-explainer.html">📄 Day10 Explainer</a><a class="page-link" href="course/day11-explainer.html">📄 Day11 Explainer</a><a class="page-link" href="course/day5-explainer.html">📄 Day5 Explainer</a><a class="page-link" href="course/day6-explainer.html">📄 Day6 Explainer</a><a class="page-link" href="course/day7-explainer.html">📄 Day7 Explainer</a><a class="page-link" href="course/day9-explainer.html">📄 Day9 Explainer</a><a class="page-link" href="course/task-manager-deck.html">📄 Task Manager Deck</a></div>
+<div class="wordmark">The Vault</div>
+<div class="updated">Updated Tuesday, July 21 2026 · 10:28:55 · regenerates automatically when the vault changes</div>
 </header>
 
-<div class="stats">
-<div class="stat"><div class="n">30</div><div class="l">total notes</div></div>
-<div class="stat"><div class="n">4</div><div class="l">projects</div></div>
-<div class="stat"><div class="n">13</div><div class="l">knowledge notes</div></div>
-<div class="stat"><div class="n">1</div><div class="l">references</div></div>
-<div class="stat"><div class="n">9</div><div class="l">daily notes</div></div>
-<div class="stat"><div class="n">12</div><div class="l">recent commits</div></div>
-<a class="stat pending-stat" href="#pending"><div class="n">5</div><div class="l">pending writes</div></a>
-</div>
+<div class="stats"><button class="stat stat-tab" data-tab="__all__"><div class="n">30</div><div class="l">total notes</div></button><button class="stat stat-tab" data-tab="projects"><div class="n">4</div><div class="l">projects</div></button><button class="stat stat-tab" data-tab="knowledge"><div class="n">13</div><div class="l">knowledge notes</div></button><button class="stat stat-tab" data-tab="references"><div class="n">1</div><div class="l">references</div></button><button class="stat stat-tab" data-tab="daily"><div class="n">9</div><div class="l">daily notes</div></button><div class="stat"><div class="n">12</div><div class="l">recent commits</div></div><a class="stat pending-stat" href="#pending"><div class="n">7</div><div class="l">pending writes</div></a></div>
 
-<section id="pending"><h2>⚖️ Pending review <span class="count">5</span></h2>
+<section id="pending"><h2>Pending review <span class="count">7</span></h2>
 <div class="pending-box">
-<div class="pending-row"><span class="pstate modified">✏️ modified</span><code>INDEX.md</code></div><div class="pending-row"><span class="pstate modified">✏️ modified</span><code>course/course-so-far-deck.html</code></div><div class="pending-row"><span class="pstate modified">✏️ modified</span><code>course/overview.md</code></div><div class="pending-row"><span class="pstate new">🆕 new</span><code>daily/2026-07-20.md</code></div><div class="pending-row"><span class="pstate new">🆕 new</span><code>knowledge/the-face-frontend.md</code></div>
+<div class="pending-row"><span class="pstate modified">modified</span><code>.dashboard/generate.py</code></div><div class="pending-row"><span class="pstate new">new</span><code>.dashboard/assets/wallpaper.jpg</code></div><div class="pending-row"><span class="pstate new">new</span><code>course/the-pulse-filled.html</code></div><div class="pending-row"><span class="pstate new">new</span><code>course/wireframe-explainer.html</code></div><div class="pending-row"><span class="pstate new">new</span><code>course/wireframe-journey-deck.html</code></div><div class="pending-row"><span class="pstate new">new</span><code>course/wireframe-the-pulse.html</code></div><div class="pending-row"><span class="pstate new">new</span><code>course/wireframe.html</code></div>
 <div class="pending-actions">
-<a class="btn" href="review.html">Read the full diffs → review.html</a>
-<span class="hint">approve in terminal: <code>git add -A && git commit</code> · reject: <code>git checkout -- &lt;file&gt;</code></span>
+<a class="btn" href="review.html">Read the full diffs</a>
+<span class="hint">approve in terminal: <code>git add -A &amp;&amp; git commit</code> · reject: <code>git checkout -- &lt;file&gt;</code></span>
 </div>
 </div></section>
 
+<div class="controls">
 <input id="search" type="search" placeholder="Search notes, tags, text…">
-<div class="tagbar"><button class="tag big" data-tag="ai-workflow">#ai-workflow <b>16</b></button><button class="tag big" data-tag="course">#course <b>15</b></button><button class="tag big" data-tag="knowledge-management">#knowledge-management <b>15</b></button><button class="tag big" data-tag="cli">#cli <b>10</b></button><button class="tag big" data-tag="missiles">#missiles <b>5</b></button><button class="tag big" data-tag="hooks">#hooks <b>5</b></button><button class="tag big" data-tag="github">#github <b>4</b></button><button class="tag big" data-tag="week-3">#week-3 <b>4</b></button><button class="tag big" data-tag="week-2">#week-2 <b>3</b></button><button class="tag big" data-tag="task-manager">#task-manager <b>2</b></button><button class="tag big" data-tag="retrieval">#retrieval <b>2</b></button><button class="tag big" data-tag="frontend">#frontend <b>2</b></button><button class="tag big" data-tag="design">#design <b>2</b></button><button class="tag big" data-tag="the-pulse">#the-pulse <b>2</b></button><button class="tag big" data-tag="week-1">#week-1 <b>1</b></button><button class="tag big" data-tag="housekeeping">#housekeeping <b>1</b></button><button class="tag big" data-tag="adr">#adr <b>1</b></button><button class="tag big" data-tag="project">#project <b>1</b></button><button class="tag big" data-tag="day-12">#day-12 <b>1</b></button><button class="tag big" data-tag="warehouse">#warehouse <b>1</b></button><button class="tag big" data-tag="inventory">#inventory <b>1</b></button><button class="tag big" data-tag="sources">#sources <b>1</b></button></div>
+</div>
 
-<section><h2>🎓 Course <span class="count">2</span></h2><div class="grid"><a class="card" href="course/overview.md" data-search="4-week course — overview course ai-workflow knowledge-management what: a 4-week hands-on course; the work products live in the bash 1 workspace (terminal, git/github, and ai-assisted knowledge building)." data-tags="course,ai-workflow,knowledge-management">
-<div class="card-top" style="background:#9d4edd"></div>
+<div class="tabnav"><button class="tabbtn active" data-tab="__all__">All</button><button class="tabbtn" data-tab="course">Course</button><button class="tabbtn" data-tab="projects">Projects</button><button class="tabbtn" data-tab="knowledge">Knowledge</button><button class="tabbtn" data-tab="decisions">Decisions</button><button class="tabbtn" data-tab="references">References</button><button class="tabbtn" data-tab="daily">Daily notes</button><button class="tabbtn" data-tab="__tracker__">Tracker</button></div>
+
+<details class="tagwrap">
+<summary>Filter by tag <span class="tcount">22</span></summary>
+<div class="tagbar"><button class="tag big" data-tag="ai-workflow">#ai-workflow <b>16</b></button><button class="tag big" data-tag="course">#course <b>15</b></button><button class="tag big" data-tag="knowledge-management">#knowledge-management <b>15</b></button><button class="tag big" data-tag="cli">#cli <b>10</b></button><button class="tag big" data-tag="missiles">#missiles <b>5</b></button><button class="tag big" data-tag="hooks">#hooks <b>5</b></button><button class="tag big" data-tag="github">#github <b>4</b></button><button class="tag big" data-tag="week-3">#week-3 <b>4</b></button><button class="tag big" data-tag="week-2">#week-2 <b>3</b></button><button class="tag big" data-tag="task-manager">#task-manager <b>2</b></button><button class="tag big" data-tag="retrieval">#retrieval <b>2</b></button><button class="tag big" data-tag="frontend">#frontend <b>2</b></button><button class="tag big" data-tag="design">#design <b>2</b></button><button class="tag big" data-tag="the-pulse">#the-pulse <b>2</b></button><button class="tag big" data-tag="week-1">#week-1 <b>1</b></button><button class="tag big" data-tag="housekeeping">#housekeeping <b>1</b></button><button class="tag big" data-tag="adr">#adr <b>1</b></button><button class="tag big" data-tag="project">#project <b>1</b></button><button class="tag big" data-tag="day-12">#day-12 <b>1</b></button><button class="tag big" data-tag="warehouse">#warehouse <b>1</b></button><button class="tag big" data-tag="inventory">#inventory <b>1</b></button><button class="tag big" data-tag="sources">#sources <b>1</b></button></div>
+</details>
+
+<section class="tabpanel" data-tab="course"><h2>Course <span class="count">2</span></h2><div class="grid"><a class="card" href="course/overview.md" data-search="4-week course — overview course ai-workflow knowledge-management what: a 4-week hands-on course; the work products live in the bash 1 workspace (terminal, git/github, and ai-assisted knowledge building)." data-tags="course,ai-workflow,knowledge-management">
 <div class="card-body">
-<div class="card-head"><span class="type" style="color:#9d4edd">course</span><span class="status">active</span><span class="date">2026-07-06</span></div>
+<div class="card-head"><span class="dot" style="background:#9d4edd"></span><span class="type">course</span><span class="status">active</span><span class="date">2026-07-06</span></div>
 <h3>4-Week Course — Overview</h3>
 <p>What: a 4-week hands-on course; the work products live in the BASH 1 workspace (terminal, git/GitHub, and AI-assisted knowledge building).</p>
-<div class="meta"><span class="tag" data-tag="course">#course</span><span class="tag" data-tag="ai-workflow">#ai-workflow</span><span class="tag" data-tag="knowledge-management">#knowledge-management</span><span class="rel">↔ week-1</span><span class="rel">↔ next-gen-warfare</span><span class="rel">↔ warhouse-vault</span></div>
+<div class="meta"><span class="tag" data-tag="course">#course</span><span class="tag" data-tag="ai-workflow">#ai-workflow</span><span class="tag" data-tag="knowledge-management">#knowledge-management</span></div>
 </div></a>
 <a class="card" href="course/week-1.md" data-search="week 1 analysis (jun 29 – jul 5) course week-1 github knowledge-management ai-workflow 1. warhouse vault (~jul 1, &quot;day 2&quot;) — first knowledge-base build: a warehouse parts inventory (warhouse-vault) with 12 parts across 2 warehouses, strict frontmatter (partno, natoclass, warehouse), a never-guess rule with…" data-tags="course,week-1,github,knowledge-management,ai-workflow">
-<div class="card-top" style="background:#9d4edd"></div>
 <div class="card-body">
-<div class="card-head"><span class="type" style="color:#9d4edd">week</span><span class="date">2026-07-06</span></div>
+<div class="card-head"><span class="dot" style="background:#9d4edd"></span><span class="type">week</span><span class="date">2026-07-06</span></div>
 <h3>Week 1 Analysis (Jun 29 – Jul 5)</h3>
 <p>1. Warhouse Vault (~Jul 1, &quot;Day 2&quot;) — first knowledge-base build: a warehouse parts inventory (warhouse-vault) with 12 parts across 2 warehouses, strict frontmatter (partno, natoclass, warehouse), a never-guess rule with…</p>
-<div class="meta"><span class="tag" data-tag="course">#course</span><span class="tag" data-tag="week-1">#week-1</span><span class="tag" data-tag="github">#github</span><span class="tag" data-tag="knowledge-management">#knowledge-management</span><span class="tag" data-tag="ai-workflow">#ai-workflow</span><span class="rel">↔ overview</span><span class="rel">↔ warhouse-vault</span><span class="rel">↔ next-gen-warfare</span><span class="rel">↔ the-eight-kb-moves</span></div>
+<div class="meta"><span class="tag" data-tag="course">#course</span><span class="tag" data-tag="week-1">#week-1</span><span class="tag" data-tag="github">#github</span><span class="tag more">+2</span></div>
 </div></a></div></section>
-<section><h2>🚀 Projects <span class="count">4</span></h2><div class="grid"><a class="card" href="projects/the-pulse.md" data-search="the pulse the-pulse course day-12 ai-workflow cli one-liner: the day 12 &quot;ship something real&quot; build — give it a topic and it shows, in
+<section class="tabpanel" data-tab="projects"><h2>Projects <span class="count">4</span></h2><div class="grid"><a class="card" href="projects/the-pulse.md" data-search="the pulse the-pulse course day-12 ai-workflow cli one-liner: the day 12 &quot;ship something real&quot; build — give it a topic and it shows, in
 one clean view, what people are saying about it right now, then an ai-synthesized
 summary on top. my topic: ai agents. first platform: …" data-tags="the-pulse,course,day-12,ai-workflow,cli">
-<div class="card-top" style="background:#e63946"></div>
 <div class="card-body">
-<div class="card-head"><span class="type" style="color:#e63946">project</span><span class="status">active</span><span class="date">2026-07-16</span></div>
+<div class="card-head"><span class="dot" style="background:#e63946"></span><span class="type">project</span><span class="status">active</span><span class="date">2026-07-16</span></div>
 <h3>The Pulse</h3>
 <p>One-liner: the Day 12 &quot;Ship Something Real&quot; build — give it a topic and it shows, in
 one clean view, what people are saying about it right now, then an AI-synthesized
 summary on top. My topic: AI agents. First platform: …</p>
-<div class="meta"><span class="tag" data-tag="the-pulse">#the-pulse</span><span class="tag" data-tag="course">#course</span><span class="tag" data-tag="day-12">#day-12</span><span class="tag" data-tag="ai-workflow">#ai-workflow</span><span class="tag" data-tag="cli">#cli</span><span class="rel">↔ the-three-channel-loop</span><span class="rel">↔ the-door-reads-both-ways</span><span class="rel">↔ the-doorway-cli</span></div>
+<div class="meta"><span class="tag" data-tag="the-pulse">#the-pulse</span><span class="tag" data-tag="course">#course</span><span class="tag" data-tag="day-12">#day-12</span><span class="tag more">+2</span></div>
 </div></a>
 <a class="card" href="projects/task-manager.md" data-search="task manager v1 (end-of-week project) course task-manager adr project one-liner: the instructor&#x27;s end-of-week build — a working version 1 task manager (a single-screen app) delivered together with a set of 5 adrs that justify every design choice. decisions-first, exactly as the course teac…" data-tags="course,task-manager,adr,project">
-<div class="card-top" style="background:#e63946"></div>
 <div class="card-body">
-<div class="card-head"><span class="type" style="color:#e63946">project</span><span class="status">shipped</span><span class="date">2026-07-08</span></div>
+<div class="card-head"><span class="dot" style="background:#e63946"></span><span class="type">project</span><span class="status">shipped</span><span class="date">2026-07-08</span></div>
 <h3>Task Manager v1 (end-of-week project)</h3>
 <p>One-liner: the instructor&#x27;s end-of-week build — a working Version 1 task manager (a single-screen app) delivered together with a set of 5 ADRs that justify every design choice. Decisions-first, exactly as the course teac…</p>
-<div class="meta"><span class="tag" data-tag="course">#course</span><span class="tag" data-tag="task-manager">#task-manager</span><span class="tag" data-tag="adr">#adr</span><span class="tag" data-tag="project">#project</span><span class="rel">↔ the-doctor</span><span class="rel">↔ overview</span></div>
+<div class="meta"><span class="tag" data-tag="course">#course</span><span class="tag" data-tag="task-manager">#task-manager</span><span class="tag" data-tag="adr">#adr</span><span class="tag more">+1</span></div>
 </div></a>
 <a class="card" href="projects/next-gen-warfare.md" data-search="next-gen warfare missiles knowledge-management ai-workflow github one-liner: a non-sensitive, public-data missile knowledge base — 11 systems profiled across inventory/classes/armory, with photos, custom svg infographics, and an 11-slide presentation — built in one day by instructing a…" data-tags="missiles,knowledge-management,ai-workflow,github">
-<div class="card-top" style="background:#e63946"></div>
 <div class="card-body">
-<div class="card-head"><span class="type" style="color:#e63946">project</span><span class="status">active</span><span class="date">2026-07-02</span></div>
+<div class="card-head"><span class="dot" style="background:#e63946"></span><span class="type">project</span><span class="status">active</span><span class="date">2026-07-02</span></div>
 <h3>Next-Gen Warfare</h3>
 <p>One-liner: a non-sensitive, public-data missile knowledge base — 11 systems profiled across inventory/classes/armory, with photos, custom SVG infographics, and an 11-slide presentation — built in one day by instructing A…</p>
-<div class="meta"><span class="tag" data-tag="missiles">#missiles</span><span class="tag" data-tag="knowledge-management">#knowledge-management</span><span class="tag" data-tag="ai-workflow">#ai-workflow</span><span class="tag" data-tag="github">#github</span><span class="rel">↔ the-eight-kb-moves</span><span class="rel">↔ hypersonic-weapons</span><span class="rel">↔ mirv</span><span class="rel">↔ warhouse-vault</span></div>
+<div class="meta"><span class="tag" data-tag="missiles">#missiles</span><span class="tag" data-tag="knowledge-management">#knowledge-management</span><span class="tag" data-tag="ai-workflow">#ai-workflow</span><span class="tag more">+1</span></div>
 </div></a>
 <a class="card" href="projects/warhouse-vault.md" data-search="warhouse vault warehouse inventory knowledge-management github one-liner: a warehouse parts-inventory knowledge base — markdown notes tracking industrial parts (part number, nato supply class, warehouse location, supplier, assembly) across two warehouses, with strict never-guess rul…" data-tags="warehouse,inventory,knowledge-management,github">
-<div class="card-top" style="background:#e63946"></div>
 <div class="card-body">
-<div class="card-head"><span class="type" style="color:#e63946">project</span><span class="status">active</span><span class="date">2026-07-02</span></div>
+<div class="card-head"><span class="dot" style="background:#e63946"></span><span class="type">project</span><span class="status">active</span><span class="date">2026-07-02</span></div>
 <h3>Warhouse Vault</h3>
 <p>One-liner: a warehouse parts-inventory knowledge base — markdown notes tracking industrial parts (part number, NATO supply class, warehouse location, supplier, assembly) across two warehouses, with strict never-guess rul…</p>
-<div class="meta"><span class="tag" data-tag="warehouse">#warehouse</span><span class="tag" data-tag="inventory">#inventory</span><span class="tag" data-tag="knowledge-management">#knowledge-management</span><span class="tag" data-tag="github">#github</span><span class="rel">↔ next-gen-warfare</span><span class="rel">↔ the-eight-kb-moves</span></div>
+<div class="meta"><span class="tag" data-tag="warehouse">#warehouse</span><span class="tag" data-tag="inventory">#inventory</span><span class="tag" data-tag="knowledge-management">#knowledge-management</span><span class="tag more">+1</span></div>
 </div></a></div></section>
-<section><h2>🧠 Knowledge <span class="count">13</span></h2><div class="grid"><a class="card" href="knowledge/the-face-frontend.md" data-search="the face (a frontend for the vault) ai-workflow frontend design weeks 1–3 built the vault&#x27;s brain (notes, the vault cli, the doctor, the guard) — but
+<section class="tabpanel" data-tab="knowledge"><h2>Knowledge <span class="count">13</span></h2><div class="grid"><a class="card" href="knowledge/the-face-frontend.md" data-search="the face (a frontend for the vault) ai-workflow frontend design weeks 1–3 built the vault&#x27;s brain (notes, the vault cli, the doctor, the guard) — but
 it&#x27;s only met as a list of files in the terminal. week 4 gives it a face: a visual
 frontend so notes can be seen (grouped, dated, clic…" data-tags="ai-workflow,frontend,design">
-<div class="card-top" style="background:#2a9d8f"></div>
 <div class="card-body">
-<div class="card-head"><span class="type" style="color:#2a9d8f">note</span><span class="date">2026-07-20</span></div>
+<div class="card-head"><span class="dot" style="background:#2a9d8f"></span><span class="type">note</span><span class="date">2026-07-20</span></div>
 <h3>The Face (a frontend for the vault)</h3>
 <p>Weeks 1–3 built the vault&#x27;s brain (notes, the vault CLI, the doctor, the guard) — but
 it&#x27;s only met as a list of files in the terminal. Week 4 gives it a face: a visual
 frontend so notes can be seen (grouped, dated, clic…</p>
-<div class="meta"><span class="tag" data-tag="ai-workflow">#ai-workflow</span><span class="tag" data-tag="frontend">#frontend</span><span class="tag" data-tag="design">#design</span><span class="rel">↔ the-doorway-cli</span><span class="rel">↔ the-eight-kb-moves</span></div>
+<div class="meta"><span class="tag" data-tag="ai-workflow">#ai-workflow</span><span class="tag" data-tag="frontend">#frontend</span><span class="tag" data-tag="design">#design</span></div>
 </div></a>
 <a class="card" href="knowledge/headless-claude-as-a-free-backend.md" data-search="headless claude code as a free ai backend ai-workflow cli the-pulse course an app that needs an llm doesn&#x27;t have to pay a per-token api bill. if you already have
 claude code installed and logged in, your own app can shell out to it in headless
 mode — real claude, no separate api key, free on yo…" data-tags="ai-workflow,cli,the-pulse,course">
-<div class="card-top" style="background:#2a9d8f"></div>
 <div class="card-body">
-<div class="card-head"><span class="type" style="color:#2a9d8f">note</span><span class="date">2026-07-16</span></div>
+<div class="card-head"><span class="dot" style="background:#2a9d8f"></span><span class="type">note</span><span class="date">2026-07-16</span></div>
 <h3>Headless Claude Code as a free AI backend</h3>
 <p>An app that needs an LLM doesn&#x27;t have to pay a per-token API bill. If you already have
 Claude Code installed and logged in, your own app can shell out to it in headless
 mode — real Claude, no separate API key, free on yo…</p>
-<div class="meta"><span class="tag" data-tag="ai-workflow">#ai-workflow</span><span class="tag" data-tag="cli">#cli</span><span class="tag" data-tag="the-pulse">#the-pulse</span><span class="tag" data-tag="course">#course</span><span class="rel">↔ the-pulse</span><span class="rel">↔ the-doorway-cli</span><span class="rel">↔ the-door-reads-both-ways</span></div>
+<div class="meta"><span class="tag" data-tag="ai-workflow">#ai-workflow</span><span class="tag" data-tag="cli">#cli</span><span class="tag" data-tag="the-pulse">#the-pulse</span><span class="tag more">+1</span></div>
 </div></a>
 <a class="card" href="knowledge/the-three-channel-loop.md" data-search="the three-channel loop ai-workflow knowledge-management cli course working with an ai on a real build is one loop with three channels:" data-tags="ai-workflow,knowledge-management,cli,course">
-<div class="card-top" style="background:#2a9d8f"></div>
 <div class="card-body">
-<div class="card-head"><span class="type" style="color:#2a9d8f">note</span><span class="date">2026-07-16</span></div>
+<div class="card-head"><span class="dot" style="background:#2a9d8f"></span><span class="type">note</span><span class="date">2026-07-16</span></div>
 <h3>The three-channel loop</h3>
 <p>Working with an AI on a real build is one loop with three channels:</p>
-<div class="meta"><span class="tag" data-tag="ai-workflow">#ai-workflow</span><span class="tag" data-tag="knowledge-management">#knowledge-management</span><span class="tag" data-tag="cli">#cli</span><span class="tag" data-tag="course">#course</span><span class="rel">↔ the-doorway-cli</span><span class="rel">↔ the-house-rule</span><span class="rel">↔ the-door-reads-both-ways</span><span class="rel">↔ the-eight-kb-moves</span></div>
+<div class="meta"><span class="tag" data-tag="ai-workflow">#ai-workflow</span><span class="tag" data-tag="knowledge-management">#knowledge-management</span><span class="tag" data-tag="cli">#cli</span><span class="tag more">+1</span></div>
 </div></a>
 <a class="card" href="knowledge/the-door-reads-both-ways.md" data-search="the door reads both ways ai-workflow knowledge-management cli retrieval course the the-doorway-cli|doorway began as a write-only door: capture, adr, plan, task, done — every one a checked write. its help text admitted the gap: &quot;reads arrive on day 11.&quot; a door you can only put things into is a drawe…" data-tags="ai-workflow,knowledge-management,cli,retrieval,course">
-<div class="card-top" style="background:#2a9d8f"></div>
 <div class="card-body">
-<div class="card-head"><span class="type" style="color:#2a9d8f">note</span><span class="date">2026-07-16</span></div>
+<div class="card-head"><span class="dot" style="background:#2a9d8f"></span><span class="type">note</span><span class="date">2026-07-16</span></div>
 <h3>The door reads both ways</h3>
 <p>The the-doorway-cli|doorway began as a write-only door: capture, adr, plan, task, done — every one a checked write. Its help text admitted the gap: &quot;reads arrive on Day 11.&quot; A door you can only put things into is a drawe…</p>
-<div class="meta"><span class="tag" data-tag="ai-workflow">#ai-workflow</span><span class="tag" data-tag="knowledge-management">#knowledge-management</span><span class="tag" data-tag="cli">#cli</span><span class="tag" data-tag="retrieval">#retrieval</span><span class="tag" data-tag="course">#course</span><span class="rel">↔ the-doorway-cli</span><span class="rel">↔ the-three-channel-loop</span><span class="rel">↔ the-doctor-at-the-counter</span></div>
+<div class="meta"><span class="tag" data-tag="ai-workflow">#ai-workflow</span><span class="tag" data-tag="knowledge-management">#knowledge-management</span><span class="tag" data-tag="cli">#cli</span><span class="tag more">+2</span></div>
 </div></a>
 <a class="card" href="knowledge/the-doctor-at-the-counter.md" data-search="the doctor at the counter (validate before you file) ai-workflow knowledge-management cli day 7&#x27;s the-doctor checked notes after they were filed. day 9&#x27;s the-doorway-cli
 made the counter the only door. but the counter still filed whatever it was handed.
 day 11 posts the doctor at the counter: vault capture no…" data-tags="ai-workflow,knowledge-management,cli">
-<div class="card-top" style="background:#2a9d8f"></div>
 <div class="card-body">
-<div class="card-head"><span class="type" style="color:#2a9d8f">note</span><span class="date">2026-07-15</span></div>
+<div class="card-head"><span class="dot" style="background:#2a9d8f"></span><span class="type">note</span><span class="date">2026-07-15</span></div>
 <h3>The Doctor at the Counter (validate before you file)</h3>
 <p>Day 7&#x27;s the-doctor checked notes after they were filed. Day 9&#x27;s the-doorway-cli
 made the counter the only door. But the counter still filed whatever it was handed.
 Day 11 posts the doctor at the counter: vault capture no…</p>
-<div class="meta"><span class="tag" data-tag="ai-workflow">#ai-workflow</span><span class="tag" data-tag="knowledge-management">#knowledge-management</span><span class="tag" data-tag="cli">#cli</span><span class="rel">↔ the-doctor</span><span class="rel">↔ the-doorway-cli</span><span class="rel">↔ the-second-law</span></div>
+<div class="meta"><span class="tag" data-tag="ai-workflow">#ai-workflow</span><span class="tag" data-tag="knowledge-management">#knowledge-management</span><span class="tag" data-tag="cli">#cli</span></div>
 </div></a>
 <a class="card" href="knowledge/the-second-law.md" data-search="the second law (bricking up the wall) ai-workflow knowledge-management hooks cli day 9&#x27;s the-doorway-cli was opt-in: you could write notes through the vault
 counter, but the ai (or an editor, or a script) could still write files directly and
 skip every check. day 10 closes that hole by giving the day…" data-tags="ai-workflow,knowledge-management,hooks,cli">
-<div class="card-top" style="background:#2a9d8f"></div>
 <div class="card-body">
-<div class="card-head"><span class="type" style="color:#2a9d8f">note</span><span class="date">2026-07-14</span></div>
+<div class="card-head"><span class="dot" style="background:#2a9d8f"></span><span class="type">note</span><span class="date">2026-07-14</span></div>
 <h3>The Second Law (bricking up the wall)</h3>
 <p>Day 9&#x27;s the-doorway-cli was opt-in: you could write notes through the vault
 counter, but the AI (or an editor, or a script) could still write files directly and
 skip every check. Day 10 closes that hole by giving the Day…</p>
-<div class="meta"><span class="tag" data-tag="ai-workflow">#ai-workflow</span><span class="tag" data-tag="knowledge-management">#knowledge-management</span><span class="tag" data-tag="hooks">#hooks</span><span class="tag" data-tag="cli">#cli</span><span class="rel">↔ the-doorway-cli</span><span class="rel">↔ the-guard-hook</span><span class="rel">↔ the-doctor</span></div>
+<div class="meta"><span class="tag" data-tag="ai-workflow">#ai-workflow</span><span class="tag" data-tag="knowledge-management">#knowledge-management</span><span class="tag" data-tag="hooks">#hooks</span><span class="tag more">+1</span></div>
 </div></a>
 <a class="card" href="knowledge/the-doorway-cli.md" data-search="the doorway (a cli that checks before the write) ai-workflow knowledge-management cli day 7&#x27;s the-doctor checks the notes after they&#x27;re written. the doorway (a vault cli) checks the same rules before anything lands — a single, guarded entrance that both the human and the ai use." data-tags="ai-workflow,knowledge-management,cli">
-<div class="card-top" style="background:#2a9d8f"></div>
 <div class="card-body">
-<div class="card-head"><span class="type" style="color:#2a9d8f">note</span><span class="date">2026-07-13</span></div>
+<div class="card-head"><span class="dot" style="background:#2a9d8f"></span><span class="type">note</span><span class="date">2026-07-13</span></div>
 <h3>The Doorway (a CLI that checks before the write)</h3>
 <p>Day 7&#x27;s the-doctor checks the notes after they&#x27;re written. The doorway (a vault CLI) checks the same rules before anything lands — a single, guarded entrance that both the human and the AI use.</p>
-<div class="meta"><span class="tag" data-tag="ai-workflow">#ai-workflow</span><span class="tag" data-tag="knowledge-management">#knowledge-management</span><span class="tag" data-tag="cli">#cli</span><span class="rel">↔ the-doctor</span><span class="rel">↔ the-guard-hook</span><span class="rel">↔ the-house-rule</span></div>
+<div class="meta"><span class="tag" data-tag="ai-workflow">#ai-workflow</span><span class="tag" data-tag="knowledge-management">#knowledge-management</span><span class="tag" data-tag="cli">#cli</span></div>
 </div></a>
 <a class="card" href="knowledge/the-doctor.md" data-search="the doctor (rules → checks) ai-workflow knowledge-management hooks the the-guard-hook guards what the ai does; it never reads what a note says. a wrong type, a missing created, a dead link walk straight past it. the doctor closes that gap: a read-only script that checks every note again…" data-tags="ai-workflow,knowledge-management,hooks">
-<div class="card-top" style="background:#2a9d8f"></div>
 <div class="card-body">
-<div class="card-head"><span class="type" style="color:#2a9d8f">note</span><span class="date">2026-07-08</span></div>
+<div class="card-head"><span class="dot" style="background:#2a9d8f"></span><span class="type">note</span><span class="date">2026-07-08</span></div>
 <h3>The Doctor (rules → checks)</h3>
 <p>The the-guard-hook guards what the AI does; it never reads what a note says. A wrong type, a missing created, a dead link walk straight past it. The doctor closes that gap: a read-only script that checks every note again…</p>
-<div class="meta"><span class="tag" data-tag="ai-workflow">#ai-workflow</span><span class="tag" data-tag="knowledge-management">#knowledge-management</span><span class="tag" data-tag="hooks">#hooks</span><span class="rel">↔ the-guard-hook</span><span class="rel">↔ the-house-rule</span><span class="rel">↔ the-eight-kb-moves</span></div>
+<div class="meta"><span class="tag" data-tag="ai-workflow">#ai-workflow</span><span class="tag" data-tag="knowledge-management">#knowledge-management</span><span class="tag" data-tag="hooks">#hooks</span></div>
 </div></a>
 <a class="card" href="knowledge/the-guard-hook.md" data-search="the guard hook (promise → law) ai-workflow knowledge-management hooks day 5&#x27;s the-house-rule made the ai promise to stop before a write. a hook makes that stop a law — enforced from outside the ai, every time, whether or not the ai remembers." data-tags="ai-workflow,knowledge-management,hooks">
-<div class="card-top" style="background:#2a9d8f"></div>
 <div class="card-body">
-<div class="card-head"><span class="type" style="color:#2a9d8f">note</span><span class="date">2026-07-08</span></div>
+<div class="card-head"><span class="dot" style="background:#2a9d8f"></span><span class="type">note</span><span class="date">2026-07-08</span></div>
 <h3>The Guard Hook (promise → law)</h3>
 <p>Day 5&#x27;s the-house-rule made the AI promise to stop before a write. A hook makes that stop a law — enforced from outside the AI, every time, whether or not the AI remembers.</p>
-<div class="meta"><span class="tag" data-tag="ai-workflow">#ai-workflow</span><span class="tag" data-tag="knowledge-management">#knowledge-management</span><span class="tag" data-tag="hooks">#hooks</span><span class="rel">↔ the-house-rule</span><span class="rel">↔ the-eight-kb-moves</span></div>
+<div class="meta"><span class="tag" data-tag="ai-workflow">#ai-workflow</span><span class="tag" data-tag="knowledge-management">#knowledge-management</span><span class="tag" data-tag="hooks">#hooks</span></div>
 </div></a>
 <a class="card" href="knowledge/the-house-rule.md" data-search="the house rule ai-workflow knowledge-management reads run free, writes wait for your review. when an ai tool acts on your vault, any verb that reads (a lookup, a recall) can run on its own — nothing changes, so there is nothing to check. any verb that writes (a new no…" data-tags="ai-workflow,knowledge-management">
-<div class="card-top" style="background:#2a9d8f"></div>
 <div class="card-body">
-<div class="card-head"><span class="type" style="color:#2a9d8f">note</span><span class="date">2026-07-06</span></div>
+<div class="card-head"><span class="dot" style="background:#2a9d8f"></span><span class="type">note</span><span class="date">2026-07-06</span></div>
 <h3>The House Rule</h3>
 <p>Reads run free, writes wait for your review. When an AI tool acts on your vault, any verb that reads (a lookup, a recall) can run on its own — nothing changes, so there is nothing to check. Any verb that writes (a new no…</p>
-<div class="meta"><span class="tag" data-tag="ai-workflow">#ai-workflow</span><span class="tag" data-tag="knowledge-management">#knowledge-management</span><span class="rel">↔ the-eight-kb-moves</span></div>
+<div class="meta"><span class="tag" data-tag="ai-workflow">#ai-workflow</span><span class="tag" data-tag="knowledge-management">#knowledge-management</span></div>
 </div></a>
 <a class="card" href="knowledge/mirv.md" data-search="mirv missiles one missile carries several warheads, each steered to a different target. introduced by the us minuteman iii (1970); now standard on heavy icbms (sarmat: 10+, df-41: up to 10) and demonstrated by india in 2024 (agni-v, &quot;…" data-tags="missiles">
-<div class="card-top" style="background:#2a9d8f"></div>
 <div class="card-body">
-<div class="card-head"><span class="type" style="color:#2a9d8f">note</span><span class="date">2026-07-02</span></div>
+<div class="card-head"><span class="dot" style="background:#2a9d8f"></span><span class="type">note</span><span class="date">2026-07-02</span></div>
 <h3>MIRV</h3>
 <p>One missile carries several warheads, each steered to a different target. Introduced by the US Minuteman III (1970); now standard on heavy ICBMs (Sarmat: 10+, DF-41: up to 10) and demonstrated by India in 2024 (Agni-V, &quot;…</p>
-<div class="meta"><span class="tag" data-tag="missiles">#missiles</span><span class="rel">↔ next-gen-warfare</span><span class="rel">↔ hypersonic-weapons</span></div>
+<div class="meta"><span class="tag" data-tag="missiles">#missiles</span></div>
 </div></a>
 <a class="card" href="knowledge/hypersonic-weapons.md" data-search="hypersonic weapons missiles &quot;hypersonic&quot; ≠ just fast. every icbm warhead re-enters at mach 20+. a true hypersonic weapon sustains mach 5+ and maneuvers inside the atmosphere — the combination that defeats defenses, because interceptors rely on pred…" data-tags="missiles">
-<div class="card-top" style="background:#2a9d8f"></div>
 <div class="card-body">
-<div class="card-head"><span class="type" style="color:#2a9d8f">note</span><span class="date">2026-07-02</span></div>
+<div class="card-head"><span class="dot" style="background:#2a9d8f"></span><span class="type">note</span><span class="date">2026-07-02</span></div>
 <h3>Hypersonic Weapons</h3>
 <p>&quot;Hypersonic&quot; ≠ just fast. Every ICBM warhead re-enters at Mach 20+. A true hypersonic weapon sustains Mach 5+ and maneuvers inside the atmosphere — the combination that defeats defenses, because interceptors rely on pred…</p>
-<div class="meta"><span class="tag" data-tag="missiles">#missiles</span><span class="rel">↔ next-gen-warfare</span><span class="rel">↔ mirv</span></div>
+<div class="meta"><span class="tag" data-tag="missiles">#missiles</span></div>
 </div></a>
 <a class="card" href="knowledge/the-eight-kb-moves.md" data-search="the eight knowledge-base moves knowledge-management ai-workflow a method for building knowledge bases that are readable by humans and consumable by ai:" data-tags="knowledge-management,ai-workflow">
-<div class="card-top" style="background:#2a9d8f"></div>
 <div class="card-body">
-<div class="card-head"><span class="type" style="color:#2a9d8f">note</span><span class="date">2026-07-02</span></div>
+<div class="card-head"><span class="dot" style="background:#2a9d8f"></span><span class="type">note</span><span class="date">2026-07-02</span></div>
 <h3>The Eight Knowledge-Base Moves</h3>
 <p>A method for building knowledge bases that are readable by humans and consumable by AI:</p>
-<div class="meta"><span class="tag" data-tag="knowledge-management">#knowledge-management</span><span class="tag" data-tag="ai-workflow">#ai-workflow</span><span class="rel">↔ next-gen-warfare</span></div>
+<div class="meta"><span class="tag" data-tag="knowledge-management">#knowledge-management</span><span class="tag" data-tag="ai-workflow">#ai-workflow</span></div>
 </div></a></div></section>
-<section><h2>⚖️ Decisions <span class="count">1</span></h2><div class="grid"><a class="card" href="decisions/adr-001-decisions-folder.md" data-search="adr-001 — keep decisions as numbered adrs in a decisions/ folder knowledge-management ai-workflow " data-tags="knowledge-management,ai-workflow">
-<div class="card-top" style="background:#f4a261"></div>
+<section class="tabpanel" data-tab="decisions"><h2>Decisions <span class="count">1</span></h2><div class="grid"><a class="card" href="decisions/adr-001-decisions-folder.md" data-search="adr-001 — keep decisions as numbered adrs in a decisions/ folder knowledge-management ai-workflow " data-tags="knowledge-management,ai-workflow">
 <div class="card-body">
-<div class="card-head"><span class="type" style="color:#f4a261">adr</span><span class="status">proposed</span><span class="date">2026-07-06</span></div>
+<div class="card-head"><span class="dot" style="background:#f4a261"></span><span class="type">adr</span><span class="status">proposed</span><span class="date">2026-07-06</span></div>
 <h3>ADR-001 — Keep decisions as numbered ADRs in a decisions/ folder</h3>
 <p></p>
-<div class="meta"><span class="tag" data-tag="knowledge-management">#knowledge-management</span><span class="tag" data-tag="ai-workflow">#ai-workflow</span><span class="rel">↔ the-house-rule</span><span class="rel">↔ the-eight-kb-moves</span></div>
+<div class="meta"><span class="tag" data-tag="knowledge-management">#knowledge-management</span><span class="tag" data-tag="ai-workflow">#ai-workflow</span></div>
 </div></a></div></section>
-<section><h2>🔗 References <span class="count">1</span></h2><div class="grid"><a class="card" href="references/missile-sources.md" data-search="missile info sources missiles sources " data-tags="missiles,sources">
-<div class="card-top" style="background:#457b9d"></div>
+<section class="tabpanel" data-tab="references"><h2>References <span class="count">1</span></h2><div class="grid"><a class="card" href="references/missile-sources.md" data-search="missile info sources missiles sources " data-tags="missiles,sources">
 <div class="card-body">
-<div class="card-head"><span class="type" style="color:#457b9d">reference</span><span class="date">2026-07-02</span></div>
+<div class="card-head"><span class="dot" style="background:#457b9d"></span><span class="type">reference</span><span class="date">2026-07-02</span></div>
 <h3>Missile Info Sources</h3>
 <p></p>
 <div class="meta"><span class="tag" data-tag="missiles">#missiles</span><span class="tag" data-tag="sources">#sources</span></div>
 </div></a></div></section>
-<section><h2>📅 Daily notes <span class="count">9</span></h2><div class="grid"><a class="card" href="daily/2026-07-20.md" data-search="2026-07-20 — day 13, the face (frontend) course frontend design week 4 opens. weeks 1–3 gave the vault a brain (notes, the vault cli, the doctor, the
+<section class="tabpanel" data-tab="daily"><h2>Daily notes <span class="count">9</span></h2><div class="grid"><a class="card" href="daily/2026-07-20.md" data-search="2026-07-20 — day 13, the face (frontend) course frontend design week 4 opens. weeks 1–3 gave the vault a brain (notes, the vault cli, the doctor, the
 guard); this week gives it a face — a visual frontend so notes can be seen, not just
 dug for in the terminal." data-tags="course,frontend,design">
-<div class="card-top" style="background:#e9c46a"></div>
 <div class="card-body">
-<div class="card-head"><span class="type" style="color:#e9c46a">daily</span><span class="date">2026-07-20</span></div>
+<div class="card-head"><span class="dot" style="background:#e9c46a"></span><span class="type">daily</span><span class="date">2026-07-20</span></div>
 <h3>2026-07-20 — Day 13, the face (frontend)</h3>
 <p>Week 4 opens. Weeks 1–3 gave the vault a brain (notes, the vault CLI, the doctor, the
 guard); this week gives it a face — a visual frontend so notes can be seen, not just
@@ -298,74 +303,67 @@ dug for in the terminal.</p>
 <div class="meta"><span class="tag" data-tag="course">#course</span><span class="tag" data-tag="frontend">#frontend</span><span class="tag" data-tag="design">#design</span></div>
 </div></a>
 <a class="card" href="daily/2026-07-16.md" data-search="2026-07-16 course week-3 cli retrieval " data-tags="course,week-3,cli,retrieval">
-<div class="card-top" style="background:#e9c46a"></div>
 <div class="card-body">
-<div class="card-head"><span class="type" style="color:#e9c46a">daily</span><span class="date">2026-07-16</span></div>
+<div class="card-head"><span class="dot" style="background:#e9c46a"></span><span class="type">daily</span><span class="date">2026-07-16</span></div>
 <h3>2026-07-16</h3>
 <p></p>
-<div class="meta"><span class="tag" data-tag="course">#course</span><span class="tag" data-tag="week-3">#week-3</span><span class="tag" data-tag="cli">#cli</span><span class="tag" data-tag="retrieval">#retrieval</span></div>
+<div class="meta"><span class="tag" data-tag="course">#course</span><span class="tag" data-tag="week-3">#week-3</span><span class="tag" data-tag="cli">#cli</span><span class="tag more">+1</span></div>
 </div></a>
 <a class="card" href="daily/2026-07-15.md" data-search="2026-07-15 course week-3 cli " data-tags="course,week-3,cli">
-<div class="card-top" style="background:#e9c46a"></div>
 <div class="card-body">
-<div class="card-head"><span class="type" style="color:#e9c46a">daily</span><span class="date">2026-07-15</span></div>
+<div class="card-head"><span class="dot" style="background:#e9c46a"></span><span class="type">daily</span><span class="date">2026-07-15</span></div>
 <h3>2026-07-15</h3>
 <p></p>
 <div class="meta"><span class="tag" data-tag="course">#course</span><span class="tag" data-tag="week-3">#week-3</span><span class="tag" data-tag="cli">#cli</span></div>
 </div></a>
 <a class="card" href="daily/2026-07-14.md" data-search="2026-07-14 course week-3 hooks task-manager " data-tags="course,week-3,hooks,task-manager">
-<div class="card-top" style="background:#e9c46a"></div>
 <div class="card-body">
-<div class="card-head"><span class="type" style="color:#e9c46a">daily</span><span class="date">2026-07-14</span></div>
+<div class="card-head"><span class="dot" style="background:#e9c46a"></span><span class="type">daily</span><span class="date">2026-07-14</span></div>
 <h3>2026-07-14</h3>
 <p></p>
-<div class="meta"><span class="tag" data-tag="course">#course</span><span class="tag" data-tag="week-3">#week-3</span><span class="tag" data-tag="hooks">#hooks</span><span class="tag" data-tag="task-manager">#task-manager</span></div>
+<div class="meta"><span class="tag" data-tag="course">#course</span><span class="tag" data-tag="week-3">#week-3</span><span class="tag" data-tag="hooks">#hooks</span><span class="tag more">+1</span></div>
 </div></a>
 <a class="card" href="daily/2026-07-13.md" data-search="2026-07-13 course week-3 cli " data-tags="course,week-3,cli">
-<div class="card-top" style="background:#e9c46a"></div>
 <div class="card-body">
-<div class="card-head"><span class="type" style="color:#e9c46a">daily</span><span class="date">2026-07-13</span></div>
+<div class="card-head"><span class="dot" style="background:#e9c46a"></span><span class="type">daily</span><span class="date">2026-07-13</span></div>
 <h3>2026-07-13</h3>
 <p></p>
 <div class="meta"><span class="tag" data-tag="course">#course</span><span class="tag" data-tag="week-3">#week-3</span><span class="tag" data-tag="cli">#cli</span></div>
 </div></a>
 <a class="card" href="daily/2026-07-08.md" data-search="2026-07-08 course week-2 housekeeping " data-tags="course,week-2,housekeeping">
-<div class="card-top" style="background:#e9c46a"></div>
 <div class="card-body">
-<div class="card-head"><span class="type" style="color:#e9c46a">daily</span><span class="date">2026-07-08</span></div>
+<div class="card-head"><span class="dot" style="background:#e9c46a"></span><span class="type">daily</span><span class="date">2026-07-08</span></div>
 <h3>2026-07-08</h3>
 <p></p>
 <div class="meta"><span class="tag" data-tag="course">#course</span><span class="tag" data-tag="week-2">#week-2</span><span class="tag" data-tag="housekeeping">#housekeeping</span></div>
 </div></a>
 <a class="card" href="daily/2026-07-07.md" data-search="2026-07-07 course week-2 hooks " data-tags="course,week-2,hooks">
-<div class="card-top" style="background:#e9c46a"></div>
 <div class="card-body">
-<div class="card-head"><span class="type" style="color:#e9c46a">daily</span><span class="date">2026-07-07</span></div>
+<div class="card-head"><span class="dot" style="background:#e9c46a"></span><span class="type">daily</span><span class="date">2026-07-07</span></div>
 <h3>2026-07-07</h3>
 <p></p>
 <div class="meta"><span class="tag" data-tag="course">#course</span><span class="tag" data-tag="week-2">#week-2</span><span class="tag" data-tag="hooks">#hooks</span></div>
 </div></a>
 <a class="card" href="daily/2026-07-06.md" data-search="2026-07-06 course week-2 " data-tags="course,week-2">
-<div class="card-top" style="background:#e9c46a"></div>
 <div class="card-body">
-<div class="card-head"><span class="type" style="color:#e9c46a">daily</span><span class="date">2026-07-06</span></div>
+<div class="card-head"><span class="dot" style="background:#e9c46a"></span><span class="type">daily</span><span class="date">2026-07-06</span></div>
 <h3>2026-07-06</h3>
 <p></p>
 <div class="meta"><span class="tag" data-tag="course">#course</span><span class="tag" data-tag="week-2">#week-2</span></div>
 </div></a>
 <a class="card" href="daily/2026-07-02.md" data-search="2026-07-02 missiles github knowledge-management " data-tags="missiles,github,knowledge-management">
-<div class="card-top" style="background:#e9c46a"></div>
 <div class="card-body">
-<div class="card-head"><span class="type" style="color:#e9c46a">daily</span><span class="date">2026-07-02</span></div>
+<div class="card-head"><span class="dot" style="background:#e9c46a"></span><span class="type">daily</span><span class="date">2026-07-02</span></div>
 <h3>2026-07-02</h3>
 <p></p>
 <div class="meta"><span class="tag" data-tag="missiles">#missiles</span><span class="tag" data-tag="github">#github</span><span class="tag" data-tag="knowledge-management">#knowledge-management</span></div>
 </div></a></div></section>
 
+<section class="tabpanel hidden" data-tab="__tracker__"><h2>Tracker <span class="count">14</span></h2><div class="pagegrid"><a class="pagecard" href="review.html"><span class="pagecard-t">Review</span><span class="pagecard-go">Open</span></a><a class="pagecard" href="course/course-so-far-deck.html"><span class="pagecard-t">Course So Far Deck</span><span class="pagecard-go">Open</span></a><a class="pagecard" href="course/day10-explainer.html"><span class="pagecard-t">Day10 Explainer</span><span class="pagecard-go">Open</span></a><a class="pagecard" href="course/day11-explainer.html"><span class="pagecard-t">Day11 Explainer</span><span class="pagecard-go">Open</span></a><a class="pagecard" href="course/day5-explainer.html"><span class="pagecard-t">Day5 Explainer</span><span class="pagecard-go">Open</span></a><a class="pagecard" href="course/day6-explainer.html"><span class="pagecard-t">Day6 Explainer</span><span class="pagecard-go">Open</span></a><a class="pagecard" href="course/day7-explainer.html"><span class="pagecard-t">Day7 Explainer</span><span class="pagecard-go">Open</span></a><a class="pagecard" href="course/day9-explainer.html"><span class="pagecard-t">Day9 Explainer</span><span class="pagecard-go">Open</span></a><a class="pagecard" href="course/task-manager-deck.html"><span class="pagecard-t">Task Manager Deck</span><span class="pagecard-go">Open</span></a><a class="pagecard" href="course/the-pulse-filled.html"><span class="pagecard-t">The Pulse Filled</span><span class="pagecard-go">Open</span></a><a class="pagecard" href="course/wireframe-explainer.html"><span class="pagecard-t">Wireframe Explainer</span><span class="pagecard-go">Open</span></a><a class="pagecard" href="course/wireframe-journey-deck.html"><span class="pagecard-t">Wireframe Journey Deck</span><span class="pagecard-go">Open</span></a><a class="pagecard" href="course/wireframe-the-pulse.html"><span class="pagecard-t">Wireframe The Pulse</span><span class="pagecard-go">Open</span></a><a class="pagecard" href="course/wireframe.html"><span class="pagecard-t">Wireframe</span><span class="pagecard-go">Open</span></a></div></section>
 
-<section><h2>🕐 Recent activity (git)</h2><div class="commits"><div class="commit"><code>9a4403c</code><span class="date">2026-07-16 12:19</span><span>feed: The Pulse shipped (Day 12 project) — live X data + free AI summary</span></div><div class="commit"><code>31485b5</code><span class="date">2026-07-16 09:51</span><span>feed: Day 12 — three-channel loop + the door&#x27;s read side</span></div><div class="commit"><code>6934e59</code><span class="date">2026-07-15 11:58</span><span>Add Day 9/10/11 explainers + comprehensive &#x27;Course So Far&#x27; deck</span></div><div class="commit"><code>164326d</code><span class="date">2026-07-15 11:26</span><span>feed: Day 11 — the doctor at the counter (capture validation + sensitive check)</span></div><div class="commit"><code>8fa798d</code><span class="date">2026-07-14 12:17</span><span>feed: Day 10 (the second law) + task image/detail feature + catch-up</span></div><div class="commit"><code>0cad6ef</code><span class="date">2026-07-13 13:46</span><span>Un-mix: remove v4 roadmap artifacts wrongly tied to task-manager</span></div><div class="commit"><code>d73d2a4</code><span class="date">2026-07-13 13:37</span><span>Add v4 roadmap HTML preview (generated from plan/task files)</span></div><div class="commit"><code>051f7ca</code><span class="date">2026-07-13 12:49</span><span>feed: v4 roadmap set via the plan/task pipeline (account-safety + sync scopes)</span></div><div class="commit"><code>45e7622</code><span class="date">2026-07-13 09:56</span><span>feed: Day 9 — the doorway CLI (checks writes at the entry)</span></div><div class="commit"><code>dd3bbe0</code><span class="date">2026-07-09 12:41</span><span>Deck: add V3 (accounts) slides + real screenshots; enable Pages (.nojekyll)</span></div><div class="commit"><code>0ba6d27</code><span class="date">2026-07-09 12:34</span><span>feed: Task Manager v3 multi-user auth (ADR-014..017) + v3 screenshots</span></div><div class="commit"><code>40c39c7</code><span class="date">2026-07-09 12:16</span><span>Add real app screenshots to Task Manager deck (default board + WIP-full)</span></div></div></section>
+<section><h2>Recent activity</h2><div class="commits"><div class="commit"><code>4778e1a</code><span class="date">2026-07-20 11:06</span><span>Day 13: the face — frontend concept, SvelteKit choice, wireframe; deck + overview + index</span></div><div class="commit"><code>9a4403c</code><span class="date">2026-07-16 12:19</span><span>feed: The Pulse shipped (Day 12 project) — live X data + free AI summary</span></div><div class="commit"><code>31485b5</code><span class="date">2026-07-16 09:51</span><span>feed: Day 12 — three-channel loop + the door&#x27;s read side</span></div><div class="commit"><code>6934e59</code><span class="date">2026-07-15 11:58</span><span>Add Day 9/10/11 explainers + comprehensive &#x27;Course So Far&#x27; deck</span></div><div class="commit"><code>164326d</code><span class="date">2026-07-15 11:26</span><span>feed: Day 11 — the doctor at the counter (capture validation + sensitive check)</span></div><div class="commit"><code>8fa798d</code><span class="date">2026-07-14 12:17</span><span>feed: Day 10 (the second law) + task image/detail feature + catch-up</span></div><div class="commit"><code>0cad6ef</code><span class="date">2026-07-13 13:46</span><span>Un-mix: remove v4 roadmap artifacts wrongly tied to task-manager</span></div><div class="commit"><code>d73d2a4</code><span class="date">2026-07-13 13:37</span><span>Add v4 roadmap HTML preview (generated from plan/task files)</span></div><div class="commit"><code>051f7ca</code><span class="date">2026-07-13 12:49</span><span>feed: v4 roadmap set via the plan/task pipeline (account-safety + sync scopes)</span></div><div class="commit"><code>45e7622</code><span class="date">2026-07-13 09:56</span><span>feed: Day 9 — the doorway CLI (checks writes at the entry)</span></div><div class="commit"><code>dd3bbe0</code><span class="date">2026-07-09 12:41</span><span>Deck: add V3 (accounts) slides + real screenshots; enable Pages (.nojekyll)</span></div><div class="commit"><code>0ba6d27</code><span class="date">2026-07-09 12:34</span><span>feed: Task Manager v3 multi-user auth (ADR-014..017) + v3 screenshots</span></div></div></section>
 
-<footer>Generated by .dashboard/generate.py · rules in CLAUDE.md · feed me daily</footer>
+<footer>Generated by .dashboard/generate.py · rules in CLAUDE.md</footer>
 
 <script>
 // --- twinkling starfield background ---
@@ -375,16 +373,16 @@ let stars = [];
 function seedStars() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
-  const n = Math.floor(canvas.width * canvas.height / 3800);
+  const n = Math.floor(canvas.width * canvas.height / 5200);
   stars = Array.from({length: n}, () => ({
     x: Math.random() * canvas.width,
     y: Math.random() * canvas.height,
-    r: Math.random() * 1.4 + 0.3,
-    base: Math.random() * 0.55 + 0.25,          // base brightness
-    amp: Math.random() * 0.45 + 0.15,           // twinkle depth
-    speed: Math.random() * 1.6 + 0.3,           // twinkle speed
+    r: Math.random() * 0.8 + 0.25,              // small
+    base: Math.random() * 0.32 + 0.16,          // visible over the wallpaper tint
+    amp: Math.random() * 0.30 + 0.12,           // gentle twinkle
+    speed: Math.random() * 1.2 + 0.3,           // twinkle speed
     phase: Math.random() * Math.PI * 2,
-    hue: Math.random() < 0.12 ? '233,196,106' : (Math.random() < 0.08 ? '160,200,255' : '241,250,238')
+    hue: Math.random() < 0.55 ? '201,168,106' : '224,190,120'   // gold tones, synced to the gilt
   }));
 }
 function drawStars(t) {
@@ -395,10 +393,10 @@ function drawStars(t) {
     ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
     ctx.fillStyle = `rgba(${s.hue},${a.toFixed(3)})`;
     ctx.fill();
-    if (s.r > 1.2 && a > 0.75) {               // glow on the brightest
+    if (s.r > 0.7 && a > 0.6) {                // soft gold glow on the brightest
       ctx.beginPath();
-      ctx.arc(s.x, s.y, s.r * 2.6, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(${s.hue},${(a * 0.12).toFixed(3)})`;
+      ctx.arc(s.x, s.y, s.r * 3.2, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${s.hue},${(a * 0.14).toFixed(3)})`;
       ctx.fill();
     }
   }
@@ -414,8 +412,17 @@ if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
 
 const search = document.getElementById('search');
 let activeTag = null;
+let activeSection = '__all__';
 function apply() {
   const q = search.value.toLowerCase();
+  // 1) show only the chosen tab's panel (unless "All"), and reveal panels that hold a search/tag hit
+  document.querySelectorAll('.tabpanel').forEach(p => {
+    const t = p.dataset.tab;
+    const onTab = (t === '__tracker__') ? (activeSection === '__tracker__')
+                                        : (activeSection === '__all__' || t === activeSection);
+    p.classList.toggle('hidden', !onTab);
+  });
+  // 2) filter the cards inside the visible panels by search + tag
   document.querySelectorAll('.card').forEach(c => {
     const matchQ = !q || c.dataset.search.includes(q);
     const matchT = !activeTag || c.dataset.tags.split(',').includes(activeTag);
@@ -423,6 +430,17 @@ function apply() {
   });
 }
 search.addEventListener('input', apply);
+function activateTab(key, scroll) {
+  activeSection = key;
+  document.querySelectorAll('.tabbtn').forEach(x => x.classList.toggle('active', x.dataset.tab === key));
+  apply();
+  if (scroll) {
+    const nav = document.querySelector('.tabnav');
+    if (nav) nav.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+document.querySelectorAll('.tabbtn').forEach(b => b.addEventListener('click', () => activateTab(b.dataset.tab, false)));
+document.querySelectorAll('.stat-tab').forEach(s => s.addEventListener('click', () => activateTab(s.dataset.tab, true)));
 document.querySelectorAll('.tag').forEach(t => t.addEventListener('click', e => {
   e.preventDefault(); e.stopPropagation();
   activeTag = (activeTag === t.dataset.tag) ? null : t.dataset.tag;

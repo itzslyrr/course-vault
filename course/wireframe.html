@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wireframe — My Vault · Recent Notes</title>
+<style>
+  /* A WIREFRAME. Grey boxes, borders and labels only.
+     No colour, no real data, no JavaScript. It shows WHAT GOES WHERE. */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Helvetica, Arial, sans-serif; background: #e9e9ec; color: #555;
+         padding: 28px 16px 48px; display: flex; flex-direction: column; align-items: center; }
+
+  .caption { font-size: 12px; color: #999; letter-spacing: 1px; text-transform: uppercase;
+             margin-bottom: 14px; }
+
+  /* the "screen" we are sketching */
+  .screen { width: min(560px, 100%); background: #f6f6f7; border: 2px solid #adadad;
+            border-radius: 8px; padding: 16px; }
+
+  .wbox { border: 2px dashed #a5a5a5; border-radius: 6px; background: #fff; }
+  .lbl  { font-size: 10px; color: #9a9a9a; letter-spacing: 1px; text-transform: uppercase; }
+
+  /* header */
+  .header { display: flex; justify-content: space-between; align-items: center;
+            padding: 14px 16px; margin-bottom: 12px; }
+  .header .name { font-size: 18px; font-weight: bold; color: #666; }
+  .header .avatar { width: 30px; height: 30px; border: 2px solid #a5a5a5; border-radius: 50%; background: #e2e2e2; }
+
+  /* search */
+  .search { padding: 11px 14px; margin-bottom: 14px; color: #aaa; font-size: 13px; }
+
+  /* body: zones + notes */
+  .body { display: flex; gap: 12px; }
+  .zones { flex: 0 0 120px; padding: 12px; }
+  .zones .lbl { display: block; margin-bottom: 10px; }
+  .zone { border: 1px solid #b7b7b7; border-radius: 4px; padding: 8px 10px; margin-bottom: 8px;
+          font-size: 12px; color: #777; }
+  .zone.on { background: #e0e0e0; border-color: #9a9a9a; font-weight: bold; }
+
+  .notes { flex: 1; }
+  .notes > .lbl { display: block; margin-bottom: 10px; }
+
+  .card { border: 2px dashed #b0b0b0; border-radius: 6px; background: #fff; padding: 12px 14px; margin-bottom: 10px; }
+  .card.newest { border-width: 3px; border-color: #8f8f8f; padding: 18px 16px; }
+  .tag-newest { font-size: 9px; color: #999; letter-spacing: 1px; text-transform: uppercase; }
+
+  /* grey placeholder lines = where text will go */
+  .line { height: 10px; background: #d2d2d2; border-radius: 3px; margin: 8px 0; }
+  .card.newest .line.title { height: 14px; }
+  .line.title { width: 75%; }
+  .line.date  { width: 32%; height: 7px; background: #dedede; }
+
+  .foot { margin-top: 18px; font-size: 11px; color: #aaa; text-align: center; font-style: italic;
+          max-width: 560px; }
+</style>
+</head>
+<body>
+
+  <div class="caption">Wireframe · Day 13 · "recent notes" screen</div>
+
+  <div class="screen">
+
+    <!-- 1 · HEADER -->
+    <div class="wbox header">
+      <span class="name">My Vault</span>
+      <div class="avatar"></div>
+    </div>
+
+    <!-- 2 · SEARCH -->
+    <div class="wbox search">search your notes…</div>
+
+    <div class="body">
+
+      <!-- 3 · ZONES -->
+      <div class="wbox zones">
+        <span class="lbl">Zones</span>
+        <div class="zone on">knowledge</div>
+        <div class="zone">inbox</div>
+        <div class="zone">tasks</div>
+        <div class="zone">projects</div>
+      </div>
+
+      <!-- 4 + 5 · NOTES -->
+      <div class="notes">
+        <span class="lbl">Recent notes</span>
+
+        <!-- 4 · newest, biggest -->
+        <div class="wbox card newest">
+          <span class="tag-newest">newest</span>
+          <div class="line title"></div>
+          <div class="line" style="width:55%"></div>
+          <div class="line date"></div>
+        </div>
+
+        <!-- 5 · older, smaller -->
+        <div class="wbox card">
+          <div class="line title"></div>
+          <div class="line date"></div>
+        </div>
+        <div class="wbox card">
+          <div class="line title"></div>
+          <div class="line date"></div>
+        </div>
+        <div class="wbox card">
+          <div class="line title"></div>
+          <div class="line date"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <p class="foot">Boxes and labels only — no colour, no real words, no code. The grey lines are where each
+  note's title and date will go. The newest note is drawn biggest so the eye lands there first.</p>
+
+</body>
+</html>

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Wireframe — explained, with my vault on it</title>
+<style>
+  :root { --line:#d7d7dd; --card:#fff; --bg:#f4f4f7; --ink:#2b2b33; --mut:#8a8a95;
+           --accent:#5b6ee1; --accent-bg:#eef0ff; }
+  * { box-sizing:border-box; }
+  body { font-family:-apple-system,Helvetica,Arial,sans-serif; background:var(--bg);
+          color:var(--ink); margin:0; padding:32px 20px; line-height:1.55; }
+  .wrap { max-width:1000px; margin:0 auto; }
+  h1 { font-size:28px; margin:0 0 6px; }
+  h2 { font-size:18px; margin:34px 0 12px; }
+  .lead { color:var(--mut); font-size:15px; margin:0 0 8px; }
+  .say { background:#fff; border:1px solid var(--line); border-left:4px solid var(--accent);
+          border-radius:8px; padding:12px 16px; font-size:14px; margin:14px 0; }
+  .say b { color:var(--accent); }
+  .defbox { background:var(--accent-bg); border-radius:10px; padding:16px 18px; font-size:15px; }
+  .two { display:grid; grid-template-columns:1fr 1fr; gap:22px; align-items:start; }
+  @media (max-width:760px) { .two { grid-template-columns:1fr; } }
+  .panel { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px; }
+  .plabel { font-size:12px; text-transform:uppercase; letter-spacing:1px; color:var(--mut);
+             margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+  .plabel .dot { width:9px; height:9px; border-radius:50%; background:var(--accent); }
+  /* shared screen layout */
+  .head { border:2px dashed var(--line); border-radius:8px; padding:11px 13px; margin-bottom:10px;
+           font-weight:700; color:var(--ink); position:relative; }
+  .real .head, .real .search, .real .ztab, .real .card { border-style:solid; }
+  .search { border:2px dashed var(--line); border-radius:8px; padding:9px 13px; margin-bottom:12px;
+             color:var(--mut); font-size:13px; position:relative; }
+  .body { display:flex; gap:10px; }
+  .zcol { flex:0 0 96px; display:flex; flex-direction:column; gap:6px; position:relative; }
+  .ztab { border:1px solid var(--line); border-radius:6px; padding:6px 8px; font-size:11px;
+           color:var(--mut); display:flex; justify-content:space-between; align-items:center; }
+  .ztab.active { background:#e9e9ef; color:var(--ink); font-weight:600; }
+  .real .ztab.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+  .zn { background:rgba(0,0,0,.08); border-radius:9px; padding:0 6px; font-size:10px; }
+  .real .ztab.active .zn { background:rgba(255,255,255,.3); }
+  .main { flex:1; display:flex; flex-direction:column; gap:7px; position:relative; }
+  .card { border:2px dashed var(--line); border-radius:8px; padding:10px; position:relative; }
+  .card.big { border-width:3px; padding:14px 12px; }
+  .real .card.big { border-color:#c3c9f2; }
+  .bar { height:8px; background:var(--line); border-radius:3px; margin-bottom:6px; }
+  .bar.sm { height:6px; } .w80 { width:80%; } .w70 { width:70%; } .w40 { width:40%; } .w30 { width:30%; }
+  .rtitle { font-size:13px; font-weight:600; margin-bottom:4px; }
+  .card.big .rtitle { font-size:16px; }
+  .rdate { font-size:11px; color:var(--mut); }
+  .badge { position:absolute; top:-10px; left:-10px; width:20px; height:20px; border-radius:50%;
+            background:var(--ink); color:#fff; font-size:11px; display:flex; align-items:center;
+            justify-content:center; }
+  .badge.mut { background:var(--mut); }
+  /* legend */
+  .legend { list-style:none; padding:0; margin:16px 0 0; display:grid;
+             grid-template-columns:1fr 1fr; gap:10px; }
+  @media (max-width:600px) { .legend { grid-template-columns:1fr; } }
+  .legend li { display:flex; gap:10px; font-size:14px; color:#4a4a52; }
+  .legend .num { flex:0 0 20px; height:20px; border-radius:50%; background:var(--ink); color:#fff;
+                  font-size:11px; display:flex; align-items:center; justify-content:center; }
+  .contents { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-top:8px; }
+  @media (max-width:600px) { .contents { grid-template-columns:repeat(2,1fr); } }
+  .cbox { background:#fff; border:1px solid var(--line); border-radius:12px; padding:14px; text-align:center; }
+  .cbox .big { font-size:30px; font-weight:700; color:var(--accent); }
+  .cbox .lbl { font-size:13px; color:var(--mut); text-transform:capitalize; margin-top:2px; }
+  footer { color:var(--mut); font-size:12px; margin-top:30px; text-align:center; }
+</style></head>
+<body><div class="wrap">
+
+  <h1>My wireframe — explained</h1>
+  <p class="lead">Week 4, Day 13 · the "recent notes" screen of my vault</p>
+
+  <div class="defbox">
+    <b>A wireframe is a rough sketch of a screen, drawn before you build it.</b>
+    Like an architect's floor plan before the house exists — it shows only <i>where each
+    thing goes</i>, using plain grey boxes. No colour, no real words, no code yet.
+    It answers one question: <b>"what goes where on this screen?"</b>
+  </div>
+
+  <h2>The plan, and the same plan filled with my vault</h2>
+  <p class="lead">Left: the sketch (boxes). Right: the exact same layout, now holding my real notes.</p>
+
+  <div class="two">
+    <div class="panel">
+      <div class="plabel"><span class="dot"></span> 1 · the wireframe (the plan)</div>
+      <div class="head"><span class="badge">1</span>My Vault</div>
+      <div class="search"><span class="badge">2</span>search…</div>
+      <div class="body">
+        <div class="zcol"><span class="badge">3</span><div class="ztab active">knowledge</div>
+<div class="ztab">inbox</div>
+<div class="ztab">tasks</div>
+<div class="ztab">projects</div></div>
+        <div class="main"><div class="card big"><span class="badge">4</span><div class="bar w80"></div><div class="bar sm w40"></div></div>
+<div class="card"><span class="badge mut">5</span><div class="bar w70"></div><div class="bar sm w30"></div></div>
+<div class="card"><div class="bar w70"></div><div class="bar sm w30"></div></div>
+<div class="card"><div class="bar w70"></div><div class="bar sm w30"></div></div></div>
+      </div>
+    </div>
+
+    <div class="panel real">
+      <div class="plabel"><span class="dot"></span> 2 · my vault on it (the real thing)</div>
+      <div class="head">My Vault</div>
+      <div class="search">search…</div>
+      <div class="body">
+        <div class="zcol"><div class="ztab active">knowledge<span class="zn">20</span></div>
+<div class="ztab">inbox<span class="zn">1</span></div>
+<div class="ztab">tasks<span class="zn">0</span></div>
+<div class="ztab">projects<span class="zn">69</span></div></div>
+        <div class="main"><div class="card big"><div class="rtitle">apidirect contract: returns title/url/date/author/snippet/source; auth via X-API-Key header</div><div class="rdate">2026-07-16</div></div>
+<div class="card"><div class="rtitle">Plan the week</div><div class="rdate">2026-07-15</div></div>
+<div class="card"><div class="rtitle">vendor call notes</div><div class="rdate">2026-07-15</div></div>
+<div class="card"><div class="rtitle">a wall is part of the door</div><div class="rdate">2026-07-14</div></div>
+<div class="card"><div class="rtitle">a refusal with a clear reason beats a silent failure</div><div class="rdate">2026-07-13</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <h2>What each numbered box means</h2>
+  <ul class="legend">
+    <li><span class="num">1</span><div><b>Header</b> — the app name, always on top so you know where you are.</div></li>
+    <li><span class="num">2</span><div><b>Search</b> — type to filter your notes.</div></li>
+    <li><span class="num">3</span><div><b>Zones</b> — the vault's four drawers; click one to switch.</div></li>
+    <li><span class="num">4</span><div><b>Newest note</b> — drawn biggest so the eye lands there first (hierarchy).</div></li>
+    <li><span class="num">5</span><div><b>Older notes</b> — smaller cards below; the grey bars become each title + date.</div></li>
+  </ul>
+
+  <h2>What's actually in my vault (90 notes)</h2>
+  <div class="contents">
+    <div class="cbox"><div class="big">20</div><div class="lbl">knowledge</div></div>
+    <div class="cbox"><div class="big">1</div><div class="lbl">inbox</div></div>
+    <div class="cbox"><div class="big">0</div><div class="lbl">tasks</div></div>
+    <div class="cbox"><div class="big">69</div><div class="lbl">projects</div></div>
+  </div>
+
+  <div class="say">🎤 <b>Say:</b> "This is my wireframe — a plan of the screen, boxes only. On the right
+  is the very same layout with my real vault poured in: 20 knowledge notes, 69
+  project notes, and so on. The newest note is biggest on purpose. Next I add colour and type (Day 14),
+  then build it for real in SvelteKit (Day 15)."</div>
+
+  <footer>Generated 2026-07-20 from ~/vault · re-run build-explainer.py to refresh the real data</footer>
+</div></body></html>
