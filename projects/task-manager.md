@@ -3,6 +3,7 @@ title: Task Manager v1 (end-of-week project)
 type: project
 created: 2026-07-08
 status: shipped
+url: apps/task-manager/index.html
 tags: [course, task-manager, adr, project]
 related: ["[[the-doctor]]", "[[overview]]"]
 source: ~/vault/projects/task-manager/

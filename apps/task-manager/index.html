@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Task Manager — v2 (Kanban)</title>
+<style>
+  :root{
+    --bg:#0d1321; --surface:#1b2436; --card:#232f45; --text:#f1faee; --muted:#8d99ae;
+    --todo:#457b9d; --doing:#e9c46a; --done:#2a9d8f; --danger:#e63946; --line:rgba(255,255,255,.08);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    background:radial-gradient(ellipse at 50% -10%,#16203a 0%,#0d1321 60%);
+    min-height:100vh; color:var(--text);
+    font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; padding:36px clamp(14px,4vw,48px) 60px;
+  }
+  header{ max-width:1080px; margin:0 auto 6px; display:flex; align-items:baseline; justify-content:space-between; }
+  h1{ font-size:26px; font-weight:800; letter-spacing:-.5px; }
+  h1 span{ background:linear-gradient(135deg,var(--todo),var(--done)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+  .ver{ color:var(--muted); font-size:13px; }
+  .sub{ max-width:1080px; margin:0 auto 20px; color:var(--muted); font-size:13.5px; }
+
+  form{ max-width:1080px; margin:0 auto 22px; display:flex; gap:10px; }
+  #field{ flex:1; background:var(--surface); border:1px solid var(--line); border-radius:12px; color:var(--text); font-size:15px; padding:13px 16px; outline:none; }
+  #field:focus{ border-color:var(--todo); }
+  #field::placeholder{ color:var(--muted); }
+  button.add{ background:linear-gradient(135deg,var(--todo),#37627e); color:#fff; border:none; border-radius:12px; font-size:15px; font-weight:700; padding:0 20px; cursor:pointer; }
+  button.add:disabled{ opacity:.45; cursor:not-allowed; }
+
+  .board{ max-width:1080px; margin:0 auto; display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+  @media(max-width:760px){ .board{ grid-template-columns:1fr; } }
+
+  .col{ background:rgba(27,36,54,.6); border:1px solid var(--line); border-radius:16px; padding:14px; min-height:180px; transition:.15s; }
+  .col.over{ border-color:var(--todo); background:rgba(69,123,157,.12); }
+  .col.wipfull.over{ border-color:var(--danger); background:rgba(230,57,70,.12); }
+  .col-head{ display:flex; align-items:center; gap:8px; margin-bottom:12px; padding:0 4px; }
+  .dot{ width:10px; height:10px; border-radius:50%; flex:none; }
+  .col[data-col="todo"] .dot{ background:var(--todo); }
+  .col[data-col="doing"] .dot{ background:var(--doing); }
+  .col[data-col="done"] .dot{ background:var(--done); }
+  .col-title{ font-weight:700; font-size:14.5px; }
+  .col-count{ margin-left:auto; color:var(--muted); font-size:12.5px; }
+  .col-count.limit{ color:var(--doing); font-weight:700; }
+  .col-count.full{ color:var(--danger); font-weight:700; }
+
+  .cards{ display:flex; flex-direction:column; gap:9px; min-height:40px; }
+  .card{ background:var(--card); border:1px solid var(--line); border-left:3px solid var(--todo); border-radius:10px; padding:11px 12px; cursor:grab; animation:pop .16s ease-out; }
+  .card[data-col="doing"]{ border-left-color:var(--doing); }
+  .card[data-col="done"]{ border-left-color:var(--done); }
+  .card.dragging{ opacity:.4; }
+  @keyframes pop{ from{opacity:0; transform:translateY(-4px);} to{opacity:1; transform:none;} }
+  .card .txt{ font-size:14.5px; word-break:break-word; }
+  .card[data-col="done"] .txt{ color:var(--muted); text-decoration:line-through; }
+  .card-foot{ display:flex; align-items:center; gap:6px; margin-top:9px; }
+  .when{ color:var(--muted); font-size:11px; }
+  .card-foot .spacer{ flex:1; }
+  .mv, .del{ background:none; border:1px solid var(--line); color:var(--muted); border-radius:6px; font-size:12px; line-height:1; padding:3px 7px; cursor:pointer; }
+  .mv:hover{ color:var(--text); border-color:var(--todo); }
+  .mv:disabled{ opacity:.3; cursor:not-allowed; }
+  .mv.done-btn:hover{ color:var(--done); border-color:var(--done); }
+  .del:hover{ color:var(--danger); border-color:var(--danger); }
+  .reset{ background:none; border:1px solid var(--line); color:var(--muted); border-radius:8px; font-size:12px; padding:6px 12px; cursor:pointer; }
+  .reset:hover{ color:var(--text); border-color:var(--todo); }
+
+  .empty{ color:var(--muted); font-size:12.5px; text-align:center; padding:18px 0; opacity:.7; }
+  .toast{ position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--danger); color:#fff; padding:11px 18px; border-radius:10px; font-size:13.5px; opacity:0; pointer-events:none; transition:.25s; }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+  footer{ max-width:1080px; margin:26px auto 0; text-align:center; color:var(--muted); font-size:11.5px; }
+  footer code{ color:var(--doing); }
+</style>
+</head>
+<body>
+<header>
+  <h1>▤ <span>Task Manager</span></h1>
+  <span class="ver">v2 · Kanban</span>
+</header>
+<p class="sub">Drag a card between columns, or use the ◀ ▶ buttons · <b style="color:var(--doing)">In Progress</b> has a WIP limit of 3 · saved in this browser.</p>
+
+<form id="form">
+  <input id="field" type="text" placeholder="Add a task to “To Do”…" autocomplete="off" maxlength="200" />
+  <button class="add" id="addBtn" type="submit" disabled>Add</button>
+</form>
+
+<div style="max-width:1080px;margin:-12px auto 22px;text-align:right;">
+  <button class="reset" id="reset">↻ Reset demo cards</button>
+</div>
+
+<div class="board" id="board"></div>
+
+<div class="toast" id="toast"></div>
+<footer>Task Manager v2 · Kanban board · WIP-limited · decisions recorded as <code>ADR-006…010</code> · data in <code>localStorage</code></footer>
+
+<script>
+  // ---- Task Manager v2 (Kanban) ----
+  // ADR-006: three columns — To Do / In Progress / Done.
+  // ADR-007: cards move by drag-and-drop, with ◀ ▶ button fallback.
+  // ADR-008: data model — task = { id, text, column, createdAt }; migrates v1 (done -> column).
+  // ADR-009: WIP limit of 3 on "In Progress" — a move that would exceed it is blocked.
+  // ADR-010: ordering is per-column, newest on top.
+
+  const COLS = [
+    { key:'todo',  title:'To Do' },
+    { key:'doing', title:'In Progress', wip:3 },
+    { key:'done',  title:'Done' },
+  ];
+  const KEY = 'task-manager-v2';
+  const V1KEY = 'task-manager-v1';
+
+  const board = document.getElementById('board');
+  const form = document.getElementById('form');
+  const field = document.getElementById('field');
+  const addBtn = document.getElementById('addBtn');
+  const toast = document.getElementById('toast');
+
+  let tasks = init();
+
+  function init(){
+    // use v2 data if present
+    try { const v2 = JSON.parse(localStorage.getItem(KEY)); if (v2 && v2.length) return v2; } catch {}
+    // else migrate v1 if present (ADR-008)
+    try {
+      const v1 = JSON.parse(localStorage.getItem(V1KEY));
+      if (v1 && v1.length) return v1.map(t => ({ id:t.id, text:t.text, column: t.done ? 'done' : 'todo', createdAt:t.createdAt }));
+    } catch {}
+    // else seed dummy cards for preview
+    return seed();
+  }
+
+  function seed(){
+    const now = Date.now(), min = 60000, hr = 3600000, day = 86400000;
+    return [
+      { id:'d1', text:'Ship Task Manager v1',            column:'done',  createdAt: now - 2*day },
+      { id:'d2', text:'Write the 5 v1 ADRs',             column:'done',  createdAt: now - 2*day + hr },
+      { id:'d3', text:'Pass the doctor (clean bill)',    column:'done',  createdAt: now - day },
+      { id:'d4', text:'Build the Kanban V2 board',       column:'doing', createdAt: now - 3*hr },
+      { id:'d5', text:'Research WIP limits',             column:'doing', createdAt: now - 90*min },
+      { id:'d6', text:'Write ADR-006 → 010 for v2',      column:'todo',  createdAt: now - 40*min },
+      { id:'d7', text:'Demo the board to the instructor',column:'todo',  createdAt: now - 20*min },
+      { id:'d8', text:'Plan v3: sync across devices',    column:'todo',  createdAt: now - 5*min },
+    ];
+  }
+
+  function save(){ localStorage.setItem(KEY, JSON.stringify(tasks)); }
+  function uid(){ return Date.now().toString(36) + Math.floor(Math.random()*1e4).toString(36); }
+  function countIn(col){ return tasks.filter(t => t.column === col).length; }
+  function colDef(key){ return COLS.find(c => c.key === key); }
+
+  function relTime(ts){
+    const s = Math.floor((Date.now()-ts)/1000);
+    if (s<60) return 'just now';
+    const m=Math.floor(s/60); if(m<60) return m+'m ago';
+    const h=Math.floor(m/60); if(h<24) return h+'h ago';
+    return Math.floor(h/24)+'d ago';
+  }
+
+  function flash(msg){ toast.textContent = msg; toast.classList.add('show'); clearTimeout(flash._t); flash._t = setTimeout(()=>toast.classList.remove('show'), 1900); }
+
+  // ADR-009: can a card enter this column?
+  function canEnter(col, ignoreId){
+    const def = colDef(col);
+    if (!def.wip) return true;
+    const n = tasks.filter(t => t.column === col && t.id !== ignoreId).length;
+    return n < def.wip;
+  }
+
+  function move(id, toCol){
+    const t = tasks.find(t => t.id === id);
+    if (!t || t.column === toCol) return;
+    if (!canEnter(toCol, id)){ flash('“'+colDef(toCol).title+'” is full (WIP limit '+colDef(toCol).wip+')'); return; }
+    t.column = toCol; save(); render();
+  }
+  function add(text){
+    text = text.trim(); if (!text) return;
+    tasks.push({ id:uid(), text, column:'todo', createdAt:Date.now() });
+    save(); render();
+  }
+  function remove(id){ tasks = tasks.filter(t => t.id !== id); save(); render(); }
+
+  function render(){
+    board.innerHTML = '';
+    COLS.forEach((c, ci) => {
+      const n = countIn(c.key);
+      const col = document.createElement('div');
+      col.className = 'col'; col.dataset.col = c.key;
+      if (c.wip && n >= c.wip) col.classList.add('wipfull');
+
+      let countTxt = String(n), countCls = 'col-count';
+      if (c.wip){ countTxt = n + ' / ' + c.wip; countCls += (n >= c.wip) ? ' full' : ' limit'; }
+
+      const head = document.createElement('div');
+      head.className = 'col-head';
+      head.innerHTML = '<span class="dot"></span><span class="col-title"></span><span class="'+countCls+'">'+countTxt+'</span>';
+      head.querySelector('.col-title').textContent = c.title;
+      col.appendChild(head);
+
+      const cards = document.createElement('div');
+      cards.className = 'cards';
+      const mine = tasks.filter(t => t.column === c.key).sort((a,b) => b.createdAt - a.createdAt); // ADR-010 newest first
+      if (mine.length === 0) cards.innerHTML = '<div class="empty">— empty —</div>';
+      mine.forEach(t => cards.appendChild(cardEl(t, ci)));
+      col.appendChild(cards);
+
+      // drop zone (ADR-007)
+      col.addEventListener('dragover', e => { e.preventDefault(); col.classList.add('over'); });
+      col.addEventListener('dragleave', () => col.classList.remove('over'));
+      col.addEventListener('drop', e => { e.preventDefault(); col.classList.remove('over'); const id = e.dataTransfer.getData('text/plain'); move(id, c.key); });
+      board.appendChild(col);
+    });
+  }
+
+  function cardEl(t, colIndex){
+    const el = document.createElement('div');
+    el.className = 'card'; el.dataset.col = t.column; el.draggable = true;
+    el.innerHTML =
+      '<div class="txt"></div>'+
+      '<div class="card-foot">'+
+        '<button class="mv left" title="Move left">◀</button>'+
+        '<button class="mv right" title="Move right">▶</button>'+
+        '<button class="mv done-btn" title="Mark done">✓</button>'+
+        '<span class="when">'+relTime(t.createdAt)+'</span>'+
+        '<span class="spacer"></span>'+
+        '<button class="del" title="Delete">✕</button>'+
+      '</div>';
+    el.querySelector('.txt').textContent = t.text; // injection-safe
+    const left = el.querySelector('.left'), right = el.querySelector('.right');
+    left.disabled = colIndex === 0;
+    right.disabled = colIndex === COLS.length - 1;
+    left.onclick = () => move(t.id, COLS[colIndex-1].key);
+    right.onclick = () => move(t.id, COLS[colIndex+1].key);
+    const doneBtn = el.querySelector('.done-btn');
+    if (t.column === 'done') doneBtn.style.display = 'none';   // already done
+    else doneBtn.onclick = () => move(t.id, 'done');           // ✓ jumps straight to Done
+    el.querySelector('.del').onclick = () => remove(t.id);
+    el.addEventListener('dragstart', e => { e.dataTransfer.setData('text/plain', t.id); el.classList.add('dragging'); });
+    el.addEventListener('dragend', () => el.classList.remove('dragging'));
+    return el;
+  }
+
+  form.addEventListener('submit', e => { e.preventDefault(); add(field.value); field.value=''; addBtn.disabled=true; field.focus(); });
+  field.addEventListener('input', () => { addBtn.disabled = field.value.trim() === ''; });
+  document.getElementById('reset').addEventListener('click', () => { tasks = seed(); save(); render(); flash('Board reset to demo cards'); });
+
+  render();
+  field.focus();
+</script>
+</body>
+</html>

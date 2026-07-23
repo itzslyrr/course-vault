@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Pulse</title>
+<style>
+  :root{
+    --bg:#05070f; --surface:#111827; --line:rgba(255,255,255,.08);
+    --text:#eef2f8; --muted:#8b97ad; --accent:#5b8def; --live:#38c172; --demo:#e9c46a;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:radial-gradient(ellipse at 50% -20%,#0f1a38 0%,#070b18 50%,#03050c 100%);
+    background-attachment:fixed;min-height:100vh;
+    color:var(--text);font-family:-apple-system,'Helvetica Neue',Arial,sans-serif;padding:56px 20px 80px}
+  #stars{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none}
+  .wrap{max-width:720px;margin:0 auto;position:relative;z-index:1}
+  .eyebrow{text-transform:uppercase;letter-spacing:3px;font-size:11px;font-weight:700;color:var(--accent);opacity:.85;margin-bottom:10px}
+  h1{font-size:40px;letter-spacing:-1.2px;font-weight:800}
+  h1 span{background:linear-gradient(135deg,#7aa5ff,#b79dff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .sub{color:var(--muted);margin:8px 0 30px;font-size:15.5px}
+  form{display:flex;gap:10px;flex-wrap:wrap}
+  input,select,button{font-size:15px;border-radius:10px;border:1px solid var(--line);
+    background:var(--surface);color:var(--text);padding:12px 14px;outline:none}
+  input{flex:1;min-width:180px}
+  input:focus,select:focus{border-color:var(--accent)}
+  button{background:var(--accent);border-color:var(--accent);color:#08122b;font-weight:700;cursor:pointer}
+  button:hover{filter:brightness(1.08)}
+  button:disabled{opacity:.6;cursor:default}
+  .status{margin:22px 0 6px;min-height:22px;font-size:13.5px;color:var(--muted);display:flex;align-items:center;gap:10px}
+  .badge{font-size:11px;font-weight:800;letter-spacing:.8px;padding:2px 9px;border-radius:20px;text-transform:uppercase}
+  .badge.live{background:rgba(56,193,114,.15);color:var(--live);border:1px solid rgba(56,193,114,.4)}
+  .badge.demo{background:rgba(233,196,106,.15);color:var(--demo);border:1px solid rgba(233,196,106,.4)}
+  .card{display:block;background:rgba(17,24,39,.82);backdrop-filter:blur(3px);border:1px solid var(--line);border-radius:14px;
+    padding:16px 18px;margin-bottom:12px;text-decoration:none;color:inherit;transition:border-color .15s,transform .15s}
+  .card:hover{border-color:rgba(91,141,239,.5);transform:translateY(-2px)}
+  .card h3{font-size:16.5px;line-height:1.35;margin-bottom:7px}
+  .card p{color:var(--muted);font-size:14px;line-height:1.55}
+  .card .meta{margin-top:10px;font-size:12.5px;color:var(--muted);display:flex;gap:12px;flex-wrap:wrap}
+  .card .meta b{color:var(--text);font-weight:600}
+  /* AI summary — the upgrade. Glows and pulses so it reads as synthesized, not copy-pasted. */
+  .pulse-summary{position:relative;background:linear-gradient(135deg,rgba(91,141,239,.13),rgba(157,123,255,.11));
+    border:1px solid rgba(123,165,255,.35);border-radius:16px;padding:20px 22px;margin-bottom:22px;overflow:hidden;
+    animation:glow 3.2s ease-in-out infinite}
+  @keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(123,165,255,.10)}50%{box-shadow:0 0 26px 2px rgba(123,165,255,.28)}}
+  .pulse-summary::after{content:"";position:absolute;top:0;left:-60%;width:60%;height:100%;pointer-events:none;
+    background:linear-gradient(100deg,transparent,rgba(183,157,255,.16),transparent);animation:sweep 3.2s linear infinite}
+  @keyframes sweep{to{left:130%}}
+  .ai-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:800;letter-spacing:1.2px;
+    text-transform:uppercase;color:#d3c2ff;background:rgba(157,123,255,.16);border:1px solid rgba(157,123,255,.5);
+    border-radius:20px;padding:3px 11px;animation:aipulse 1.5s ease-in-out infinite}
+  @keyframes aipulse{0%,100%{opacity:.6}50%{opacity:1;text-shadow:0 0 10px rgba(183,157,255,.9)}}
+  .pulse-summary h2{font-size:19px;line-height:1.45;margin:13px 0 2px;position:relative}
+  .themes{margin-top:13px;display:flex;flex-direction:column;gap:10px;position:relative}
+  .theme{display:flex;gap:10px;font-size:14px;line-height:1.5}
+  .theme .dot{color:var(--accent);font-weight:800}
+  .theme b{color:var(--text)} .theme span{color:var(--muted)}
+  .sources-label{font-size:11.5px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin:4px 0 12px}
+  /* offline fallback (no LLM) — calmer, honest styling; no purple "AI" glow */
+  .pulse-summary.auto{background:rgba(27,36,54,.6);border-color:rgba(255,255,255,.10);animation:none}
+  .pulse-summary.auto::after{display:none}
+  .pulse-summary.auto .ai-badge{color:var(--demo);background:rgba(233,196,106,.12);border-color:rgba(233,196,106,.45)}
+  @media (prefers-reduced-motion:reduce){.pulse-summary,.pulse-summary::after,.ai-badge{animation:none}}
+  /* summary header row: badge · mood pill · copy button */
+  .summary-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;position:relative;z-index:1}
+  .mood{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:800;letter-spacing:.6px;
+    text-transform:uppercase;border-radius:20px;padding:3px 10px;border:1px solid}
+  .mood.positive{color:var(--live);background:rgba(56,193,114,.14);border-color:rgba(56,193,114,.45)}
+  .mood.mixed{color:var(--demo);background:rgba(233,196,106,.14);border-color:rgba(233,196,106,.45)}
+  .mood.negative{color:#f2a7a7;background:rgba(233,90,90,.14);border-color:rgba(233,90,90,.45)}
+  .copy-btn{margin-left:auto;font-size:12px;font-weight:700;color:var(--muted);background:transparent;
+    border:1px solid var(--line);border-radius:8px;padding:5px 11px;cursor:pointer;transition:color .15s,border-color .15s}
+  .copy-btn:hover{color:var(--text);border-color:var(--accent)}
+  .summary-meta{font-size:12px;color:var(--muted);margin-top:12px;position:relative;z-index:1}
+  /* recent / suggestion chips */
+  .chips{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .chip-label{font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-right:2px}
+  .chip{font-size:12.5px;color:var(--muted);background:var(--surface);border:1px solid var(--line);
+    border-radius:20px;padding:5px 12px;cursor:pointer;transition:border-color .15s,color .15s}
+  .chip:hover{border-color:var(--accent);color:var(--text)}
+  /* loading skeleton (shimmer) */
+  .skeleton{background:rgba(27,36,54,.6);border:1px solid var(--line);border-radius:16px;padding:20px 22px;margin-bottom:22px}
+  .sk-line{height:13px;border-radius:7px;margin:10px 0;
+    background:linear-gradient(90deg,rgba(255,255,255,.05),rgba(255,255,255,.15),rgba(255,255,255,.05));
+    background-size:200% 100%;animation:sk 1.3s linear infinite}
+  .sk-badge{width:160px;height:22px;border-radius:20px;margin-bottom:14px}
+  .sk-line.w90{width:90%}.sk-line.w70{width:70%}.sk-line.w50{width:50%}
+  @keyframes sk{to{background-position:-200% 0}}
+  @media (prefers-reduced-motion:reduce){.sk-line{animation:none}}
+  /* saved history panel */
+  .hist-toggle{font-size:12.5px;color:var(--muted);background:transparent;border:none;cursor:pointer;padding:8px 0 0;display:inline-flex;gap:6px;align-items:center}
+  .hist-toggle:hover{color:var(--text)}
+  .history{margin-top:10px;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .history.hidden{display:none}
+  .hist-head{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;font-size:12px;color:var(--muted);border-bottom:1px solid var(--line)}
+  .hist-clear{font-size:12px;color:var(--muted);background:transparent;border:1px solid var(--line);border-radius:6px;padding:3px 10px;cursor:pointer}
+  .hist-clear:hover{color:#f2a7a7;border-color:rgba(233,90,90,.45)}
+  .hist-row{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:transparent;border:none;border-bottom:1px solid rgba(255,255,255,.04);color:var(--text);padding:11px 14px;cursor:pointer;font-size:14px}
+  .hist-row:last-child{border-bottom:none}
+  .hist-row:hover{background:rgba(255,255,255,.03)}
+  .hist-mood{width:8px;height:8px;border-radius:50%;background:var(--muted);flex:none}
+  .hist-mood.positive{background:var(--live)}.hist-mood.mixed{background:var(--demo)}.hist-mood.negative{background:#f2a7a7}
+  .hist-topic{font-weight:600}
+  .hist-plat{color:var(--muted);font-size:12.5px}
+  .hist-when{margin-left:auto;color:var(--muted);font-size:12px;white-space:nowrap}
+  .hist-empty{padding:16px;color:var(--muted);font-size:13.5px;text-align:center}
+  .empty,.error{background:var(--surface);border:1px dashed var(--line);border-radius:14px;padding:30px;text-align:center;color:var(--muted)}
+  .error{border-color:rgba(233,90,90,.5);color:#f2a7a7}
+  .hidden{display:none}
+  footer{color:var(--muted);font-size:12px;margin-top:36px;text-align:center}
+</style>
+</head>
+<body>
+<canvas id="stars"></canvas>
+<div class="wrap">
+  <div class="eyebrow">Live social intelligence</div>
+  <h1>The <span>Pulse</span></h1>
+  <p class="sub">One topic — what people are saying about it right now, across platforms.</p>
+
+  <form id="f">
+    <input id="topic" value="AI agents" placeholder="a topic you care about" autocomplete="off">
+    <select id="platform">
+      <option value="x">X (Twitter)</option>
+      <option value="reddit">Reddit</option>
+      <option value="youtube">YouTube</option>
+    </select>
+    <button id="go" type="submit">Take the pulse</button>
+  </form>
+
+  <div class="chips" id="chips"></div>
+  <button id="histToggle" class="hist-toggle">🕘 History</button>
+  <div id="history" class="history hidden"></div>
+
+  <div class="status" id="status"></div>
+  <div id="results"></div>
+
+  <footer>The Pulse · Day 12 build · key stays server-side, never in the page</footer>
+</div>
+
+<script>
+// ── pulsing starfield ──────────────────────────────────────────────
+const sky = document.getElementById('stars');
+const sctx = sky.getContext('2d');
+let stars = [];
+function seedStars(){
+  sky.width = innerWidth; sky.height = innerHeight;
+  const n = Math.floor(innerWidth * innerHeight / 4200);
+  stars = Array.from({length:n}, () => ({
+    x: Math.random()*sky.width, y: Math.random()*sky.height,
+    r: Math.random()*1.4 + 0.3,
+    base: Math.random()*0.5 + 0.2,   // base brightness
+    amp:  Math.random()*0.45 + 0.15, // pulse depth
+    spd:  Math.random()*1.6 + 0.3,   // pulse speed
+    ph:   Math.random()*Math.PI*2,
+    hue:  Math.random()<0.10 ? '150,180,255' : (Math.random()<0.08 ? '120,150,255' : '235,240,255')
+  }));
+}
+function drawStars(t){
+  sctx.clearRect(0,0,sky.width,sky.height);
+  for(const s of stars){
+    const a = Math.max(0, Math.min(1, s.base + Math.sin(t/1000*s.spd + s.ph)*s.amp));
+    sctx.beginPath(); sctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+    sctx.fillStyle = `rgba(${s.hue},${a.toFixed(3)})`; sctx.fill();
+    if(s.r > 1.2 && a > 0.75){                       // soft glow on the brightest
+      sctx.beginPath(); sctx.arc(s.x, s.y, s.r*2.6, 0, Math.PI*2);
+      sctx.fillStyle = `rgba(${s.hue},${(a*0.12).toFixed(3)})`; sctx.fill();
+    }
+  }
+  requestAnimationFrame(drawStars);
+}
+seedStars(); addEventListener('resize', seedStars);
+if(!matchMedia('(prefers-reduced-motion: reduce)').matches){ requestAnimationFrame(drawStars); } else { drawStars(0); }
+
+// ── app ────────────────────────────────────────────────────────────
+const f = document.getElementById('f');
+const statusEl = document.getElementById('status');
+const resultsEl = document.getElementById('results');
+const goBtn = document.getElementById('go');
+
+function esc(s){ return (s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+function card(r){
+  const meta = [
+    r.author ? `<b>${esc(r.author)}</b>` : '',
+    r.date ? esc(r.date) : '',
+    r.source ? esc(r.source) : ''
+  ].filter(Boolean).join(' · ');
+  const inner = `
+    <h3>${esc(r.title) || '(untitled)'}</h3>
+    ${r.snippet ? `<p>${esc(r.snippet)}</p>` : ''}
+    <div class="meta">${meta}</div>`;
+  return r.url
+    ? `<a class="card" href="${esc(r.url)}" target="_blank" rel="noopener">${inner}</a>`
+    : `<div class="card">${inner}</div>`;
+}
+
+function moodPill(sent){
+  if(!['positive','mixed','negative'].includes(sent)) return '';
+  const icon = {positive:'▲', mixed:'◆', negative:'▼'}[sent];
+  return `<span class="mood ${sent}">${icon} ${sent}</span>`;
+}
+function summaryCard(s, meta){
+  if(!s || (!s.headline && !(s.themes && s.themes.length))) return '';
+  const themes = (s.themes || []).map(t =>
+    `<div class="theme"><span class="dot">▸</span><div><b>${esc(t.point)}</b>${t.detail ? ` — <span>${esc(t.detail)}</span>` : ''}</div></div>`
+  ).join('');
+  const isLLM = !!s.source && s.source !== 'auto';   // 'auto' = offline heuristic; anything else is a real model
+  const label = isLLM ? `✦ AI summary · ${esc(s.source)}` : '✦ auto-summary';
+  const metaLine = meta ? `<div class="summary-meta">as of ${esc(meta.time)} · ${meta.count} posts</div>` : '';
+  return `<div class="pulse-summary${isLLM ? '' : ' auto'}">
+    <div class="summary-top">
+      <span class="ai-badge">${label}</span>
+      ${moodPill(s.sentiment)}
+      <button class="copy-btn" onclick="copySummary(this)">Copy</button>
+    </div>
+    ${s.headline ? `<h2>${esc(s.headline)}</h2>` : ''}
+    ${themes ? `<div class="themes">${themes}</div>` : ''}
+    ${metaLine}
+  </div>`;
+}
+function hasSummary(s){ return s && (s.headline || (s.themes && s.themes.length)); }
+
+// --- copy the summary as plain text ---
+let lastSummary = null, lastMeta = null;
+function copySummary(btn){
+  if(!lastSummary) return;
+  const parts = [];
+  if(lastSummary.sentiment) parts.push(`Mood: ${lastSummary.sentiment}`);
+  if(lastSummary.headline) parts.push(lastSummary.headline);
+  (lastSummary.themes || []).forEach(t => parts.push(`• ${t.point}${t.detail ? ': ' + t.detail : ''}`));
+  if(lastMeta) parts.push(`\n(The Pulse — ${lastMeta.count} posts, as of ${lastMeta.time})`);
+  navigator.clipboard.writeText(parts.join('\n')).then(() => {
+    btn.textContent = 'Copied ✓'; setTimeout(() => { btn.textContent = 'Copy'; }, 1500);
+  }).catch(() => { btn.textContent = 'Copy failed'; });
+}
+
+// --- loading skeleton (shimmer) ---
+function skeleton(){
+  return `<div class="skeleton">
+    <div class="sk-line sk-badge"></div>
+    <div class="sk-line w90"></div><div class="sk-line w70"></div>
+    <div class="sk-line w50"></div><div class="sk-line w90"></div>
+  </div>`;
+}
+
+// --- recent searches / suggestion chips (localStorage) ---
+const CHIPS_KEY = 'pulse_recent';
+const SUGGEST = [{topic:'AI agents', platform:'x'}, {topic:'mechanical keyboards', platform:'reddit'}, {topic:'space launches', platform:'x'}];
+function loadRecent(){ try { return JSON.parse(localStorage.getItem(CHIPS_KEY)) || []; } catch(e){ return []; } }
+function pushRecent(topic, platform){
+  let list = loadRecent().filter(r => !(r.topic.toLowerCase() === topic.toLowerCase() && r.platform === platform));
+  list.unshift({topic, platform});
+  try { localStorage.setItem(CHIPS_KEY, JSON.stringify(list.slice(0, 6))); } catch(e){}
+  renderChips();
+}
+function renderChips(){
+  const el = document.getElementById('chips');
+  const recent = loadRecent();
+  const list = recent.length ? recent : SUGGEST;
+  el.innerHTML = `<span class="chip-label">${recent.length ? 'Recent' : 'Try'}</span>` +
+    list.map((r, i) => `<button class="chip" data-i="${i}">${esc(r.topic)} · ${esc(r.platform)}</button>`).join('');
+  el.querySelectorAll('.chip').forEach(c => c.addEventListener('click', () => {
+    const r = list[+c.dataset.i];
+    document.getElementById('topic').value = r.topic;
+    document.getElementById('platform').value = r.platform;
+    takePulse();
+  }));
+}
+
+function renderResult(data, opts){
+  opts = opts || {};
+  const topic = data.topic || document.getElementById('topic').value.trim();
+  const platform = data.platform || document.getElementById('platform').value;
+
+  if(data.error){                                     // sad path: server flagged an error
+    statusEl.innerHTML = '';
+    resultsEl.innerHTML = `<div class="error">${esc(data.error)}</div>`;
+    return;
+  }
+  if(!data.results || data.results.length === 0){     // sad path: nothing to show
+    statusEl.innerHTML = '';
+    resultsEl.innerHTML = `<div class="empty">No chatter found for “${esc(topic)}” right now. Try another topic or platform.</div>`;
+    return;
+  }
+
+  const badge = data.mode === 'live'
+    ? '<span class="badge live">live</span>'
+    : '<span class="badge demo">demo data</span>';
+  const savedNote = opts.saved ? ' <span class="badge demo">saved</span>' : '';
+  statusEl.innerHTML = `${badge}${savedNote} ${data.results.length} posts on <b>${esc(platform)}</b> for “${esc(topic)}”`;
+
+  const meta = { count: data.results.length,
+                 time: (opts.saved && data.ts) ? data.ts
+                     : new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) };
+  lastSummary = data.summary;
+  lastMeta = hasSummary(data.summary) ? meta : null;
+
+  let html = summaryCard(data.summary, meta);
+  if(data.summary_error){
+    html += `<div class="error" style="margin-bottom:18px">AI summary unavailable: ${esc(data.summary_error)}</div>`;
+  }
+  if(hasSummary(data.summary)){
+    html += `<div class="sources-label">Sources · ${data.results.length} posts</div>`;
+  }
+  html += data.results.map(card).join('');
+  resultsEl.innerHTML = html;
+
+  if(opts.record){                                    // a fresh live search — record it
+    pushRecent(topic, platform);
+    if(historyOpen) loadHistory();                    // refresh the open panel
+  }
+}
+
+async function takePulse(){
+  const topic = document.getElementById('topic').value.trim();
+  const platform = document.getElementById('platform').value;
+  if(!topic){ statusEl.textContent = 'Type a topic first.'; return; }
+
+  goBtn.disabled = true;
+  statusEl.textContent = `Taking the pulse on "${topic}" and summarizing…`;
+  resultsEl.innerHTML = skeleton();
+
+  try{
+    const res = await fetch(`/api/pulse?topic=${encodeURIComponent(topic)}&platform=${platform}`);
+    renderResult(await res.json(), {record: true});
+  }catch(e){                                          // couldn't even reach our own server
+    statusEl.innerHTML = '';
+    resultsEl.innerHTML = `<div class="error">Couldn't reach the server. Is it still running?</div>`;
+  }finally{
+    goBtn.disabled = false;
+  }
+}
+
+// --- saved history (server-side, survives restarts) ---
+const histToggle = document.getElementById('histToggle');
+const historyEl = document.getElementById('history');
+let historyOpen = false;
+histToggle.addEventListener('click', () => {
+  historyOpen = !historyOpen;
+  historyEl.classList.toggle('hidden', !historyOpen);
+  histToggle.textContent = historyOpen ? '🕘 Hide history' : '🕘 History';
+  if(historyOpen) loadHistory();
+});
+async function loadHistory(){
+  historyEl.innerHTML = '<div class="hist-empty">Loading…</div>';
+  try{
+    const data = await (await fetch('/api/history')).json();
+    const items = data.history || [];
+    if(!items.length){ historyEl.innerHTML = '<div class="hist-empty">No searches saved yet.</div>'; return; }
+    const moodClass = m => ['positive','mixed','negative'].includes(m) ? m : '';
+    historyEl.innerHTML =
+      `<div class="hist-head"><span>${items.length} saved search${items.length===1?'':'es'}</span>` +
+      `<button class="hist-clear" id="histClear">Clear</button></div>` +
+      items.map(h => `<button class="hist-row" data-id="${esc(h.id)}">
+        <span class="hist-mood ${moodClass(h.sentiment)}"></span>
+        <span class="hist-topic">${esc(h.topic)}</span>
+        <span class="hist-plat">${esc(h.platform)}</span>
+        <span class="hist-when">${esc(h.ts)} · ${h.count} posts</span>
+      </button>`).join('');
+    document.getElementById('histClear').addEventListener('click', async () => {
+      await fetch('/api/history?action=clear'); loadHistory();
+    });
+    historyEl.querySelectorAll('.hist-row').forEach(r =>
+      r.addEventListener('click', () => openHistory(r.dataset.id)));
+  }catch(e){ historyEl.innerHTML = '<div class="hist-empty">Couldn\'t load history.</div>'; }
+}
+async function openHistory(id){
+  statusEl.textContent = 'Opening saved search…';
+  resultsEl.innerHTML = skeleton();
+  try{
+    const data = await (await fetch('/api/history/' + encodeURIComponent(id))).json();
+    document.getElementById('topic').value = data.topic || '';
+    if(data.platform) document.getElementById('platform').value = data.platform;
+    renderResult(data, {saved: true});
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  }catch(e){
+    statusEl.innerHTML = '';
+    resultsEl.innerHTML = '<div class="error">Couldn\'t open that saved search.</div>';
+  }
+}
+
+f.addEventListener('submit', e => { e.preventDefault(); takePulse(); });
+renderChips();   // show recent searches / suggestions
+takePulse();     // load once on open
+</script>
+</body>
+</html>

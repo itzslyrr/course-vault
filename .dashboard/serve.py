@@ -125,10 +125,14 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         pass  # quiet
 
 
+class ThreadingServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
+    daemon_threads = True
+    allow_reuse_address = True
+
+
 def main():
     os.chdir(VAULT)
-    socketserver.TCPServer.allow_reuse_address = True
-    with socketserver.TCPServer(("127.0.0.1", PORT), Handler) as httpd:
+    with ThreadingServer(("127.0.0.1", PORT), Handler) as httpd:
         print(f"Approve server running → http://127.0.0.1:{PORT}/dashboard.html")
         print("Press Ctrl+C to stop.")
         try:

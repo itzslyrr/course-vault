@@ -3,6 +3,7 @@ title: The Pulse
 type: project
 created: 2026-07-16
 status: active
+url: apps/the-pulse/index.html
 tags: [the-pulse, course, day-12, ai-workflow, cli]
 related: ["[[the-three-channel-loop]]", "[[the-door-reads-both-ways]]", "[[the-doorway-cli]]"]
 source: conversation (UAEN Week 3 Day 12 — "Ship Something Real")

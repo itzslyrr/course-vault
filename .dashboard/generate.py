@@ -174,7 +174,7 @@ def render(notes, pending):
     # discover standalone HTML pages (explainers, review, decks) to link from the header
     pages = []
     for root, _dirs, files in os.walk(VAULT):
-        if "/.git" in root:
+        if "/.git" in root or "/apps" in root:   # apps open from their project card, not the Tracker
             continue
         for fn in sorted(files):
             if fn.endswith(".html") and fn != "dashboard.html":
